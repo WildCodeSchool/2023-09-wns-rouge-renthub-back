@@ -18,7 +18,6 @@ import {
   IsDate,
 } from "class-validator";
 import { Field, ID, InputType, ObjectType } from "type-graphql";
-import { ObjectId } from "./ObjectId";
 import { Picture } from "./Picture";
 
 @Entity()
@@ -77,8 +76,8 @@ export class User extends BaseEntity {
   @Column({ default: false })
   isVerified!: boolean;
 
-  @Column({ type: "timestamp", nullable: true })
-  @Field(() => Date, { nullable: true })
+  @Column({ type: "timestamp" })
+  @Field(() => Date)
   lastConnectionDate!: Date;
 
   @CreateDateColumn()
@@ -152,16 +151,23 @@ export class UserUpdateInput {
   nickName!: string;
 
   @Field({ nullable: true })
-  pictureId?: number;
+  dateOfBirth!: Date;
+
+  @Field({ nullable: true })
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/)
+  password!: string;
 
   @Field({ nullable: true })
   phoneNumber!: string;
 
-  @Field(() => [ObjectId], { nullable: true })
-  ads!: ObjectId[];
-
-  @Field()
+  @Field({ nullable: true })
   isVerified!: boolean;
+
+  @Field(() => ID, { nullable: true })
+  updatedBy?: number;
+
+  @Field({ nullable: true })
+  pictureId?: number;
 }
 
 @InputType()
