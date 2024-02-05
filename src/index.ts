@@ -47,7 +47,7 @@ export type UserContext = {
   id: number;
   nickName: string;
   picture: string;
-  role: Role;
+  // role: Role;
 };
 
 export interface MyContext {
