@@ -164,24 +164,30 @@ export class UsersResolver {
       throw new Error("Email non vérifié, consultez votre boite mail");
     }
 
-    const valid = await argon2.verify(user.hashedPassword, data.password);
+    // const valid = await argon2.verify(user.hashedPassword, data.password);
+    // if (!valid) {
+    //   throw new Error("Email ou mot de passe incorrect");
+    // }
+
+    // TMP before hashage, to delete before push
+    const valid = user.hashedPassword === data.password;
     if (!valid) {
       throw new Error("Email ou mot de passe incorrect");
     }
 
     const token = jwt.sign(
       {
-        exp: Math.floor(Date.now() + 2 * 60 * 60 * 1000),
+        exp: Math.floor(Date.now() + 4 * 60 * 60 * 1000),
         userId: user.id,
       },
       process.env.JWT_SECRET_KEY || ""
     );
 
     const cookie = new Cookies(context.req, context.res);
-    cookie.set("TGCookie", token, {
+    cookie.set("RentHubCookie", token, {
       httpOnly: true,
       secure: false,
-      expires: new Date(Date.now() + 2 * 60 * 60 * 1000),
+      expires: new Date(Date.now() + 4 * 60 * 60 * 1000), // verify expiration time
     });
     return user;
   }
