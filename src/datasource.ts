@@ -9,5 +9,5 @@ export const dataSource = new DataSource({
   database: process.env.POSTGRES_DB,
   entities: [`${__dirname}/entities/*.ts`],
   synchronize: true,
-  logging: true,
+  logging: process.env.DOCKER_LOGS === "true" ? true : false,
 });
