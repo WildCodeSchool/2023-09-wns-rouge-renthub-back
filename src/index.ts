@@ -1,3 +1,5 @@
+import { config } from "dotenv";
+config();
 //-----------------------------------------
 //-----------------TYPE ORM----------------
 //-----------------------------------------
@@ -47,7 +49,7 @@ export type UserContext = {
   id: number;
   nickName: string;
   picture: string;
-  role: Role;
+  role: "ADMIN" | "USER";
 };
 
 export interface MyContext {
@@ -67,7 +69,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.static(path.join(__dirname, "../public")));
 
 async function start() {
-  const port = 5000;
+  const port = process.env.BACKEND_PORT || 5000;
   const schema = await buildSchema({
     resolvers: [UsersResolver, PictureResolver],
     authChecker: customAuthChecker,
@@ -80,6 +82,7 @@ async function start() {
   });
 
   await dataSource.initialize();
+  
   await server.start();
   app.use(
     "/",
