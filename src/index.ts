@@ -24,6 +24,12 @@ import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 
 //-----------------------------------------
+//------------ENTIETIES / TYPES------------
+//-----------------------------------------
+
+import { Role } from "./entities/Role";
+
+//-----------------------------------------
 //-----------------EXPRESS-----------------
 //-----------------------------------------
 
@@ -41,7 +47,7 @@ export type UserContext = {
   id: number;
   nickName: string;
   picture: string;
-  role: "ADMIN" | "USER";
+  role: Role;
 };
 
 export interface MyContext {

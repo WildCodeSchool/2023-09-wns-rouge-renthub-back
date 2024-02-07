@@ -12,8 +12,6 @@ import { UsersResolver } from "./resolvers/Users";
 import { customAuthChecker } from "./auth";
 import { PictureResolver } from "./resolvers/Pictures";
 
-
-
 export async function getSchema() {
   const schema = await buildSchema({
     resolvers: [UsersResolver, PictureResolver],

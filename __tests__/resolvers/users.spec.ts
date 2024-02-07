@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 config();
-import { describe, it, expect, beforeAll, jest } from "@jest/globals";
+import { describe, it, expect, beforeAll } from "@jest/globals";
 import { getSchema } from "../../src/schema";
 import { GraphQLSchema, graphql, print } from "graphql";
 import { DataSource } from "typeorm";
@@ -9,14 +9,17 @@ import { mutationUserCreate } from "./graphql/mutationUserCreate";
 import { mutationUserLogin } from "./graphql/mutationUserLogin";
 import { User } from "../../src/entities/User";
 import { serialize, parse } from "cookie";
+import { queryMe } from "./graphql/queryMe";
 
-function mockContext(token?: string) {
-  const value: { context: any; token?: string } = {
-    token,
+function mockContext(renthub_token?: string) {
+  const value: { context: any; renthub_token?: string } = {
+    renthub_token,
     context: {
       req: {
         headers: {
-          cookie: token ? serialize("token", token) : undefined,
+          cookie: renthub_token
+            ? serialize("renthub_token", renthub_token)
+            : undefined,
         },
         connection: { encrypted: false },
       },
@@ -26,8 +29,8 @@ function mockContext(token?: string) {
           const parseValue = parse(
             Array.isArray(cookieValue) ? cookieValue[0] : cookieValue
           );
-          if (parseValue.token) {
-            value.token = parseValue.token;
+          if (parseValue.renthub_token) {
+            value.renthub_token = parseValue.renthub_token;
           }
         },
         headers: {},
@@ -38,11 +41,13 @@ function mockContext(token?: string) {
 }
 
 let schema: GraphQLSchema;
+let dataSource: DataSource;
+let renthub_token: string | undefined;
 
 beforeAll(async () => {
   schema = await getSchema();
 
-  const dataSource = new DataSource({
+  dataSource = new DataSource({
     ...dataSourceOptions,
     host: process.env.DB_HOST_LOCAL,
     port: Number(process.env.DB_PORT_LOCAL),
@@ -66,7 +71,7 @@ describe("TEST => users resolvers", () => {
       },
       contextValue: mock.context,
     })) as any;
-    
+
     expect(result?.data?.userCreate?.id).toBe("1");
 
     const user = await User.findOneBy({ id: result?.data?.userCreate?.id });
@@ -88,7 +93,32 @@ describe("TEST => users resolvers", () => {
       },
       contextValue: mock.context,
     })) as any;
-    
+
     expect(result?.data?.userLogin?.id).toBe("1");
+    expect(!!mock.renthub_token).toBeTruthy();
+    renthub_token = mock.renthub_token;
+  });
+
+  it("should return null if NOT connected", async () => {
+    const mock = mockContext();
+    const result = (await graphql({
+      schema,
+      source: print(queryMe), // print() is used to convert the gql string to a string
+      contextValue: mock.context,
+    })) as any;
+
+    expect(result?.data).toBeNull();
+  });
+
+  it("should return user if connected", async () => {
+    const mock = mockContext(renthub_token);
+    const result = (await graphql({
+      schema,
+      source: print(queryMe), // print() is used to convert the gql string to a string
+      contextValue: mock.context,
+    })) as any;
+
+    expect(!!result?.data?.me?.id).toBeTruthy();
+    expect(!!result?.data?.me?.email).toBeTruthy();
   });
 });

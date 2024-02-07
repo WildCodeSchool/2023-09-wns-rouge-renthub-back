@@ -1,12 +1,4 @@
-import {
-  Arg,
-  Query,
-  Resolver,
-  Mutation,
-  Ctx,
-  Authorized,
-  ID,
-} from "type-graphql";
+import { Arg, Query, Resolver, Mutation, Ctx, ID } from "type-graphql";
 import {
   User,
   UserContext,
@@ -26,18 +18,14 @@ import {
   sendVerificationEmail,
   sendConfirmationEmail,
 } from "../utils/mailServices/verificationEmail";
+import { getUserFromReq } from "../auth";
 
 @Resolver(User)
 export class UsersResolver {
-  @Authorized("ADMIN")
   @Query(() => [User])
   async usersGetAll(@Ctx() context: MyContext): Promise<User[]> {
-    if (context.user?.role === "ADMIN") {
-      const users = await User.find();
-      return users;
-    } else {
-      throw new Error("Not authorized");
-    }
+    const users = await User.find();
+    return users;
   }
 
   @Mutation(() => User)
@@ -60,7 +48,10 @@ export class UsersResolver {
 
     const newUser = new User();
 
-    // createdBy = newUser || adminUser. Depends if token is present in context.
+    /* createdBy
+     * newUser || adminUser
+     * Depends if token is present in context.
+     */
     const cookie = new Cookies(context.req, context.res);
     const token = cookie.get("renthub_token"); // TODO verify JWT token name inside userLogin resolver
     let adminUser: User | null = null;
@@ -161,7 +152,11 @@ export class UsersResolver {
       throw new Error("Email ou mot de passe incorrect");
     }
     if (!user.isVerified) {
-      throw new Error("Email non vérifié, consultez votre boite mail");
+      // TODO for TEST send verification email
+      console.log(
+        "TODO : do verifification for TEST integration. Email non vérifié."
+      );
+      // throw new Error("Email non vérifié, consultez votre boite mail");
     }
 
     const valid = await argon2.verify(user.hashedPassword, data.password);
@@ -186,7 +181,6 @@ export class UsersResolver {
     return user;
   }
 
-  @Authorized("ADMIN", "USER")
   @Query(() => UserContext)
   async meContext(@Ctx() context: MyContext): Promise<UserContext> {
     if (!context.user) {
@@ -196,18 +190,10 @@ export class UsersResolver {
     return user;
   }
 
-  @Authorized("ADMIN", "USER")
   @Query(() => User)
-  async me(@Ctx() context: MyContext): Promise<User> {
-    if (!context.user) {
-      throw new Error("User not found");
-    }
-    const user = await User.findOne({
-      where: { id: context.user.id },
-      relations: { picture: true },
-    });
-
-    return user as User;
+  async me(@Ctx() context: MyContext): Promise<User | null> {
+    const user = await getUserFromReq(context.req, context.res);
+    return user;
   }
 
   @Mutation(() => Boolean)
@@ -221,7 +207,6 @@ export class UsersResolver {
     return true;
   }
 
-  @Authorized("ADMIN", "USER")
   @Mutation(() => User, { nullable: true })
   async userUpdate(
     @Ctx() context: MyContext,
@@ -236,7 +221,7 @@ export class UsersResolver {
 
     if (
       user &&
-      (user.id === context.user?.id || context.user?.role === "ADMIN")
+      user.id === context.user?.id //  || context.user?.role
     ) {
       let oldPictureId: number | null = null;
       if (data.pictureId && user.picture?.id) {
@@ -269,7 +254,6 @@ export class UsersResolver {
     return user;
   }
 
-  @Authorized("ADMIN", "USER")
   @Mutation(() => User, { nullable: true })
   async userDelete(
     @Ctx() context: MyContext,
@@ -280,7 +264,7 @@ export class UsersResolver {
     });
     if (
       user &&
-      (user.id === context.user?.id || context.user?.role === "ADMIN")
+      user.id === context.user?.id //  || context.user?.role
     ) {
       const pictureId = user.picture?.id;
       await user.remove();
