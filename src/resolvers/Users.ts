@@ -164,13 +164,7 @@ export class UsersResolver {
       throw new Error("Email non vérifié, consultez votre boite mail");
     }
 
-    // const valid = await argon2.verify(user.hashedPassword, data.password);
-    // if (!valid) {
-    //   throw new Error("Email ou mot de passe incorrect");
-    // }
-
-    // TMP before hashage, to delete before push
-    const valid = user.hashedPassword === data.password;
+    const valid = await argon2.verify(user.hashedPassword, data.password);
     if (!valid) {
       throw new Error("Email ou mot de passe incorrect");
     }
