@@ -8,6 +8,7 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from "typeorm";
 import {
   IsEmail,
@@ -20,6 +21,7 @@ import {
 import { Field, ID, InputType, ObjectType } from "type-graphql";
 import { Picture } from "./Picture";
 import { ObjectId } from "./ObjectId";
+import { VerificationCode } from "./VerificationCode";
 
 @Entity()
 @ObjectType()
@@ -107,6 +109,13 @@ export class User extends BaseEntity {
   @JoinColumn()
   @Field({ nullable: true })
   picture?: Picture;
+
+  @OneToMany(
+    () => VerificationCode,
+    (verificationCode) => verificationCode.user,
+    { cascade: true }
+  )
+  verificationCodes!: VerificationCode[];
 }
 
 @InputType()
@@ -126,7 +135,8 @@ export class UserCreateInput {
   @Field()
   // TODO why this validation is not working?
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/, {
-    message: "Password is not valid. At least 8 characters, 1 uppercase, 1 lowercase and 1 number required!",
+    message:
+      "Password is not valid. At least 8 characters, 1 uppercase, 1 lowercase and 1 number required!",
   })
   password!: string;
 

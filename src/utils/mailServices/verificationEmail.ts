@@ -11,7 +11,7 @@ export const sendVerificationEmail = async (
     process.env.JWT_VERIFY_EMAIL_SECRET_KEY || "",
     { expiresIn: "12h" }
   );
-
+  // envoyer utilisateur à la page de vérification ? Id ?
   const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
 
   const emailParams: EmailTemplateParams = {

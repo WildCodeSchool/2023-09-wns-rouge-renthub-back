@@ -1,4 +1,5 @@
 import { ObjectId } from "../entities/ObjectId";
+import { randomBytes } from "crypto";
 
 /**
  * Merge some data on an existing database entity, it takes care of keeping existing many-to-many relations to avoid unicity constraints
@@ -32,3 +33,7 @@ export function merge(entity: any, data: any): any {
   Object.assign(entity, data);
   return entity;
 }
+
+export const generateSecurityCode = (length: number): string => {
+  return randomBytes(length).toString("hex").substring(0, length);
+};

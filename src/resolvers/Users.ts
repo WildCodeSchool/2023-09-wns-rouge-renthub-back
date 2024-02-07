@@ -26,6 +26,8 @@ import {
   sendVerificationEmail,
   sendConfirmationEmail,
 } from "../utils/mailServices/verificationEmail";
+import { generateSecurityCode } from "../utils/utils";
+import { VerificationCode } from "../entities/VerificationCode";
 
 @Resolver(User)
 export class UsersResolver {
@@ -96,12 +98,22 @@ export class UsersResolver {
     const errors = await validate(newUser);
     if (errors.length === 0) {
       await newUser.save();
-      // TODO send verification email
-      // await sendVerificationEmail(newUser.email, newUser.nickName);
-      return newUser;
-    } else {
-      throw new Error(`New User validation error : ${JSON.stringify(errors)}`);
+
+      const verificationCodeLength = 8;
+      const verificationCode = generateSecurityCode(verificationCodeLength);
+
+      const emailVerificationCode = new VerificationCode();
+      emailVerificationCode.code = verificationCode;
+      emailVerificationCode.type = "email-verification";
+      emailVerificationCode.expirationDate = new Date(
+        Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+      );
+      emailVerificationCode.user = newUser;
+
+      await emailVerificationCode.save();
+      await sendVerificationEmail(newUser.email, verificationCode);
     }
+    return newUser;
   }
 
   @Mutation(() => VerifyEmailResponse)
