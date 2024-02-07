@@ -7,6 +7,7 @@ import {
   JoinColumn,
   ManyToOne,
   CreateDateColumn,
+  UpdateDateColumn,
 } from "typeorm";
 import {
   IsEmail,
@@ -93,8 +94,8 @@ export class User extends BaseEntity {
   @Field(() => User)
   createdBy!: User;
 
-  @Column({ type: "timestamp", nullable: true })
-  @Field(() => Date, { nullable: true })
+  @UpdateDateColumn()
+  @Field(() => Date)
   updatedAt!: Date;
 
   @ManyToOne(() => User, (user) => user.updatedBy, { nullable: true })
