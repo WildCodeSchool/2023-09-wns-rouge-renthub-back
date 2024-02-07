@@ -43,7 +43,7 @@ VALUES
   ('Planches de natation', 4, true, 'admin', NOW(), 4);
 
 
-
+-- image to category fake data
 INSERT INTO picture (filename, "createdBy", "updatedBy", "urlHD", "urlMiniature")
 VALUES 
     ('surfboard.jpg', 'admin', NULL, 'http://example.com/images/surfboard_hd.jpg', 'http://example.com/images/surfboard_thumb.jpg'),

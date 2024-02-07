@@ -34,8 +34,8 @@ export class Picture extends BaseEntity {
   @Field()
   filename: string
 
-  @Column()
-  @Field()
+  @Column({ nullable: true })
+  @Field({ nullable: true })
   urlHD: string
 
   @Column({ nullable: true })
