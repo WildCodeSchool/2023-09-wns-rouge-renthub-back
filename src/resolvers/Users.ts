@@ -184,10 +184,10 @@ export class UsersResolver {
     );
 
     const cookie = new Cookies(context.req, context.res);
-    cookie.set("RentHubCookie", token, {
+    cookie.set("renthub_token", token, {
       httpOnly: true,
       secure: false,
-      expires: new Date(Date.now() + 4 * 60 * 60 * 1000), // verify expiration time
+      expires: new Date(Date.now() + 4 * 60 * 60 * 1000),
     });
     return user;
   }
