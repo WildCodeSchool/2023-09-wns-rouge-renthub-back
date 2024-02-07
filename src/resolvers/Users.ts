@@ -111,7 +111,7 @@ export class UsersResolver {
       emailVerificationCode.user = newUser;
 
       await emailVerificationCode.save();
-      await sendVerificationEmail(newUser.email, verificationCode);
+      await sendVerificationEmail(newUser.id, newUser.email, verificationCode);
     }
     return newUser;
   }
@@ -151,7 +151,7 @@ export class UsersResolver {
       }
     } catch (error) {
       if (error instanceof jwt.TokenExpiredError && userEmail && userNickName) {
-        await sendVerificationEmail(userEmail, userNickName);
+        // await sendVerificationEmail(userEmail, userNickName);
         return {
           success: false,
           message:

@@ -3,23 +3,19 @@ import { sendEmail, EmailOptions } from "./nodeMailer";
 import { EmailTemplateParams, createEmailTemplate } from "./emailTemplate";
 
 export const sendVerificationEmail = async (
+  userId: number,
   userEmail: string,
-  userFirstName: string
+  userCode: string
 ) => {
-  const token = jwt.sign(
-    { email: userEmail, firstName: userFirstName },
-    process.env.JWT_VERIFY_EMAIL_SECRET_KEY || "",
-    { expiresIn: "12h" }
-  );
-  // envoyer utilisateur à la page de vérification ? Id ?
-  const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+  const verificationLink = `${process.env.FRONTEND_URL}/verify-email?userId=${userId}`;
 
   const emailParams: EmailTemplateParams = {
     content: `<div class="header">
-    Bonjour ${userFirstName},
+    Bonjour,
   </div>
   <div class="content">
-    <p>Cliquez sur le bouton ci-dessous pour valider votre inscription et rejoindre notre communauté !</p>
+    <p>Votre code de vérification est : <strong>${userCode}</strong></p>
+    <p>Cliquez sur le lien ci-dessous pour valider votre inscription et rejoindre notre communauté !</p>
     <a href="${verificationLink}" class="button">Vérifiez votre email</a>
   </div>
   <div class="footer">
