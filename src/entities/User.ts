@@ -131,10 +131,9 @@ export class UserCreateInput {
   dateOfBirth!: string;
 
   @Field()
-  // TODO why this validation is not working?
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/, {
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()_+]{8,}$/, {
     message:
-      "Password is not valid. At least 8 characters, 1 uppercase, 1 lowercase and 1 number required!",
+      "Password is not valid. At least 8 characters, 1 uppercase, 1 lowercase, 1 special characters and 1 number required!",
   })
   password!: string;
 
