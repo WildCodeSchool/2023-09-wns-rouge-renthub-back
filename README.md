@@ -13,6 +13,16 @@ E-commerce. Sports equipment rental.
   * with docker and docker-compose.yaml. Command in root : `docker compose up`
   * `npm run start`
 
+
+### COMMANDS scripts
+- `npm run start`
+- `npm run test` => testing app with jest library
+- `npm run build` => build an app
+
+### TESTING with jest
+- `jest.config.ts` is present in the root. Configure if needed.
+- Create test in the app and execute command in root : `npm run test`
+
 ### SUPPORT
   - `docker-compose.yaml` : 
       services:
