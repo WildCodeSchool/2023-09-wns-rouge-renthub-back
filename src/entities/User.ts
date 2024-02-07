@@ -6,8 +6,8 @@ import {
   OneToOne,
   JoinColumn,
   ManyToOne,
-  UpdateDateColumn,
   CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm'
 import {
   IsEmail,
@@ -19,6 +19,7 @@ import {
 } from 'class-validator'
 import { Field, ID, InputType, ObjectType } from 'type-graphql'
 import { Picture } from './Picture'
+import { ObjectId } from './ObjectId'
 
 @Entity()
 @ObjectType()
@@ -27,30 +28,34 @@ export class User extends BaseEntity {
   @Field(() => ID)
   id!: number
 
-  @Column({ length: 50 })
+  @Column({ length: 50, nullable: true })
+  @IsOptional()
   @Length(2, 50, { message: 'Entre 2 et 50 caractères' })
   @Matches(/^[a-zA-ZÀ-ÿ-]+$/, {
     message: 'Le prénom ne doit contenir que des lettres',
   })
-  @Field()
+  @Field({ nullable: true })
   firstName!: string
 
-  @Column({ length: 50 })
+  @Column({ length: 50, nullable: true })
+  @IsOptional()
   @Length(2, 50, { message: 'Entre 2 et 50 caractères' })
   @Matches(/^[a-zA-ZÀ-ÿ-]+$/, {
     message: 'Le nom de famille ne doit contenir que des lettres',
   })
-  @Field()
+  @Field({ nullable: true })
   lastName!: string
 
   @Column({ length: 50, nullable: true })
+  @IsOptional()
   @Length(2, 50, { message: 'Entre 2 et 50 caractères' })
   @Field({ nullable: true })
   nickName!: string
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', nullable: true })
+  @IsOptional()
   @IsDate({ message: 'Doit être une date valide' })
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   dateOfBirth!: Date
 
   @Column({ length: 250 })
@@ -74,13 +79,14 @@ export class User extends BaseEntity {
   email!: string
 
   @Column({ default: false })
+  @Field()
   isVerified!: boolean
 
-  @Column({ type: 'timestamp' })
-  @Field(() => Date)
+  @Column({ type: 'timestamp', nullable: true })
+  @Field(() => Date, { nullable: true })
   lastConnectionDate!: Date
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp' })
   @Field(() => Date)
   createdAt!: Date
 
@@ -92,11 +98,12 @@ export class User extends BaseEntity {
   @Field(() => Date)
   updatedAt!: Date
 
-  @ManyToOne(() => User, (user) => user.updatedBy)
-  @Field(() => User)
+  @ManyToOne(() => User, (user) => user.updatedBy, { nullable: true })
+  @Field(() => User, { nullable: true })
   updatedBy!: User
 
   @OneToOne(() => Picture, { nullable: true })
+  @IsOptional()
   @JoinColumn()
   @Field({ nullable: true })
   picture?: Picture
@@ -108,39 +115,37 @@ export class User extends BaseEntity {
 
 @InputType()
 export class UserCreateInput {
-  @Field()
+  @Field({ nullable: true })
   firstName!: string
 
-  @Field()
+  @Field({ nullable: true })
   lastName!: string
 
-  @Field()
+  @Field({ nullable: true })
   nickName!: string
 
-  @Field()
-  dateOfBirth!: Date
+  @Field({ nullable: true })
+  dateOfBirth!: string
 
   @Field()
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/)
+  // TODO why this validation is not working?
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/, {
+    message:
+      'Password is not valid. At least 8 characters, 1 uppercase, 1 lowercase and 1 number required!',
+  })
   password!: string
 
   @Field({ nullable: true })
   phoneNumber?: string
 
   @Field()
+  @Matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, {
+    message: 'Email is not valid!',
+  })
   email!: string
 
-  @Field()
-  isVerified!: boolean
-
-  @Field(() => ID)
-  createdBy?: number
-
-  @Field(() => ID)
-  updatedBy?: number
-
   @Field({ nullable: true })
-  pictureId?: number
+  pictureId?: ObjectId
 }
 
 @InputType()

@@ -16,7 +16,6 @@ import {
   VerifyEmailResponse,
 } from "../entities/User";
 import { validate } from "class-validator";
-import { currentDate } from "../utils/date";
 import * as argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { MyContext } from "../index";
@@ -43,25 +42,51 @@ export class UsersResolver {
 
   @Mutation(() => User)
   async userCreate(
+    @Ctx() context: MyContext,
     @Arg("data", () => UserCreateInput) data: UserCreateInput
   ): Promise<User> {
+    // Validate input data before creating User entity
+    const inputsDataErrors = await validate(data);
+    if (inputsDataErrors.length > 0) {
+      throw new Error(
+        `Inputs data validation error : ${JSON.stringify(inputsDataErrors)}`
+      );
+    }
+
     const existingUser = await User.findOne({ where: { email: data.email } });
     if (existingUser) {
       throw new Error("User already exists");
     }
 
-    const registrationDate = currentDate();
     const newUser = new User();
-    Object.assign(newUser, data, { registrationDate });
 
-    if (data.pictureId) {
-      const picture = await Picture.findOne({ where: { id: data.pictureId } });
-      if (!picture) {
-        throw new Error("Picture not found");
+    // createdBy = newUser || adminUser. Depends if token is present in context.
+    const cookie = new Cookies(context.req, context.res);
+    const token = cookie.get("renthub_token"); // TODO verify JWT token name inside userLogin resolver
+    let adminUser: User | null = null;
+    if (token) {
+      const payload = jwt.verify(token, process.env.JWT_SECRET_KEY || "");
+      if (typeof payload === "object" && "userId" in payload) {
+        const user = await User.findOne({
+          where: { id: payload.userId },
+          relations: {
+            picture: true,
+            // TODO add relations to adminUser if needed. For example Role.
+          },
+        });
+        // TODO add extra condition : if(adminUser.role === "ADMIN" || adminUser.role === "SUPERADMIN")
+        adminUser = user;
+      } else {
+        throw new Error("Token invalid");
       }
-      newUser.picture = picture;
     }
 
+    Object.assign(newUser, data, {
+      dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
+      createdBy: adminUser || newUser,
+    });
+
+    //
     try {
       newUser.hashedPassword = await argon2.hash(data.password);
     } catch (error) {
@@ -71,10 +96,11 @@ export class UsersResolver {
     const errors = await validate(newUser);
     if (errors.length === 0) {
       await newUser.save();
-      await sendVerificationEmail(newUser.email, newUser.nickName);
+      // TODO send verification email
+      // await sendVerificationEmail(newUser.email, newUser.nickName);
       return newUser;
     } else {
-      throw new Error(`Error occured: ${JSON.stringify(errors)}`);
+      throw new Error(`New User validation error : ${JSON.stringify(errors)}`);
     }
   }
 
