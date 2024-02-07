@@ -18,18 +18,10 @@ import { createImage } from "./utils/pictureServices/pictureServices";
 //----------GRAPHQL / APOLLO SERVER--------
 //-----------------------------------------
 
-import { buildSchema } from "type-graphql";
+import { getSchema } from "./schema";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
-
-//-----------------------------------------
-//-----------------RESOLVERS---------------
-//-----------------------------------------
-
-import { UsersResolver } from "./resolvers/Users";
-import { customAuthChecker } from "./auth";
-import { PictureResolver } from "./resolvers/Pictures";
 
 //-----------------------------------------
 //-----------------EXPRESS-----------------
@@ -70,10 +62,8 @@ app.use(express.static(path.join(__dirname, "../public")));
 
 async function start() {
   const port = process.env.BACKEND_PORT || 5000;
-  const schema = await buildSchema({
-    resolvers: [UsersResolver, PictureResolver],
-    authChecker: customAuthChecker,
-  });
+  
+  const schema = await getSchema();
 
   const httpServer = http.createServer(app);
   const server = new ApolloServer({
