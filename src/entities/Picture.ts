@@ -1,9 +1,10 @@
 import {
   BaseEntity,
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -14,6 +15,17 @@ import { Category } from './Category'
 @Entity()
 @ObjectType()
 export class Picture extends BaseEntity {
+  @BeforeInsert()
+  updateDatesOnInsert() {
+    this.createdAt = new Date()
+    this.updatedAt = new Date()
+  }
+
+  @BeforeUpdate()
+  updateDatesOnUpdate() {
+    this.updatedAt = new Date()
+  }
+
   @PrimaryGeneratedColumn()
   @Field(() => ID)
   id: number
@@ -54,4 +66,13 @@ export class Picture extends BaseEntity {
 export class PictureCreateInput {
   @Field()
   filename: string
+
+  @Field()
+  urlHD: string
+
+  @Field({ nullable: true })
+  urlMiniature: string
+
+  @Field({ nullable: true })
+  createdBy: string
 }

@@ -13,12 +13,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm'
 import { Field, ID, InputType, ObjectType } from 'type-graphql'
-import { Picture } from './Picture'
+import { Picture, PictureCreateInput } from './Picture'
 
 @Entity()
 @ObjectType()
 export class Category {
-
   @BeforeInsert()
   updateDatesOnInsert() {
     this.createdAt = new Date()
@@ -34,7 +33,7 @@ export class Category {
   @Field(() => ID)
   id: number
 
-  @Column({ length: 50 })
+  @Column({ length: 50, unique: true })
   @Field()
   name: string
 
@@ -67,18 +66,20 @@ export class Category {
   @Field(() => Category, { nullable: true })
   parentCategory?: Category
 
-  @OneToMany(() => Category, (category) => category.parentCategory)
+  @OneToMany(() => Category, (category) => category.parentCategory, {
+    cascade: true,
+  })
   @Field(() => [Category], { nullable: true })
   childCategories?: Category[]
 
   @OneToOne(() => Picture)
-  @JoinColumn({ name: 'pictureId', referencedColumnName: 'id' }) // Vous pouvez spécifier des options dans JoinColumn si nécessaire
+  @JoinColumn({ name: 'pictureId', referencedColumnName: 'id' })
   @Field(() => Picture, { nullable: true })
-  picture?: Picture // Utilisation de ? pour indiquer qu'il est facultatif
+  picture?: Picture
 }
 
 @InputType()
-export class CategoryInput {
+export class CategoryCreateInput {
   @Field()
   name: string
 
@@ -93,4 +94,29 @@ export class CategoryInput {
 
   @Field(() => ID, { nullable: true })
   parentCategoryId: number
+
+  // @Field(() => PictureCreateInput, { nullable: true })
+  // picture?: PictureCreateInput
+}
+
+@InputType()
+export class CategoryUpdateInput {
+  @Field(() => ID)
+  id: number
+
+  @Field({ nullable: true })
+  name?: string
+
+  @Field(() => ID, { nullable: true })
+  index?: number
+
+  @Field(() => Boolean, { nullable: true })
+  display?: boolean
+
+  @Field()
+  updatedBy: string
+  
+  @Field(() => ID, { nullable: true })
+  parentCategoryId: number
+
 }
