@@ -1,13 +1,13 @@
 export type EmailTemplateParams = {
-  content: string;
-  title: string;
+	content: string;
+	title: string;
 };
 
 export const createEmailTemplate = ({
-  content,
-  title,
+	content,
+	title,
 }: EmailTemplateParams): string => {
-  return `<!DOCTYPE html>
+	return `<!DOCTYPE html>
       <html lang="fr">
       <head>
         <meta charset="UTF-8">
