@@ -200,17 +200,17 @@ export class UsersResolver {
 
     const token = jwt.sign(
       {
-        exp: Math.floor(Date.now() + 2 * 60 * 60 * 1000),
+        exp: Math.floor(Date.now() + 4 * 60 * 60 * 1000),
         userId: user.id,
       },
       process.env.JWT_SECRET_KEY || ""
     );
 
     const cookie = new Cookies(context.req, context.res);
-    cookie.set("TGCookie", token, {
+    cookie.set("renthub_token", token, {
       httpOnly: true,
       secure: false,
-      expires: new Date(Date.now() + 2 * 60 * 60 * 1000),
+      expires: new Date(Date.now() + 4 * 60 * 60 * 1000),
     });
     return user;
   }
