@@ -29,10 +29,8 @@ export class VerificationCode extends BaseEntity {
 
   @ManyToOne(() => User, (user) => user.verificationCodes)
   user!: User;
-}
 
-@InputType()
-export class VerificationCodeCreateInput {
+  @Column({ default: 0 })
   @Field()
-  filename!: string;
+  maximumTry!: number;
 }

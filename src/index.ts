@@ -30,6 +30,7 @@ import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHt
 import { UsersResolver } from "./resolvers/Users";
 import { customAuthChecker } from "./auth";
 import { PictureResolver } from "./resolvers/Pictures";
+import { VerificationCodeResolver } from "./resolvers/VerificationCode";
 
 //-----------------------------------------
 //-----------------EXPRESS-----------------
@@ -71,7 +72,7 @@ app.use(express.static(path.join(__dirname, "../public")));
 async function start() {
   const port = process.env.BACKEND_PORT || 5000;
   const schema = await buildSchema({
-    resolvers: [UsersResolver, PictureResolver],
+    resolvers: [UsersResolver, PictureResolver, VerificationCodeResolver],
     authChecker: customAuthChecker,
   });
 
@@ -82,7 +83,7 @@ async function start() {
   });
 
   await dataSource.initialize();
-  
+
   await server.start();
   app.use(
     "/",
