@@ -8,7 +8,8 @@ import {
   ManyToOne,
   UpdateDateColumn,
   CreateDateColumn,
-} from "typeorm";
+  OneToMany,
+} from 'typeorm';
 import {
   IsEmail,
   IsNumberString,
@@ -16,11 +17,12 @@ import {
   Length,
   Matches,
   IsDate,
-} from "class-validator";
-import { Field, ID, InputType, ObjectType } from "type-graphql";
-import { Picture } from "./Picture";
-import { Role } from "./Role";
-import { ObjectId } from "./ObjectId";
+} from 'class-validator';
+import { Field, ID, InputType, ObjectType } from 'type-graphql';
+import { Picture } from './Picture';
+import { Role } from './Role';
+import { ObjectId } from './ObjectId';
+import { VerificationCode } from './VerificationCode';
 
 @Entity()
 @ObjectType()
@@ -31,31 +33,31 @@ export class User extends BaseEntity {
 
   @Column({ length: 50, nullable: true })
   @IsOptional()
-  @Length(2, 50, { message: "Entre 2 et 50 caractères" })
+  @Length(2, 50, { message: 'Entre 2 et 50 caractères' })
   @Matches(/^[a-zA-ZÀ-ÿ-]+$/, {
-    message: "Le prénom ne doit contenir que des lettres",
+    message: 'Le prénom ne doit contenir que des lettres',
   })
   @Field({ nullable: true })
   firstName!: string;
 
   @Column({ length: 50, nullable: true })
   @IsOptional()
-  @Length(2, 50, { message: "Entre 2 et 50 caractères" })
+  @Length(2, 50, { message: 'Entre 2 et 50 caractères' })
   @Matches(/^[a-zA-ZÀ-ÿ-]+$/, {
-    message: "Le nom de famille ne doit contenir que des lettres",
+    message: 'Le nom de famille ne doit contenir que des lettres',
   })
   @Field({ nullable: true })
   lastName!: string;
 
   @Column({ length: 50, nullable: true })
   @IsOptional()
-  @Length(2, 50, { message: "Entre 2 et 50 caractères" })
+  @Length(2, 50, { message: 'Entre 2 et 50 caractères' })
   @Field({ nullable: true })
   nickName!: string;
 
-  @Column({ type: "date", nullable: true })
+  @Column({ type: 'date', nullable: true })
   @IsOptional()
-  @IsDate({ message: "Doit être une date valide" })
+  @IsDate({ message: 'Doit être une date valide' })
   @Field(() => Date, { nullable: true })
   dateOfBirth!: Date;
 
@@ -66,10 +68,10 @@ export class User extends BaseEntity {
   @IsOptional()
   @IsNumberString(
     {},
-    { message: "Le numéro de téléphone doit être une chaîne de chiffres" }
+    { message: 'Le numéro de téléphone doit être une chaîne de chiffres' }
   )
   @Length(10, 10, {
-    message: "Le numéro de téléphone doit avoir exactement 10 chiffres",
+    message: 'Le numéro de téléphone doit avoir exactement 10 chiffres',
   })
   @Field({ nullable: true })
   phoneNumber!: string;
@@ -83,11 +85,11 @@ export class User extends BaseEntity {
   @Field()
   isVerified!: boolean;
 
-  @Column({ type: "timestamp", nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   @Field(() => Date, { nullable: true })
   lastConnectionDate!: Date;
 
-  @CreateDateColumn({ type: "timestamp" })
+  @CreateDateColumn({ type: 'timestamp' })
   @Field(() => Date)
   createdAt!: Date;
 
@@ -109,8 +111,15 @@ export class User extends BaseEntity {
   @Field({ nullable: true })
   picture?: Picture;
 
+  @OneToMany(
+    () => VerificationCode,
+    (verificationCode) => verificationCode.user,
+    { cascade: true }
+  )
+  verificationCodes!: VerificationCode[];
+
   @ManyToOne(() => Role, (role) => role.user)
-  @JoinColumn({ name: "role" })
+  @JoinColumn({ name: 'role' })
   @Field(() => Role, { nullable: true })
   role!: Role;
 }
@@ -132,7 +141,7 @@ export class UserCreateInput {
   @Field()
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()_+]{8,}$/, {
     message:
-      "Password is not valid. At least 8 characters, 1 uppercase, 1 lowercase, 1 special characters and 1 number required!",
+      'Password is not valid. At least 8 characters, 1 uppercase, 1 lowercase, 1 special characters and 1 number required!',
   })
   password!: string;
 
@@ -141,7 +150,7 @@ export class UserCreateInput {
 
   @Field()
   @Matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, {
-    message: "Email is not valid!",
+    message: 'Email is not valid!',
   })
   email!: string;
 

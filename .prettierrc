@@ -4,6 +4,9 @@
   "printWidth": 80,
   "semi": true,
   "trailingComma": "es5",
-  "singleQuote": false,
-  "endOfLine": "auto"
+  "singleQuote": true,
+  "endOfLine": "auto",
+  "singleAttributePerLine": true,
+  "align-comments": 80,
+  "bracketSpacing": true
 }
