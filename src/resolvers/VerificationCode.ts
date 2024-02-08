@@ -1,20 +1,20 @@
-import { Arg, Mutation, Resolver } from "type-graphql";
-import { User } from "../entities/User";
-import { VerificationCode } from "../entities/VerificationCode";
-import { sendVerificationEmail } from "../utils/mailServices/verificationEmail";
-import { generateSecurityCode } from "../utils/utils";
-import { typeCodeVerification } from "../utils/constant";
+import { Arg, Mutation, Resolver } from 'type-graphql';
+import { User } from '../entities/User';
+import { VerificationCode } from '../entities/VerificationCode';
+import { sendVerificationEmail } from '../utils/mailServices/verificationEmail';
+import { generateSecurityCode } from '../utils/utils';
+import { typeCodeVerification } from '../utils/constant';
 
 @Resolver(VerificationCode)
 export class VerificationCodeResolver {
   @Mutation(() => Boolean)
   async generateNewVerificationCode(
-    @Arg("userId") userId: number
+    @Arg('userId') userId: number
   ): Promise<boolean> {
     try {
       const user = await User.findOneBy({ id: userId });
       if (!user) {
-        throw new Error("Utilisateur non trouvé");
+        throw new Error('Utilisateur non trouvé');
       }
       const verificationCodeLength = 8;
       const newCode = generateSecurityCode(verificationCodeLength);
