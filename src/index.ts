@@ -83,7 +83,6 @@ async function start() {
   });
 
   await dataSource.initialize();
-
   await server.start();
   app.use(
     "/",
