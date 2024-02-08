@@ -39,7 +39,7 @@ export class Category {
 
   // index permet ordonner les catégories pour l'affichage
   @Column({})
-  @Field(() => ID, { nullable: true })
+  @Field(() => ID)
   index: number
 
   @Column({ default: true })
@@ -83,7 +83,7 @@ export class CategoryCreateInput {
   @Field()
   name: string
 
-  @Field(() => ID, { nullable: true })
+  @Field(() => ID)
   index: number
 
   @Field(() => Boolean, { nullable: true })
@@ -115,8 +115,7 @@ export class CategoryUpdateInput {
 
   @Field()
   updatedBy: string
-  
+
   @Field(() => ID, { nullable: true })
   parentCategoryId: number
-
 }
