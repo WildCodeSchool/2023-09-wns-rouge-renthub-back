@@ -1,12 +1,4 @@
-import {
-  Arg,
-  Query,
-  Resolver,
-  Mutation,
-  Ctx,
-  Authorized,
-  ID,
-} from "type-graphql";
+import { Arg, Query, Resolver, Mutation, Ctx, ID } from "type-graphql";
 import {
   User,
   UserContext,
@@ -26,18 +18,17 @@ import {
   sendVerificationEmail,
   sendConfirmationEmail,
 } from "../utils/mailServices/verificationEmail";
+import { getUserFromReq } from "../auth";
+import { generateSecurityCode } from "../utils/utils";
+import { VerificationCode } from "../entities/VerificationCode";
+import { typeCodeVerification } from "../utils/constant";
 
 @Resolver(User)
 export class UsersResolver {
-  @Authorized("ADMIN")
   @Query(() => [User])
   async usersGetAll(@Ctx() context: MyContext): Promise<User[]> {
-    if (context.user?.role === "ADMIN") {
-      const users = await User.find();
-      return users;
-    } else {
-      throw new Error("Not authorized");
-    }
+    const users = await User.find();
+    return users;
   }
 
   @Mutation(() => User)
@@ -60,7 +51,10 @@ export class UsersResolver {
 
     const newUser = new User();
 
-    // createdBy = newUser || adminUser. Depends if token is present in context.
+    /* createdBy
+     * newUser || adminUser
+     * Depends if token is present in context.
+     */
     const cookie = new Cookies(context.req, context.res);
     const token = cookie.get("renthub_token"); // TODO verify JWT token name inside userLogin resolver
     let adminUser: User | null = null;
@@ -96,58 +90,84 @@ export class UsersResolver {
     const errors = await validate(newUser);
     if (errors.length === 0) {
       await newUser.save();
-      // TODO send verification email
-      // await sendVerificationEmail(newUser.email, newUser.nickName);
-      return newUser;
-    } else {
-      throw new Error(`New User validation error : ${JSON.stringify(errors)}`);
+
+      const verificationCodeLength = 8;
+      const verificationCode = generateSecurityCode(verificationCodeLength);
+
+      const emailVerificationCode = new VerificationCode();
+      emailVerificationCode.code = verificationCode;
+      emailVerificationCode.type = typeCodeVerification;
+      emailVerificationCode.expirationDate = new Date(
+        Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+      );
+      emailVerificationCode.user = newUser;
+
+      await emailVerificationCode.save();
+      await sendVerificationEmail(newUser.id, newUser.email, verificationCode);
     }
+    return newUser;
   }
 
   @Mutation(() => VerifyEmailResponse)
-  async verifyEmail(@Arg("token") token: string): Promise<VerifyEmailResponse> {
-    let userEmail: string | null = null;
-    let userNickName: string | null = null;
-
+  async verifyEmail(
+    @Arg("userId") userId: number,
+    @Arg("code") code: string
+  ): Promise<VerifyEmailResponse> {
     try {
-      const decodedToken = jwt.decode(token);
-      if (
-        typeof decodedToken === "object" &&
-        decodedToken &&
-        "email" in decodedToken
-      ) {
-        userEmail = decodedToken.email;
-        userNickName = decodedToken.nickName;
+      /* Get the user */
+      const user = await User.findOneBy({ id: userId });
+      if (!user) {
+        return { success: false, message: "Utilisateur non trouvé" };
+      }
+      /* Check if code arg is equal to verificationCode.code */
+      const verificationCode = await VerificationCode.findOneBy({
+        user: { id: user.id },
+        type: typeCodeVerification,
+      });
+
+      if (!verificationCode) {
+        return {
+          success: false,
+          message: "Code de vérification invalide ou expiré",
+        };
+      }
+      /* Check if code is expired */
+      const now = new Date();
+      if (verificationCode.expirationDate < now) {
+        return {
+          success: false,
+          message: "Code de vérification expiré",
+        };
       }
 
-      const payload = jwt.verify(
-        token,
-        process.env.JWT_VERIFY_EMAIL_SECRET_KEY || ""
-      );
-      if (typeof payload === "object" && payload.email) {
-        const user = await User.findOneBy({ email: payload.email });
-        if (!user) {
-          return { success: false, message: "Utilisateur non trouvé" };
-        }
-
-        user.isVerified = true;
-        await user.save();
-        await sendConfirmationEmail(user.email, user.nickName);
-        return { success: true, message: "Email vérifié avec succès !" };
-      } else {
-        return { success: false, message: "Invalid Token" };
-      }
-    } catch (error) {
-      if (error instanceof jwt.TokenExpiredError && userEmail && userNickName) {
-        await sendVerificationEmail(userEmail, userNickName);
+      /* Check if maximumTry is greater than 3 */
+      if (verificationCode.maximumTry == 3) {
         return {
           success: false,
           message:
-            "Le lien a expiré, un nouveau lien de vérification a été envoyé à votre adresse email.",
+            "Nombre maximal de tentatives atteint. Un nouveau code doit être généré.",
         };
-      } else {
-        return { success: false, message: "Error verifying email." };
       }
+      /* Incremente maximumTry when user write wrong code */
+      if (verificationCode.code !== code) {
+        verificationCode.maximumTry++;
+        await verificationCode.save();
+        return { success: false, message: "Code de vérification invalide" };
+      }
+
+      user.isVerified = true;
+      await user.save();
+
+      await verificationCode.remove();
+
+      await sendConfirmationEmail(user.email, user.nickName);
+
+      return { success: true, message: "Email vérifié avec succès !" };
+    } catch (error) {
+      return {
+        success: false,
+        message: "Erreur lors de la vérification de l'email.",
+      };
     }
   }
 
@@ -161,7 +181,11 @@ export class UsersResolver {
       throw new Error("Email ou mot de passe incorrect");
     }
     if (!user.isVerified) {
-      throw new Error("Email non vérifié, consultez votre boite mail");
+      // TODO for TEST send verification email
+      console.log(
+        "TODO : do verifification for TEST integration. Email non vérifié."
+      );
+      // throw new Error("Email non vérifié, consultez votre boite mail");
     }
 
     const valid = await argon2.verify(user.hashedPassword, data.password);
@@ -186,7 +210,6 @@ export class UsersResolver {
     return user;
   }
 
-  @Authorized("ADMIN", "USER")
   @Query(() => UserContext)
   async meContext(@Ctx() context: MyContext): Promise<UserContext> {
     if (!context.user) {
@@ -196,18 +219,10 @@ export class UsersResolver {
     return user;
   }
 
-  @Authorized("ADMIN", "USER")
   @Query(() => User)
-  async me(@Ctx() context: MyContext): Promise<User> {
-    if (!context.user) {
-      throw new Error("User not found");
-    }
-    const user = await User.findOne({
-      where: { id: context.user.id },
-      relations: { picture: true },
-    });
-
-    return user as User;
+  async me(@Ctx() context: MyContext): Promise<User | null> {
+    const user = await getUserFromReq(context.req, context.res);
+    return user;
   }
 
   @Mutation(() => Boolean)
@@ -221,7 +236,6 @@ export class UsersResolver {
     return true;
   }
 
-  @Authorized("ADMIN", "USER")
   @Mutation(() => User, { nullable: true })
   async userUpdate(
     @Ctx() context: MyContext,
@@ -236,7 +250,7 @@ export class UsersResolver {
 
     if (
       user &&
-      (user.id === context.user?.id || context.user?.role === "ADMIN")
+      user.id === context.user?.id //  || context.user?.role
     ) {
       let oldPictureId: number | null = null;
       if (data.pictureId && user.picture?.id) {
@@ -269,7 +283,6 @@ export class UsersResolver {
     return user;
   }
 
-  @Authorized("ADMIN", "USER")
   @Mutation(() => User, { nullable: true })
   async userDelete(
     @Ctx() context: MyContext,
@@ -280,7 +293,7 @@ export class UsersResolver {
     });
     if (
       user &&
-      (user.id === context.user?.id || context.user?.role === "ADMIN")
+      user.id === context.user?.id //  || context.user?.role
     ) {
       const pictureId = user.picture?.id;
       await user.remove();

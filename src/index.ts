@@ -18,19 +18,17 @@ import { createImage } from './utils/pictureServices/pictureServices'
 //----------GRAPHQL / APOLLO SERVER--------
 //-----------------------------------------
 
-import { buildSchema } from 'type-graphql'
-import { ApolloServer } from '@apollo/server'
-import { expressMiddleware } from '@apollo/server/express4'
-import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
+import { getSchema } from "./schema";
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@apollo/server/express4";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 
 //-----------------------------------------
-//-----------------RESOLVERS---------------
+//------------ENTIETIES / TYPES------------
 //-----------------------------------------
 
-import { UsersResolver } from './resolvers/Users'
-import { customAuthChecker } from './auth'
-import { PictureResolver } from './resolvers/Pictures'
-import { CategoriesResolver } from './resolvers/Category.resolver'
+
+import { Role } from "./entities/Role";
 
 //-----------------------------------------
 //-----------------EXPRESS-----------------
@@ -47,11 +45,11 @@ import { Request, Response } from 'express'
 //-----------------APOLLO SERVER-----------
 //-----------------------------------------
 export type UserContext = {
-  id: number
-  nickName: string
-  picture: string
-  role: 'ADMIN' | 'USER'
-}
+  id: number;
+  nickName: string;
+  picture: string;
+  role: Role;
+};
 
 export interface MyContext {
   req: Request
@@ -70,12 +68,9 @@ app.use(express.json({ limit: '50mb' }))
 app.use(express.static(path.join(__dirname, '../public')))
 
 async function start() {
-  const aa = 2
-  const port = process.env.BACKEND_PORT || 5000
-  const schema = await buildSchema({
-    resolvers: [UsersResolver, PictureResolver, CategoriesResolver],
-    authChecker: customAuthChecker,
-  })
+  const port = process.env.BACKEND_PORT || 5000;
+  
+  const schema = await getSchema();
 
   const httpServer = http.createServer(app)
   const server = new ApolloServer({
@@ -83,9 +78,10 @@ async function start() {
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   })
 
-  await dataSource.initialize()
 
-  await server.start()
+  await dataSource.initialize();
+  await server.start();
+  
   app.use(
     '/',
     express.json({ limit: '50mb' }),
