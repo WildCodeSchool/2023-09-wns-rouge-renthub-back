@@ -7,28 +7,28 @@ import { ObjectId } from '../entities/ObjectId';
  * @returns The merged entity (the entity is updated as well)
  */
 export function merge(entity: any, data: any): any {
-	// should keep existing relations
-	for (const [key, value] of Object.entries(data)) {
-		if (
-			Array.isArray(value) &&
-			value.length > 0 &&
-			value[0] instanceof ObjectId
-		) {
-			if (!(key in entity)) {
-				throw new Error(
-					`missing key ${key} in your entity, did you forgot to fetch your relation?`
-				);
-			}
-			if (Array.isArray(entity[key])) {
-				data[key] = data[key].map((entry: ObjectId) => {
-					const existingEntry = entity[key].find(
-						(entityEntry: ObjectId) => entityEntry.id == entry.id
-					);
-					return existingEntry || entry;
-				});
-			}
-		}
-	}
-	Object.assign(entity, data);
-	return entity;
+  // should keep existing relations
+  for (const [key, value] of Object.entries(data)) {
+    if (
+      Array.isArray(value) &&
+      value.length > 0 &&
+      value[0] instanceof ObjectId
+    ) {
+      if (!(key in entity)) {
+        throw new Error(
+          `missing key ${key} in your entity, did you forgot to fetch your relation?`
+        );
+      }
+      if (Array.isArray(entity[key])) {
+        data[key] = data[key].map((entry: ObjectId) => {
+          const existingEntry = entity[key].find(
+            (entityEntry: ObjectId) => entityEntry.id == entry.id
+          );
+          return existingEntry || entry;
+        });
+      }
+    }
+  }
+  Object.assign(entity, data);
+  return entity;
 }
