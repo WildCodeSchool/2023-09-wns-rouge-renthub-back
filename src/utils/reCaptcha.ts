@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { Request, Response, NextFunction } from 'express';
+import axios from "axios";
+import { Request, Response, NextFunction } from "express";
 
 export const verifyRecaptchaToken = async (
   req: Request,
@@ -15,10 +15,10 @@ export const verifyRecaptchaToken = async (
     if (response.data.success) {
       next();
     } else {
-      res.status(500).send('reCAPTCHA verification failed');
+      res.status(500).send("reCAPTCHA verification failed");
     }
   } catch (error) {
-    res.status(500).send('Error verifying reCAPTCHA');
+    res.status(500).send("Error verifying reCAPTCHA");
   }
 };
 

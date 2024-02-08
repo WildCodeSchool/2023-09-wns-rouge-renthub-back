@@ -1,6 +1,6 @@
-import { Picture } from '../../entities/Picture';
-import path from 'path';
-import { promises as fsPromises } from 'fs';
+import { Picture } from "../../entities/Picture";
+import path from "path";
+import { promises as fsPromises } from "fs";
 
 export async function createImage(filename: string): Promise<Picture> {
   const picture = new Picture();
@@ -26,10 +26,10 @@ export async function deletePicture(
 
       return picture;
     } catch (error) {
-      console.error('Error removing picture', error);
-      throw new Error('Error removing picture');
+      console.error("Error removing picture", error);
+      throw new Error("Error removing picture");
     }
   } else {
-    throw new Error('Picture not found');
+    throw new Error("Picture not found");
   }
 }

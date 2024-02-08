@@ -1,6 +1,6 @@
-import jwt from 'jsonwebtoken';
-import { sendEmail, EmailOptions } from './nodeMailer';
-import { EmailTemplateParams, createEmailTemplate } from './emailTemplate';
+import jwt from "jsonwebtoken";
+import { sendEmail, EmailOptions } from "./nodeMailer";
+import { EmailTemplateParams, createEmailTemplate } from "./emailTemplate";
 
 export const sendVerificationEmail = async (
   userEmail: string,
@@ -8,8 +8,8 @@ export const sendVerificationEmail = async (
 ) => {
   const token = jwt.sign(
     { email: userEmail, firstName: userFirstName },
-    process.env.JWT_VERIFY_EMAIL_SECRET_KEY || '',
-    { expiresIn: '12h' }
+    process.env.JWT_VERIFY_EMAIL_SECRET_KEY || "",
+    { expiresIn: "12h" }
   );
 
   const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
@@ -25,15 +25,15 @@ export const sendVerificationEmail = async (
   <div class="footer">
     Si vous n'avez pas demandé cette inscription, veuillez ignorer cet email.
   </div>`,
-    title: 'Finalisez votre inscription sur RentHub',
+    title: "Finalisez votre inscription sur RentHub",
   };
 
   const emailHtml = createEmailTemplate(emailParams);
 
   const emailOptions: EmailOptions = {
-    from: process.env.MAIL_USER || 'contact@renthub.shop',
-    to: userEmail || '',
-    subject: 'Finalisez votre inscription sur RentHub',
+    from: process.env.MAIL_USER || "contact@renthub.shop",
+    to: userEmail || "",
+    subject: "Finalisez votre inscription sur RentHub",
     html: emailHtml,
   };
 
@@ -63,15 +63,15 @@ export const sendConfirmationEmail = async (
     <div class="footer">
     Si vous n'avez pas demandé cette inscription, veuillez ignorer cet email.
     </div>`,
-    title: 'Email vérifié et compte crée !',
+    title: "Email vérifié et compte crée !",
   };
 
   const emailHtml = createEmailTemplate(emailParams);
 
   const emailOptions: EmailOptions = {
-    from: process.env.MAIL_USER || 'contact@renthub.shop',
-    to: userEmail || '',
-    subject: 'Bienvenue sur RentHub !',
+    from: process.env.MAIL_USER || "contact@renthub.shop",
+    to: userEmail || "",
+    subject: "Bienvenue sur RentHub !",
     html: emailHtml,
   };
 

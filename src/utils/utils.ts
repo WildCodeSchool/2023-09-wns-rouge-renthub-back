@@ -1,4 +1,4 @@
-import { ObjectId } from '../entities/ObjectId';
+import { ObjectId } from "../entities/ObjectId";
 
 /**
  * Merge some data on an existing database entity, it takes care of keeping existing many-to-many relations to avoid unicity constraints

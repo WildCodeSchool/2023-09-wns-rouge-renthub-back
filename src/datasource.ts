@@ -1,7 +1,7 @@
-import { DataSource } from 'typeorm';
+import { DataSource } from "typeorm";
 
 export const dataSource = new DataSource({
-  type: 'postgres',
+  type: "postgres",
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),
   username: process.env.POSTGRES_USER,
@@ -9,5 +9,5 @@ export const dataSource = new DataSource({
   database: process.env.POSTGRES_DB,
   entities: [`${__dirname}/entities/*.ts`],
   synchronize: true,
-  logging: process.env.DOCKER_LOGS === 'true' ? true : false,
+  logging: process.env.DOCKER_LOGS === "true" ? true : false,
 });
