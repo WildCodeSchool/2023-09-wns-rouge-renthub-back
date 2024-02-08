@@ -1,4 +1,4 @@
-import { gql } from "graphql-tag";
+import { gql } from 'graphql-tag'
 
 export const queryMe = gql`
   query {
@@ -7,4 +7,4 @@ export const queryMe = gql`
       email
     }
   }
-`;
+`

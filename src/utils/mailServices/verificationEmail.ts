@@ -1,12 +1,12 @@
-import { sendEmail, EmailOptions } from './nodeMailer';
-import { EmailTemplateParams, createEmailTemplate } from './emailTemplate';
+import { sendEmail, EmailOptions } from './nodeMailer'
+import { EmailTemplateParams, createEmailTemplate } from './emailTemplate'
 
 export const sendVerificationEmail = async (
   userId: number,
   userEmail: string,
   userCode: string
 ) => {
-  const verificationLink = `${process.env.FRONTEND_URL}/verify-email?userId=${userId}`;
+  const verificationLink = `${process.env.FRONTEND_URL}/verify-email?userId=${userId}`
 
   const emailParams: EmailTemplateParams = {
     content: `<div class="header">
@@ -21,30 +21,30 @@ export const sendVerificationEmail = async (
     Si vous n'avez pas demandé cette inscription, veuillez ignorer cet email.
   </div>`,
     title: 'Finalisez votre inscription sur RentHub',
-  };
+  }
 
-  const emailHtml = createEmailTemplate(emailParams);
+  const emailHtml = createEmailTemplate(emailParams)
 
   const emailOptions: EmailOptions = {
     from: process.env.MAIL_USER || 'contact@renthub.shop',
     to: userEmail || '',
     subject: 'Finalisez votre inscription sur RentHub',
     html: emailHtml,
-  };
+  }
 
   try {
-    const info = await sendEmail(emailOptions);
-    return info;
+    const info = await sendEmail(emailOptions)
+    return info
   } catch (error) {
-    throw new Error(`Error sending verification email: ${error}`);
+    throw new Error(`Error sending verification email: ${error}`)
   }
-};
+}
 
 export const sendConfirmationEmail = async (
   userEmail: string,
   userFirstName: string
 ) => {
-  const frontLink = `${process.env.FRONTEND_URL}/connexion`;
+  const frontLink = `${process.env.FRONTEND_URL}/connexion`
 
   const emailParams: EmailTemplateParams = {
     content: `<div class="header">
@@ -59,21 +59,21 @@ export const sendConfirmationEmail = async (
     Si vous n'avez pas demandé cette inscription, veuillez ignorer cet email.
     </div>`,
     title: 'Email vérifié et compte crée !',
-  };
+  }
 
-  const emailHtml = createEmailTemplate(emailParams);
+  const emailHtml = createEmailTemplate(emailParams)
 
   const emailOptions: EmailOptions = {
     from: process.env.MAIL_USER || 'contact@renthub.shop',
     to: userEmail || '',
     subject: 'Bienvenue sur RentHub !',
     html: emailHtml,
-  };
+  }
 
   try {
-    const info = await sendEmail(emailOptions);
-    return info;
+    const info = await sendEmail(emailOptions)
+    return info
   } catch (error) {
-    throw new Error(`Error sending verification email: ${error}`);
+    throw new Error(`Error sending verification email: ${error}`)
   }
-};
+}

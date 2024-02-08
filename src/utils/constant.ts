@@ -1,1 +1,1 @@
-export const typeCodeVerification: string = 'code-verification';
+export const typeCodeVerification: string = 'code-verification'

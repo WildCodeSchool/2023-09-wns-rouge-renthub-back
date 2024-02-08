@@ -2,17 +2,17 @@
 //------------------GRAPHQL----------------
 //-----------------------------------------
 
-import { buildSchema } from 'type-graphql';
+import { buildSchema } from 'type-graphql'
 
 //-----------------------------------------
 //-----------------RESOLVERS---------------
 //-----------------------------------------
 
-import { UsersResolver } from './resolvers/Users';
-import { customAuthChecker } from './auth';
-import { PictureResolver } from './resolvers/Pictures';
-import { CategoriesResolver } from './resolvers/Category.resolver';
-import { VerificationCodeResolver } from './resolvers/VerificationCode';
+import { UsersResolver } from './resolvers/Users'
+import { customAuthChecker } from './auth'
+import { PictureResolver } from './resolvers/Pictures'
+import { CategoriesResolver } from './resolvers/Category.resolver'
+import { VerificationCodeResolver } from './resolvers/VerificationCode'
 
 export async function getSchema() {
   const schema = await buildSchema({
@@ -23,6 +23,6 @@ export async function getSchema() {
       VerificationCodeResolver,
     ],
     authChecker: customAuthChecker,
-  });
-  return schema;
+  })
+  return schema
 }

@@ -1,4 +1,4 @@
-import { gql } from "graphql-tag";
+import { gql } from 'graphql-tag'
 
 export const mutationUserLogin = gql`
   mutation ($data: UserLoginInput!) {
@@ -6,4 +6,4 @@ export const mutationUserLogin = gql`
       id
     }
   }
-`;
+`

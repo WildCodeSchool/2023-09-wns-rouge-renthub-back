@@ -4,33 +4,33 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Field, ID, ObjectType } from 'type-graphql';
-import { User } from './User';
+} from 'typeorm'
+import { Field, ID, ObjectType } from 'type-graphql'
+import { User } from './User'
 
 @Entity()
 @ObjectType()
 export class VerificationCode extends BaseEntity {
   @PrimaryGeneratedColumn()
   @Field(() => ID)
-  id!: number;
+  id!: number
 
   @Column()
   @Field()
-  type!: string;
+  type!: string
 
   @Column()
   @Field()
-  code!: string;
+  code!: string
 
   @Column({ type: 'timestamp', nullable: true })
   @Field(() => Date, { nullable: true })
-  expirationDate!: Date;
+  expirationDate!: Date
 
   @ManyToOne(() => User, (user) => user.verificationCodes)
-  user!: User;
+  user!: User
 
   @Column({ default: 0 })
   @Field()
-  maximumTry!: number;
+  maximumTry!: number
 }
