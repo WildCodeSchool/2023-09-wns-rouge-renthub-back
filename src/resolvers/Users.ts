@@ -1,4 +1,4 @@
-import { Arg, Query, Resolver, Mutation, Ctx, ID } from "type-graphql";
+import { Arg, Query, Resolver, Mutation, Ctx, ID } from 'type-graphql';
 import {
   User,
   UserContext,
@@ -6,26 +6,28 @@ import {
   UserLoginInput,
   UserUpdateInput,
   VerifyEmailResponse,
-} from "../entities/User";
-import { validate } from "class-validator";
-import * as argon2 from "argon2";
-import jwt from "jsonwebtoken";
-import { MyContext } from "../index";
-import Cookies from "cookies";
-import { Picture } from "../entities/Picture";
-import { deletePicture } from "../utils/pictureServices/pictureServices";
+} from '../entities/User';
+import { validate } from 'class-validator';
+import * as argon2 from 'argon2';
+import jwt from 'jsonwebtoken';
+import { MyContext } from '../index';
+import Cookies from 'cookies';
+import { Picture } from '../entities/Picture';
+import { deletePicture } from '../utils/pictureServices/pictureServices';
 import {
   sendVerificationEmail,
   sendConfirmationEmail,
-} from "../utils/mailServices/verificationEmail";
-import { getUserFromReq } from "../auth";
-import { generateSecurityCode } from "../utils/utils";
-import { VerificationCode } from "../entities/VerificationCode";
-import { typeCodeVerification } from "../utils/constant";
+} from '../utils/mailServices/verificationEmail';
+import { getUserFromReq } from '../auth';
+import { generateSecurityCode } from '../utils/utils';
+import { VerificationCode } from '../entities/VerificationCode';
+import { typeCodeVerification } from '../utils/constant';
 
 @Resolver(User)
 export class UsersResolver {
   @Query(() => [User])
+  //TODO  : delete eslint flag when context is used and function implemented correctly
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async usersGetAll(@Ctx() context: MyContext): Promise<User[]> {
     const users = await User.find();
     return users;
@@ -34,7 +36,7 @@ export class UsersResolver {
   @Mutation(() => User)
   async userCreate(
     @Ctx() context: MyContext,
-    @Arg("data", () => UserCreateInput) data: UserCreateInput
+    @Arg('data', () => UserCreateInput) data: UserCreateInput
   ): Promise<User> {
     // Validate input data before creating User entity
     const inputsDataErrors = await validate(data);
@@ -44,9 +46,11 @@ export class UsersResolver {
       );
     }
 
-    const existingUser = await User.findOne({ where: { email: data.email } });
+    const existingUser = await User.findOne({
+      where: { email: data.email },
+    });
     if (existingUser) {
-      throw new Error("User already exists");
+      throw new Error('User already exists');
     }
 
     const newUser = new User();
@@ -56,11 +60,11 @@ export class UsersResolver {
      * Depends if token is present in context.
      */
     const cookie = new Cookies(context.req, context.res);
-    const token = cookie.get("renthub_token"); // TODO verify JWT token name inside userLogin resolver
+    const token = cookie.get('renthub_token'); // TODO verify JWT token name inside userLogin resolver
     let adminUser: User | null = null;
     if (token) {
-      const payload = jwt.verify(token, process.env.JWT_SECRET_KEY || "");
-      if (typeof payload === "object" && "userId" in payload) {
+      const payload = jwt.verify(token, process.env.JWT_SECRET_KEY || '');
+      if (typeof payload === 'object' && 'userId' in payload) {
         const user = await User.findOne({
           where: { id: payload.userId },
           relations: {
@@ -68,10 +72,10 @@ export class UsersResolver {
             // TODO add relations to adminUser if needed. For example Role.
           },
         });
-        // TODO add extra condition : if(adminUser.role === "ADMIN" || adminUser.role === "SUPERADMIN")
+        // TODO add extra condition : if(adminUser.role === "ADMIN" || adminUser.role === "SUPERADMIN")
         adminUser = user;
       } else {
-        throw new Error("Token invalid");
+        throw new Error('Token invalid');
       }
     }
 
@@ -110,14 +114,14 @@ export class UsersResolver {
 
   @Mutation(() => VerifyEmailResponse)
   async verifyEmail(
-    @Arg("userId") userId: number,
-    @Arg("code") code: string
+    @Arg('userId') userId: number,
+    @Arg('code') code: string
   ): Promise<VerifyEmailResponse> {
     try {
       /* Get the user */
       const user = await User.findOneBy({ id: userId });
       if (!user) {
-        return { success: false, message: "Utilisateur non trouvé" };
+        return { success: false, message: 'Utilisateur non trouvé' };
       }
       /* Check if code arg is equal to verificationCode.code */
       const verificationCode = await VerificationCode.findOneBy({
@@ -128,7 +132,7 @@ export class UsersResolver {
       if (!verificationCode) {
         return {
           success: false,
-          message: "Code de vérification invalide ou expiré",
+          message: 'Code de vérification invalide ou expiré',
         };
       }
       /* Check if code is expired */
@@ -136,7 +140,7 @@ export class UsersResolver {
       if (verificationCode.expirationDate < now) {
         return {
           success: false,
-          message: "Code de vérification expiré",
+          message: 'Code de vérification expiré',
         };
       }
 
@@ -145,14 +149,14 @@ export class UsersResolver {
         return {
           success: false,
           message:
-            "Nombre maximal de tentatives atteint. Un nouveau code doit être généré.",
+            'Nombre maximal de tentatives atteint. Un nouveau code doit être généré.',
         };
       }
       /* Incremente maximumTry when user write wrong code */
       if (verificationCode.code !== code) {
         verificationCode.maximumTry++;
         await verificationCode.save();
-        return { success: false, message: "Code de vérification invalide" };
+        return { success: false, message: 'Code de vérification invalide' };
       }
 
       user.isVerified = true;
@@ -162,7 +166,7 @@ export class UsersResolver {
 
       await sendConfirmationEmail(user.email, user.nickName);
 
-      return { success: true, message: "Email vérifié avec succès !" };
+      return { success: true, message: 'Email vérifié avec succès !' };
     } catch (error) {
       return {
         success: false,
@@ -174,23 +178,23 @@ export class UsersResolver {
   @Mutation(() => User)
   async userLogin(
     @Ctx() context: MyContext,
-    @Arg("data", () => UserLoginInput) data: UserLoginInput
+    @Arg('data', () => UserLoginInput) data: UserLoginInput
   ) {
     const user = await User.findOne({ where: { email: data.email } });
     if (!user) {
-      throw new Error("Email ou mot de passe incorrect");
+      throw new Error('Email ou mot de passe incorrect');
     }
     if (!user.isVerified) {
       // TODO for TEST send verification email
       console.log(
-        "TODO : do verifification for TEST integration. Email non vérifié."
+        'TODO : do verifification for TEST integration. Email non vérifié.'
       );
       // throw new Error("Email non vérifié, consultez votre boite mail");
     }
 
     const valid = await argon2.verify(user.hashedPassword, data.password);
     if (!valid) {
-      throw new Error("Email ou mot de passe incorrect");
+      throw new Error('Email ou mot de passe incorrect');
     }
 
     const token = jwt.sign(
@@ -198,11 +202,11 @@ export class UsersResolver {
         exp: Math.floor(Date.now() + 4 * 60 * 60 * 1000),
         userId: user.id,
       },
-      process.env.JWT_SECRET_KEY || ""
+      process.env.JWT_SECRET_KEY || ''
     );
 
     const cookie = new Cookies(context.req, context.res);
-    cookie.set("renthub_token", token, {
+    cookie.set('renthub_token', token, {
       httpOnly: true,
       secure: false,
       expires: new Date(Date.now() + 4 * 60 * 60 * 1000),
@@ -213,7 +217,7 @@ export class UsersResolver {
   @Query(() => UserContext)
   async meContext(@Ctx() context: MyContext): Promise<UserContext> {
     if (!context.user) {
-      throw new Error("User not found");
+      throw new Error('User not found');
     }
     const user = context.user as UserContext;
     return user;
@@ -226,9 +230,9 @@ export class UsersResolver {
   }
 
   @Mutation(() => Boolean)
-  async userSignOut(@Ctx() context: MyContext): Promise<Boolean> {
+  async userSignOut(@Ctx() context: MyContext): Promise<boolean> {
     const cookie = new Cookies(context.req, context.res);
-    cookie.set("TGCookie", "", {
+    cookie.set('TGCookie', '', {
       httpOnly: true,
       secure: false,
       maxAge: 0,
@@ -239,7 +243,7 @@ export class UsersResolver {
   @Mutation(() => User, { nullable: true })
   async userUpdate(
     @Ctx() context: MyContext,
-    @Arg("data") data: UserUpdateInput
+    @Arg('data') data: UserUpdateInput
   ): Promise<User | null> {
     const userId = context.user?.id;
 
@@ -259,7 +263,7 @@ export class UsersResolver {
           where: { id: data.pictureId },
         });
         if (!newPicture) {
-          throw new Error("New picture not found");
+          throw new Error('New picture not found');
         }
         user.picture = newPicture;
       }
@@ -286,7 +290,7 @@ export class UsersResolver {
   @Mutation(() => User, { nullable: true })
   async userDelete(
     @Ctx() context: MyContext,
-    @Arg("id", () => ID) id: number
+    @Arg('id', () => ID) id: number
   ): Promise<User | null> {
     const user = await User.findOne({
       where: { id: id },

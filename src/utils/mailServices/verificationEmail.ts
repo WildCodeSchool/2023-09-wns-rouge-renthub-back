@@ -1,6 +1,5 @@
-import jwt from "jsonwebtoken";
-import { sendEmail, EmailOptions } from "./nodeMailer";
-import { EmailTemplateParams, createEmailTemplate } from "./emailTemplate";
+import { sendEmail, EmailOptions } from './nodeMailer';
+import { EmailTemplateParams, createEmailTemplate } from './emailTemplate';
 
 export const sendVerificationEmail = async (
   userId: number,
@@ -21,15 +20,15 @@ export const sendVerificationEmail = async (
   <div class="footer">
     Si vous n'avez pas demandé cette inscription, veuillez ignorer cet email.
   </div>`,
-    title: "Finalisez votre inscription sur RentHub",
+    title: 'Finalisez votre inscription sur RentHub',
   };
 
   const emailHtml = createEmailTemplate(emailParams);
 
   const emailOptions: EmailOptions = {
-    from: process.env.MAIL_USER || "contact@renthub.shop",
-    to: userEmail || "",
-    subject: "Finalisez votre inscription sur RentHub",
+    from: process.env.MAIL_USER || 'contact@renthub.shop',
+    to: userEmail || '',
+    subject: 'Finalisez votre inscription sur RentHub',
     html: emailHtml,
   };
 
@@ -59,15 +58,15 @@ export const sendConfirmationEmail = async (
     <div class="footer">
     Si vous n'avez pas demandé cette inscription, veuillez ignorer cet email.
     </div>`,
-    title: "Email vérifié et compte crée !",
+    title: 'Email vérifié et compte crée !',
   };
 
   const emailHtml = createEmailTemplate(emailParams);
 
   const emailOptions: EmailOptions = {
-    from: process.env.MAIL_USER || "contact@renthub.shop",
-    to: userEmail || "",
-    subject: "Bienvenue sur RentHub !",
+    from: process.env.MAIL_USER || 'contact@renthub.shop',
+    to: userEmail || '',
+    subject: 'Bienvenue sur RentHub !',
     html: emailHtml,
   };
 
