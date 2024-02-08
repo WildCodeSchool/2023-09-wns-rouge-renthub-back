@@ -54,7 +54,7 @@ export const sendConfirmationEmail = async (
     <div class="content">
     <p>Votre email est vérifié et votre compte crée !</p>
     <p>Ne perdez pas un seul instant et postez une annonce directement en cliquant sur le lien ci-dessous :</p>
-    <a href="${frontLink}" class="button">Créer une annonce</a>
+    <a href="${frontLink}" class="button">Accédez à mon espace</a>
     </div>
     <div class="footer">
     Si vous n'avez pas demandé cette inscription, veuillez ignorer cet email.

@@ -44,10 +44,6 @@ export class VerificationCodeResolver {
 
       return true;
     } catch (error) {
-      console.error(
-        "Erreur lors de la génération du nouveau code de vérification : ",
-        error
-      );
       return false;
     }
   }

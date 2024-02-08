@@ -160,7 +160,6 @@ export class UsersResolver {
       /* Incremente maximumTry when user write wrong code */
       if (verificationCode.code !== code) {
         verificationCode.maximumTry++;
-        console.log("verificationCode.maximumTry", verificationCode.maximumTry);
         await verificationCode.save();
         return { success: false, message: "Code de vérification invalide" };
       }
