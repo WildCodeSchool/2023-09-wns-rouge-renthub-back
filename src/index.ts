@@ -18,19 +18,16 @@ import { createImage } from "./utils/pictureServices/pictureServices";
 //----------GRAPHQL / APOLLO SERVER--------
 //-----------------------------------------
 
-import { buildSchema } from "type-graphql";
+import { getSchema } from "./schema";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 
 //-----------------------------------------
-//-----------------RESOLVERS---------------
+//------------ENTIETIES / TYPES------------
 //-----------------------------------------
 
-import { UsersResolver } from "./resolvers/Users";
-import { customAuthChecker } from "./auth";
-import { PictureResolver } from "./resolvers/Pictures";
-import { VerificationCodeResolver } from "./resolvers/VerificationCode";
+import { Role } from "./entities/Role";
 
 //-----------------------------------------
 //-----------------EXPRESS-----------------
@@ -50,7 +47,7 @@ export type UserContext = {
   id: number;
   nickName: string;
   picture: string;
-  role: "ADMIN" | "USER";
+  role: Role;
 };
 
 export interface MyContext {
@@ -71,10 +68,8 @@ app.use(express.static(path.join(__dirname, "../public")));
 
 async function start() {
   const port = process.env.BACKEND_PORT || 5000;
-  const schema = await buildSchema({
-    resolvers: [UsersResolver, PictureResolver, VerificationCodeResolver],
-    authChecker: customAuthChecker,
-  });
+  
+  const schema = await getSchema();
 
   const httpServer = http.createServer(app);
   const server = new ApolloServer({
