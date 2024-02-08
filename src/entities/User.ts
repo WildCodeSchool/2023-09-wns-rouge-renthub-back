@@ -22,6 +22,7 @@ import { Field, ID, InputType, ObjectType } from "type-graphql";
 import { Picture } from "./Picture";
 import { Role } from "./Role";
 import { ObjectId } from "./ObjectId";
+import { VerificationCode } from "./VerificationCode";
 
 @Entity()
 @ObjectType()
@@ -109,6 +110,14 @@ export class User extends BaseEntity {
   @JoinColumn()
   @Field({ nullable: true })
   picture?: Picture;
+
+
+  @OneToMany(
+    () => VerificationCode,
+    (verificationCode) => verificationCode.user,
+    { cascade: true }
+  )
+  verificationCodes!: VerificationCode[];
 
   @ManyToOne(() => Role, (role) => role.user)
   @JoinColumn({ name: "role" })

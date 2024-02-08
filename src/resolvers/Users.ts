@@ -26,6 +26,9 @@ import {
   sendVerificationEmail,
   sendConfirmationEmail,
 } from "../utils/mailServices/verificationEmail";
+import { generateSecurityCode } from "../utils/utils";
+import { VerificationCode } from "../entities/VerificationCode";
+import { typeCodeVerification } from "../utils/constant";
 
 @Resolver(User)
 export class UsersResolver {
@@ -96,58 +99,84 @@ export class UsersResolver {
     const errors = await validate(newUser);
     if (errors.length === 0) {
       await newUser.save();
-      // TODO send verification email
-      // await sendVerificationEmail(newUser.email, newUser.nickName);
-      return newUser;
-    } else {
-      throw new Error(`New User validation error : ${JSON.stringify(errors)}`);
+
+      const verificationCodeLength = 8;
+      const verificationCode = generateSecurityCode(verificationCodeLength);
+
+      const emailVerificationCode = new VerificationCode();
+      emailVerificationCode.code = verificationCode;
+      emailVerificationCode.type = typeCodeVerification;
+      emailVerificationCode.expirationDate = new Date(
+        Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+      );
+      emailVerificationCode.user = newUser;
+
+      await emailVerificationCode.save();
+      await sendVerificationEmail(newUser.id, newUser.email, verificationCode);
     }
+    return newUser;
   }
 
   @Mutation(() => VerifyEmailResponse)
-  async verifyEmail(@Arg("token") token: string): Promise<VerifyEmailResponse> {
-    let userEmail: string | null = null;
-    let userNickName: string | null = null;
-
+  async verifyEmail(
+    @Arg("userId") userId: number,
+    @Arg("code") code: string
+  ): Promise<VerifyEmailResponse> {
     try {
-      const decodedToken = jwt.decode(token);
-      if (
-        typeof decodedToken === "object" &&
-        decodedToken &&
-        "email" in decodedToken
-      ) {
-        userEmail = decodedToken.email;
-        userNickName = decodedToken.nickName;
+      /* Get the user */
+      const user = await User.findOneBy({ id: userId });
+      if (!user) {
+        return { success: false, message: "Utilisateur non trouvé" };
+      }
+      /* Check if code arg is equal to verificationCode.code */
+      const verificationCode = await VerificationCode.findOneBy({
+        user: { id: user.id },
+        type: typeCodeVerification,
+      });
+
+      if (!verificationCode) {
+        return {
+          success: false,
+          message: "Code de vérification invalide ou expiré",
+        };
+      }
+      /* Check if code is expired */
+      const now = new Date();
+      if (verificationCode.expirationDate < now) {
+        return {
+          success: false,
+          message: "Code de vérification expiré",
+        };
       }
 
-      const payload = jwt.verify(
-        token,
-        process.env.JWT_VERIFY_EMAIL_SECRET_KEY || ""
-      );
-      if (typeof payload === "object" && payload.email) {
-        const user = await User.findOneBy({ email: payload.email });
-        if (!user) {
-          return { success: false, message: "Utilisateur non trouvé" };
-        }
-
-        user.isVerified = true;
-        await user.save();
-        await sendConfirmationEmail(user.email, user.nickName);
-        return { success: true, message: "Email vérifié avec succès !" };
-      } else {
-        return { success: false, message: "Invalid Token" };
-      }
-    } catch (error) {
-      if (error instanceof jwt.TokenExpiredError && userEmail && userNickName) {
-        await sendVerificationEmail(userEmail, userNickName);
+      /* Check if maximumTry is greater than 3 */
+      if (verificationCode.maximumTry == 3) {
         return {
           success: false,
           message:
-            "Le lien a expiré, un nouveau lien de vérification a été envoyé à votre adresse email.",
+            "Nombre maximal de tentatives atteint. Un nouveau code doit être généré.",
         };
-      } else {
-        return { success: false, message: "Error verifying email." };
       }
+      /* Incremente maximumTry when user write wrong code */
+      if (verificationCode.code !== code) {
+        verificationCode.maximumTry++;
+        await verificationCode.save();
+        return { success: false, message: "Code de vérification invalide" };
+      }
+
+      user.isVerified = true;
+      await user.save();
+
+      await verificationCode.remove();
+
+      await sendConfirmationEmail(user.email, user.nickName);
+
+      return { success: true, message: "Email vérifié avec succès !" };
+    } catch (error) {
+      return {
+        success: false,
+        message: "Erreur lors de la vérification de l'email.",
+      };
     }
   }
 
