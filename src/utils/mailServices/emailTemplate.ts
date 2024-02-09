@@ -1,7 +1,7 @@
 export type EmailTemplateParams = {
-  content: string;
-  title: string;
-};
+  content: string
+  title: string
+}
 
 export const createEmailTemplate = ({
   content,
@@ -78,5 +78,5 @@ export const createEmailTemplate = ({
             <p class="rentHub">© RentHub 2024</p>
         </div> 
       </body>
-      </html>`;
-};
+      </html>`
+}

@@ -1,12 +1,12 @@
-import * as nodemailer from 'nodemailer';
+import * as nodemailer from 'nodemailer'
 
 export type EmailOptions = {
-  from: string;
-  to: string;
-  replyTo?: string;
-  subject: string;
-  html: string;
-};
+  from: string
+  to: string
+  replyTo?: string
+  subject: string
+  html: string
+}
 
 export const sendEmail = (emailOptions: EmailOptions) => {
   const transporter = nodemailer.createTransport({
@@ -17,17 +17,17 @@ export const sendEmail = (emailOptions: EmailOptions) => {
       user: process.env.MAIL_USER,
       pass: process.env.MAIL_PASSWORD,
     },
-  });
+  })
   return new Promise((resolve, reject) => {
     transporter.sendMail(
       emailOptions,
       (error: unknown, info: nodemailer.SentMessageInfo): void => {
         if (error) {
-          reject(error);
+          reject(error)
         } else {
-          resolve(info);
+          resolve(info)
         }
       }
-    );
-  });
-};
+    )
+  })
+}

@@ -1,5 +1,5 @@
-import { DataSource } from 'typeorm';
-import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
+import { DataSource } from 'typeorm'
+import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions'
 
 export const dataSourceOptions: PostgresConnectionOptions = {
   type: 'postgres',
@@ -9,10 +9,10 @@ export const dataSourceOptions: PostgresConnectionOptions = {
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
   logging: process.env.DOCKER_LOGS === 'true' ? true : false,
-};
+}
 
 export const dataSource = new DataSource({
   ...dataSourceOptions,
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),
-});
+})

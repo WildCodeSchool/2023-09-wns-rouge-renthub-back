@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
   CreateDateColumn,
   OneToMany,
-} from 'typeorm';
+} from 'typeorm'
 import {
   IsEmail,
   IsNumberString,
@@ -17,19 +17,19 @@ import {
   Length,
   Matches,
   IsDate,
-} from 'class-validator';
-import { Field, ID, InputType, ObjectType } from 'type-graphql';
-import { Picture } from './Picture';
-import { Role } from './Role';
-import { ObjectId } from './ObjectId';
-import { VerificationCode } from './VerificationCode';
+} from 'class-validator'
+import { Field, ID, InputType, ObjectType } from 'type-graphql'
+import { Picture } from './Picture'
+import { Role } from './Role'
+import { ObjectId } from './ObjectId'
+import { VerificationCode } from './VerificationCode'
 
 @Entity()
 @ObjectType()
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   @Field(() => ID)
-  id!: number;
+  id!: number
 
   @Column({ length: 50, nullable: true })
   @IsOptional()
@@ -38,7 +38,7 @@ export class User extends BaseEntity {
     message: 'Le prénom ne doit contenir que des lettres',
   })
   @Field({ nullable: true })
-  firstName!: string;
+  firstName!: string
 
   @Column({ length: 50, nullable: true })
   @IsOptional()
@@ -47,22 +47,22 @@ export class User extends BaseEntity {
     message: 'Le nom de famille ne doit contenir que des lettres',
   })
   @Field({ nullable: true })
-  lastName!: string;
+  lastName!: string
 
   @Column({ length: 50, nullable: true })
   @IsOptional()
   @Length(2, 50, { message: 'Entre 2 et 50 caractères' })
   @Field({ nullable: true })
-  nickName!: string;
+  nickName!: string
 
   @Column({ type: 'date', nullable: true })
   @IsOptional()
   @IsDate({ message: 'Doit être une date valide' })
   @Field(() => Date, { nullable: true })
-  dateOfBirth!: Date;
+  dateOfBirth!: Date
 
   @Column({ length: 250 })
-  hashedPassword!: string;
+  hashedPassword!: string
 
   @Column({ length: 10, nullable: true })
   @IsOptional()
@@ -74,147 +74,147 @@ export class User extends BaseEntity {
     message: 'Le numéro de téléphone doit avoir exactement 10 chiffres',
   })
   @Field({ nullable: true })
-  phoneNumber!: string;
+  phoneNumber!: string
 
   @Column({ length: 255, unique: true })
   @Field()
   @IsEmail()
-  email!: string;
+  email!: string
 
   @Column({ default: false })
   @Field()
-  isVerified!: boolean;
+  isVerified!: boolean
 
   @Column({ type: 'timestamp', nullable: true })
   @Field(() => Date, { nullable: true })
-  lastConnectionDate!: Date;
+  lastConnectionDate!: Date
 
   @CreateDateColumn({ type: 'timestamp' })
   @Field(() => Date)
-  createdAt!: Date;
+  createdAt!: Date
 
   @ManyToOne(() => User, (user) => user.createdBy)
   @Field(() => User, { nullable: true })
-  createdBy!: User;
+  createdBy!: User
 
   @UpdateDateColumn()
   @Field(() => Date)
-  updatedAt!: Date;
+  updatedAt!: Date
 
   @ManyToOne(() => User, (user) => user.updatedBy, { nullable: true })
   @Field(() => User, { nullable: true })
-  updatedBy!: User;
+  updatedBy!: User
 
   @OneToOne(() => Picture, { nullable: true })
   @IsOptional()
   @JoinColumn()
   @Field({ nullable: true })
-  picture?: Picture;
+  picture?: Picture
 
   @OneToMany(
     () => VerificationCode,
     (verificationCode) => verificationCode.user,
     { cascade: true }
   )
-  verificationCodes!: VerificationCode[];
+  verificationCodes!: VerificationCode[]
 
   @ManyToOne(() => Role, (role) => role.user)
   @JoinColumn({ name: 'role' })
   @Field(() => Role, { nullable: true })
-  role!: Role;
+  role!: Role
 }
 
 @InputType()
 export class UserCreateInput {
   @Field({ nullable: true })
-  firstName!: string;
+  firstName!: string
 
   @Field({ nullable: true })
-  lastName!: string;
+  lastName!: string
 
   @Field({ nullable: true })
-  nickName!: string;
+  nickName!: string
 
   @Field({ nullable: true })
-  dateOfBirth!: string;
+  dateOfBirth!: string
 
   @Field()
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()_+]{8,}$/, {
     message:
       'Password is not valid. At least 8 characters, 1 uppercase, 1 lowercase, 1 special characters and 1 number required!',
   })
-  password!: string;
+  password!: string
 
   @Field({ nullable: true })
-  phoneNumber?: string;
+  phoneNumber?: string
 
   @Field()
   @Matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, {
     message: 'Email is not valid!',
   })
-  email!: string;
+  email!: string
 
   @Field({ nullable: true })
-  pictureId?: ObjectId;
+  pictureId?: ObjectId
 }
 
 @InputType()
 export class UserUpdateInput {
   @Field({ nullable: true })
-  firstName!: string;
+  firstName!: string
 
   @Field({ nullable: true })
-  lastName!: string;
+  lastName!: string
 
   @Field({ nullable: true })
-  nickName!: string;
+  nickName!: string
 
   @Field({ nullable: true })
-  dateOfBirth!: Date;
+  dateOfBirth!: Date
 
   @Field({ nullable: true })
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/)
-  password!: string;
+  password!: string
 
   @Field({ nullable: true })
-  phoneNumber!: string;
+  phoneNumber!: string
 
   @Field({ nullable: true })
-  isVerified!: boolean;
+  isVerified!: boolean
 
   @Field(() => ID, { nullable: true })
-  updatedBy?: number;
+  updatedBy?: number
 
   @Field({ nullable: true })
-  pictureId?: number;
+  pictureId?: number
 }
 
 @InputType()
 export class UserLoginInput {
   @Field()
-  email!: string;
+  email!: string
 
   @Field()
-  password!: string;
+  password!: string
 }
 
 @ObjectType()
 export class UserContext {
   @Field()
-  id!: number;
+  id!: number
 
   @Field()
-  nickName!: string;
+  nickName!: string
 
   @Field()
-  picture!: string;
+  picture!: string
 }
 
 @ObjectType()
 export class VerifyEmailResponse {
   @Field()
-  success!: boolean;
+  success!: boolean
 
   @Field({ nullable: true })
-  message?: string;
+  message?: string
 }
