@@ -1,5 +1,5 @@
 import { config } from 'dotenv'
-config()
+config({ path: '.env' })
 //-----------------------------------------
 //-----------------TYPE ORM----------------
 //-----------------------------------------
@@ -24,17 +24,14 @@ import { expressMiddleware } from '@apollo/server/express4'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
 
 //-----------------------------------------
-//------------ENTIETIES / TYPES------------
-//-----------------------------------------
-
-import { Role } from './entities/Role'
-
-//-----------------------------------------
 //-----------------EXPRESS-----------------
 //-----------------------------------------
 
 import express from 'express'
+
 import http from 'http'
+// eslint-disable-next-line @typescript-eslint/no-var-requires, no-var
+
 import cors from 'cors'
 import path from 'path'
 import axios from 'axios'
@@ -43,22 +40,10 @@ import { Request, Response } from 'express'
 //-----------------------------------------
 //-----------------APOLLO SERVER-----------
 //-----------------------------------------
-export type UserContext = {
-  id: number
-  nickName: string
-  picture: string
-  role: Role
-}
-
-export interface MyContext {
-  req: Request
-  res: Response
-  user?: UserContext
-}
 
 const app = express()
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: ['http://localhost:3000', 'http://localhost:5004/'],
   credentials: true,
   optionsSuccessStatus: 200,
 }
@@ -88,6 +73,7 @@ async function start() {
         return {
           req: args.req,
           res: args.res,
+          cookies: args.req.cookies,
         }
       },
     })

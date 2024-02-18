@@ -10,7 +10,7 @@ import {
 import { validate } from 'class-validator'
 import * as argon2 from 'argon2'
 import jwt from 'jsonwebtoken'
-import { MyContext } from '../index'
+import { MyContext } from '../types/MyContext'
 import Cookies from 'cookies'
 import { Picture } from '../entities/Picture'
 import { deletePicture } from '../utils/pictureServices/pictureServices'
@@ -35,7 +35,7 @@ export class UsersResolver {
 
   @Mutation(() => User)
   async userCreate(
-    @Ctx() context: MyContext,
+    @Ctx() context: { req: any; res: any },
     @Arg('data', () => UserCreateInput) data: UserCreateInput
   ): Promise<User> {
     // Validate input data before creating User entity

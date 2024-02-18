@@ -1,7 +1,7 @@
 import { AuthChecker } from 'type-graphql'
 import jwt from 'jsonwebtoken'
 import Cookies from 'cookies'
-import { MyContext } from './index'
+import { MyContext } from './types/MyContext'
 import { User } from './entities/User'
 
 export async function getUserFromReq(req: any, res: any): Promise<User | null> {

@@ -111,6 +111,7 @@ export class User extends BaseEntity {
   @Field({ nullable: true })
   picture?: Picture
 
+  //TODO : comment this line because
   @OneToMany(
     () => VerificationCode,
     (verificationCode) => verificationCode.user,

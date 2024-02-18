@@ -1,9 +1,4 @@
--- Active: 1707614539988@@127.0.0.1@5434@renthub
---CREATE DATABASE renthub;
-
--- fill category table to product location sportINSERT INTO category (name)
--- Catégories principales liées au matériel de location dans le sport
--- Catégories principales liées au matériel de location dans le sport
+-- Active: 1707614539988@@127.0.0.1@5434@renthub@public
 INSERT INTO
     category (
         name, "index", display, "createdBy", "createdAt"

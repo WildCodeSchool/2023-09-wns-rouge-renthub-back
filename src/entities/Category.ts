@@ -62,7 +62,9 @@ export class Category {
   @Field({ nullable: true })
   updatedAt!: Date
 
-  @ManyToOne(() => Category, (category) => category.childCategories)
+  @ManyToOne(() => Category, (category) => category.childCategories, {
+    nullable: true,
+  })
   @Field(() => Category, { nullable: true })
   parentCategory?: Category
 
