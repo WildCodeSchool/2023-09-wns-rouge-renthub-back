@@ -1,13 +1,13 @@
 import { config } from 'dotenv'
 config()
 import { describe, it, expect, beforeAll } from '@jest/globals'
-import { getSchema } from '../../src/schema'
+import { getSchema } from '../../../src/schema'
 import { GraphQLSchema, graphql, print } from 'graphql'
 import { DataSource } from 'typeorm'
-import { dataSourceOptions } from '../../src/datasource'
+import { dataSourceOptions } from '../../../src/datasource'
 import { mutationUserCreate } from './graphql/mutationUserCreate'
 import { mutationUserLogin } from './graphql/mutationUserLogin'
-import { User } from '../../src/entities/User'
+import { User } from '../../../src/entities/User'
 import { serialize, parse } from 'cookie'
 import { queryMe } from './graphql/queryMe'
 
