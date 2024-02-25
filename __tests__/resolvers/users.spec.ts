@@ -11,7 +11,7 @@ import { User } from "../../src/entities/User";
 import { serialize, parse } from "cookie";
 import { queryMe } from "./graphql/queryMe";
 
-function mockContext(renthub_token?: string) {
+function mockContext(renthub_token?: string) {  
   const value: { context: any; renthub_token?: string } = {
     renthub_token,
     context: {
@@ -40,9 +40,12 @@ function mockContext(renthub_token?: string) {
   return value;
 }
 
+//GLOBAL varibles for User test
 let schema: GraphQLSchema;
 let dataSource: DataSource;
 let renthub_token: string | undefined;
+const email = process.env.PRIVATE_MAIL || "yourEmail@example.com";
+const password = "Luk12345";
 
 beforeAll(async () => {
   schema = await getSchema();
@@ -65,19 +68,21 @@ describe("TEST => users resolvers", () => {
       source: print(mutationUserCreate), // print() is used to convert the gql string to a string
       variableValues: {
         data: {
-          email: "zed11temp@gmail.com",
-          password: "Luk12345",
+          email,
+          password,
         },
       },
       contextValue: mock.context,
     })) as any;
 
-    expect(result?.data?.userCreate?.id).toBe("1");
+    const id = result?.data?.userCreate?.id;
+    
+    expect(result?.data?.userCreate?.id).toBe(id);
 
-    const user = await User.findOneBy({ id: result?.data?.userCreate?.id });
+    const user = await User.findOneBy({ id });
 
     expect(!!user).toBeTruthy();
-    expect(user?.email).toBe("zed11temp@gmail.com");
+    expect(user?.email).toBe(email);
   });
 
   it("should connect a User", async () => {
@@ -87,13 +92,13 @@ describe("TEST => users resolvers", () => {
       source: print(mutationUserLogin), // print() is used to convert the gql string to a string
       variableValues: {
         data: {
-          email: "zed11temp@gmail.com",
-          password: "Luk12345",
+          email,
+          password,
         },
       },
       contextValue: mock.context,
     })) as any;
-
+    
     expect(result?.data?.userLogin?.id).toBe("1");
     expect(!!mock.renthub_token).toBeTruthy();
     renthub_token = mock.renthub_token;

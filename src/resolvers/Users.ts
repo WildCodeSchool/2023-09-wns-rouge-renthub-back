@@ -54,7 +54,6 @@ export class UsersResolver {
     }
 
     const newUser = new User();
-
     /* createdBy
      * newUser || adminUser
      * Depends if token is present in context.
@@ -79,17 +78,19 @@ export class UsersResolver {
       }
     }
 
-    Object.assign(newUser, data, {
-      dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
-      createdBy: adminUser || newUser,
-    });
-
-    //
     try {
       newUser.hashedPassword = await argon2.hash(data.password);
     } catch (error) {
       throw new Error(`Error hashing password: ${error}`);
     }
+
+    // delete user's original password from data
+    const { password, ...dataWithoutPassword } = data;
+
+    Object.assign(newUser, dataWithoutPassword, {
+      dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
+      createdBy: adminUser || newUser,
+    });
 
     const errors = await validate(newUser);
     if (errors.length === 0) {
