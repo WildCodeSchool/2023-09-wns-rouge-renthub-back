@@ -5,6 +5,7 @@ export const mutationUserCreate = gql`
     userCreate(data: $data) {
       id
       email
+      nickName
     }
   }
 `

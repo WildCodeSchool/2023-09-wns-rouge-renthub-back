@@ -186,11 +186,7 @@ export class UsersResolver {
       throw new Error('Email ou mot de passe incorrect')
     }
     if (!user.isVerified) {
-      // TODO for TEST send verification email
-      console.log(
-        'TODO : do verifification for TEST integration. Email non vérifié.'
-      )
-      // throw new Error("Email non vérifié, consultez votre boite mail");
+      throw new Error("Email non vérifié, consultez votre boite mail");
     }
 
     const valid = await argon2.verify(user.hashedPassword, data.password)
