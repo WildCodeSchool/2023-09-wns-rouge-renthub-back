@@ -7,6 +7,7 @@ import { typeCodeVerification } from '../utils/constant'
 
 @Resolver(VerificationCode)
 export class VerificationCodeResolver {
+  /* Generate a new verification code and send it to the user by email */
   @Mutation(() => Boolean)
   async generateNewVerificationCode(
     @Arg('userId') userId: number

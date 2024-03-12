@@ -114,7 +114,7 @@ export class UsersResolver {
 
   @Mutation(() => VerifyEmailResponse)
   async verifyEmail(
-    @Arg('userId') userId: number,
+    @Arg('userId') userId: number, // transforme data => le type des arguments que j'envoie 
     @Arg('code') code: string
   ): Promise<VerifyEmailResponse> {
     try {
