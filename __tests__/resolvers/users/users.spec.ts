@@ -112,7 +112,6 @@ describe('TEST => users resolvers', () => {
 
   it("should connect a User with userLogin() resolver", async () => {
     const mock = mockContext();
-
     const result = (await graphql({
       schema,
       source: print(mutationUserLogin), // print() is used to convert the gql string to a string
