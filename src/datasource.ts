@@ -21,7 +21,7 @@ const dataSourceOptions: PostgresConnectionOptions = {
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
-  logging: false, //process.env.DOCKER_LOGS === 'true' ? true : false,
+  logging: process.env.DOCKER_LOGS === 'true' ? true : false,
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),
   migrations: [`${__dirname}/../migrations/*.ts`],

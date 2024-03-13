@@ -74,6 +74,7 @@ export const sendConfirmationEmail = async (
     const info = await sendEmail(emailOptions)
     return info
   } catch (error) {
+    console.error('Error sending confirmation email: ', error)
     throw new Error(`Error sending verification email: ${error}`)
   }
 }
