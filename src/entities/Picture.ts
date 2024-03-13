@@ -73,9 +73,6 @@ export class PictureCreateInput {
 
   @Field({ nullable: true })
   urlMiniature: string
-
-  // @Field(() => ID)
-  // createdBy: number
 }
 
 @InputType()
@@ -88,7 +85,4 @@ export class PictureUpdate {
 
   @Field({ nullable: true })
   urlMiniature: string
-
-  @Field(() => ID, { nullable: true })
-  updatedBy: number
 }

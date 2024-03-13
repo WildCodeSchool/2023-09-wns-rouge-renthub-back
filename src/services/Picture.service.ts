@@ -1,5 +1,5 @@
 import { Category } from './../entities/Category'
-import { Picture, PictureCreateInput } from '../entities/Picture'
+import { Picture, PictureCreateInput, PictureUpdate } from '../entities/Picture'
 import { Repository } from 'typeorm'
 import { validate } from 'class-validator'
 import { dataSource } from '../datasource'
@@ -22,9 +22,8 @@ export class PictureService {
       relations: ['category'],
     })
     if (!picture) {
-      throw new Error('Picture not found')
+      throw new Error(`Picture with ${id} not found`)
     }
-
     return picture
   }
 
@@ -42,9 +41,8 @@ export class PictureService {
     const CategoryExist = await dataSource.getRepository(Category).findOne({
       where: { id: idCategory },
     })
-    console.log('c----------', CategoryExist)
     if (!CategoryExist) {
-      throw new Error('Category not found')
+      throw new Error(`Category with ID ${idCategory} not found`)
     }
 
     const newPicture = this.db.create({
@@ -57,8 +55,8 @@ export class PictureService {
   }
 
   async updateOnCategory(
-    pictureInput: PictureCreateInput,
-    idCategory: number,
+    idPicture: number,
+    pictureInput: PictureUpdate,
     userId: number
   ) {
     const errors = await validate(pictureInput)
@@ -67,30 +65,44 @@ export class PictureService {
       throw new Error('Validation failed!')
     }
 
-    const CategoryExist = await dataSource.getRepository(Category).findOne({
-      where: { id: idCategory },
+    const pictureUpdate: Picture | null = await this.db.findOne({
+      where: { id: +idPicture },
+      relations: ['category'],
     })
-    console.log('c----------', CategoryExist)
-    if (!CategoryExist) {
-      throw new Error('Category not found')
+    if (!pictureUpdate) {
+      throw new Error(`Picture with ID ${idPicture} not found`)
+    }
+    const pictureToSave = this.db.merge(pictureUpdate, {
+      ...pictureInput,
+      updatedBy: userId,
+    })
+    return await this.db.save(pictureToSave)
+  }
+
+  // delete picture do not delete category but remplacer pictureId by null
+  // we dont need to delete category
+  async deleteWithCategory(id: number) {
+    const picture = await this.db.findOne({
+      where: { id },
+      relations: ['category'],
+    })
+    if (!picture) {
+      throw new Error(`Picture with ${id} not found`)
+    }
+    if (picture?.category) {
+      const category = await dataSource.getRepository(Category).findOne({
+        where: { id: picture.category.id },
+      })
+      if (category) {
+        Object.assign(category, { picture: null })
+        console.log('----0--', category)
+        await dataSource.getRepository(Category).save(category)
+      }
     }
 
-    const newPicture = this.db.create({
-      ...pictureInput,
-      createdBy: userId,
-      category: CategoryExist,
-    })
-    await this.db.save(newPicture)
-    return newPicture
-  }
-  // async function createImage(filename: string) {
-  //   const newPicture = this.db.create(pictureInput)
-  //   picture.filename = filename
-  //   await picture.save()
-  //   return picture
-  // }
-  async delete(id: number) {
-    const picture = await this.find(id) // Ensure picture exists
-    await this.db.remove(picture)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { raw, affected } = await this.db.delete(picture.id)
+    if (affected === 0) throw new Error('no delete affected on picture')
+    return picture
   }
 }

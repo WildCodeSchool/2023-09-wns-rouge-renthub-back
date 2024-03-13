@@ -8,10 +8,8 @@ import {
   Query,
 } from 'type-graphql'
 import { Picture, PictureCreateInput, PictureUpdate } from '../entities/Picture'
-import { deletePicture } from '../utils/pictureServices/pictureServices'
 import { MyContext } from '../types/MyContext'
 import { PictureService } from '../services/Picture.service'
-
 // import { CategoryService } from '../services/Category.services'
 
 // TODO OK
@@ -60,20 +58,20 @@ export class PictureResolver {
   }
 
   // TODO update picture on category
-  @Authorized('ADMIN', 'USER')
+  @Authorized('ADMIN')
   @Mutation(() => Picture)
   async updatePictureOnCategory(
     @Ctx() context: MyContext,
-
-    @Arg('data') data: PictureUpdate,
-    @Arg('categoryId', () => ID) idCategory: number
+    @Arg('idPicture', () => ID) idPicture: number,
+    @Arg('dataPicture', () => PictureUpdate) data: PictureUpdate
   ) {
     if (!context.user) {
       throw new Error('Not authenticated')
     }
-    return await new PictureService().createOnCategory(
+
+    return await new PictureService().updateOnCategory(
+      idPicture,
       data,
-      idCategory,
       context.user.id
     )
   }
@@ -89,15 +87,16 @@ export class PictureResolver {
   //   return createImage(data.filename)
   // }
 
-  @Authorized('ADMIN', 'USER')
+  @Authorized('ADMIN')
   @Mutation(() => Picture, { nullable: true })
-  async pictureDelete(
+  async deletePicture(
     @Ctx() context: MyContext,
-    @Arg('id', () => ID) id: number
-  ): Promise<Picture | null> {
+    @Arg('idPicture', () => ID) idPicture: number
+  ) {
     if (!context.user) {
       throw new Error('Not authenticated')
     }
-    return deletePicture(id)
+
+    return new PictureService().deleteWithCategory(idPicture)
   }
 }

@@ -74,7 +74,7 @@ export class Category {
   @Field(() => [Category], { nullable: true })
   childCategories?: Category[]
 
-  @OneToOne(() => Picture)
+  @OneToOne(() => Picture, { nullable: true })
   @JoinColumn({ name: 'pictureId', referencedColumnName: 'id' })
   @Field(() => Picture, { nullable: true })
   picture?: Picture
