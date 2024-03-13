@@ -18,7 +18,7 @@
     "migration:revert": "npm run typeorm  migration:revert"
   },
   "lint-staged": {
-    "./src/**/*.{ts,tsx,html,css,scss}": "prettier -v-write ",
+    "./src/**/*.{ts,tsx,html,css,scss}": "prettier -write ",
     "./src/**/*.{ts,tsx}": "eslint "
   },
   "author": "",

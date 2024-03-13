@@ -1,4 +1,4 @@
-import { CategoryService } from '../services/Category.services'
+import { CategoryService } from '../services/Category.service'
 import { Arg, ID, Mutation, Query, Resolver } from 'type-graphql'
 import {
   Category,

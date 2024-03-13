@@ -8,10 +8,10 @@ import { buildSchema } from 'type-graphql'
 //-----------------RESOLVERS---------------
 //-----------------------------------------
 
-import { UsersResolver } from './resolvers/Users'
+import { UsersResolver } from './resolvers/Users.resolver'
 import { customAuthChecker } from './auth'
-import { PictureResolver } from './resolvers/Pictures'
-import { CategoriesResolver } from './resolvers/Category.resolver'
+import { PictureResolver } from './resolvers/Pictures.resolver'
+import { CategoriesResolver } from './resolvers/Categories.resolver'
 import { VerificationCodeResolver } from './resolvers/VerificationCode'
 
 export async function getSchema() {

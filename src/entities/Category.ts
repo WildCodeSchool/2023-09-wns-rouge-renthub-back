@@ -47,12 +47,12 @@ export class Category {
   display: boolean
 
   @Column({ nullable: true })
-  @Field({ nullable: true })
-  createdBy: string
+  @Field(() => ID, { nullable: true })
+  createdBy: number
 
   @Column({ nullable: true })
-  @Field({ nullable: true })
-  updatedBy: string
+  @Field(() => ID, { nullable: true })
+  updatedBy: number
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
   @Field()
@@ -91,8 +91,8 @@ export class CategoryCreateInput {
   @Field(() => Boolean, { nullable: true })
   display: boolean
 
-  @Field()
-  createdBy: string
+  @Field(() => ID)
+  createdBy: number
 
   @Field(() => ID, { nullable: true })
   parentCategoryId: number
@@ -115,8 +115,8 @@ export class CategoryUpdateInput {
   @Field(() => Boolean, { nullable: true })
   display?: boolean
 
-  @Field()
-  updatedBy: string
+  @Field(() => ID)
+  updatedBy: number
 
   @Field(() => ID, { nullable: true })
   parentCategoryId: number

@@ -1,17 +1,15 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
-import { CategoryService } from '../../src/services/Category.services'
+import { CategoryService } from '../../src/services/Category.service'
 import { Category } from './../../src/entities/Category'
 
 describe('CategoryService', () => {
   let categoryService: CategoryService
 
   beforeEach(() => {
-    // Créez une nouvelle instance du service avant chaque test
     categoryService = new CategoryService()
   })
 
   it('should return a list of categories', async () => {
-    // Créez des données fictives de catégorie
     const fakeCategories: Category[] = [
       {
         id: 1,
@@ -22,10 +20,10 @@ describe('CategoryService', () => {
         updatedBy: 'admin',
         createdAt: new Date(),
         updatedAt: new Date(),
-        parentCategory: undefined, // Mettez la référence parente si nécessaire
-        childCategories: [], // Ajoutez des catégories enfants si nécessaire
-        picture: undefined, // Ajoutez une référence à l'image si nécessaires
-        updateDatesOnInsert: () => new Date(), // Mettez la date d'insertion (ou une date fictive)
+        parentCategory: undefined,
+        childCategories: [],
+        picture: undefined,
+        updateDatesOnInsert: () => new Date(), //
         updateDatesOnUpdate: () => new Date(),
         // autres champs et valeurs ici
       },

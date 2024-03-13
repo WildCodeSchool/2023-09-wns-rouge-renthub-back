@@ -1,7 +1,7 @@
 import { buildSchema } from 'type-graphql'
 import { graphql } from 'graphql'
-import { CategoriesResolver } from '../../../../src/resolvers/Category.resolver'
-import { CategoryService } from '../../../../src/services/Category.services'
+import { CategoriesResolver } from '../../../../src/resolvers/Categories.resolver'
+import { CategoryService } from '../../../../src/services/Category.service'
 import { describe, expect, it, jest } from '@jest/globals'
 import { Category } from '../../../../src/entities/Category'
 

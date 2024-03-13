@@ -2,7 +2,7 @@ import {
   Category,
   CategoryCreateInput,
   CategoryUpdateInput,
-} from './../entities/Category'
+} from '../entities/Category'
 
 import { Repository } from 'typeorm'
 import { validate } from 'class-validator'

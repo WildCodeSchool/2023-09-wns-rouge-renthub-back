@@ -1,4 +1,4 @@
--- Active: 1707614539988@@127.0.0.1@5434@renthub@public
+-- Active: 1710102669817@@127.0.0.1@5434@renthub
 INSERT INTO
     category (
         name, "index", display, "createdBy", "createdAt"
