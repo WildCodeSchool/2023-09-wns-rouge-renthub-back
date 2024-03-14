@@ -22,8 +22,9 @@ export class Role extends BaseEntity {
 
   @Column({ length: 50 })
   @Length(2, 50, { message: 'Entre 2 et 50 caractères' })
-  @Matches(/^[a-zA-ZÀ-ÿ-]+$/, {
-    message: 'Le prénom ne doit contenir que des lettres',
+  @Matches(/^[a-zA-ZÀ-ÿ0-9-]+$/, {
+    message:
+      'Le nom du groupe Role peut contenir des lettres, des chiffres et des tirets',
   })
   @Field()
   name!: string
@@ -65,5 +66,14 @@ export class RoleCreateInput {
   name!: string
 
   @Field()
+  right!: string
+}
+
+@InputType()
+export class RoleUpdateInput {
+  @Field({ nullable: true })
+  name!: string
+
+  @Field({ nullable: true })
   right!: string
 }
