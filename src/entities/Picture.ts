@@ -43,12 +43,12 @@ export class Picture extends BaseEntity {
   urlMiniature: string
 
   @Column()
-  @Field()
-  createdBy: string
+  @Field(() => ID)
+  createdBy: number
 
   @Column({ nullable: true })
-  @Field()
-  updatedBy: string
+  @Field(() => ID, { nullable: true })
+  updatedBy: number
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
   @Field()
@@ -59,6 +59,7 @@ export class Picture extends BaseEntity {
   updatedAt?: Date
 
   @OneToOne(() => Category, (category) => category.picture)
+  @Field(() => Category, { nullable: true })
   category: Category
 }
 
@@ -72,7 +73,16 @@ export class PictureCreateInput {
 
   @Field({ nullable: true })
   urlMiniature: string
+}
+
+@InputType()
+export class PictureUpdate {
+  @Field({ nullable: true })
+  filename: string
 
   @Field({ nullable: true })
-  createdBy: string
+  urlHD: string
+
+  @Field({ nullable: true })
+  urlMiniature: string
 }

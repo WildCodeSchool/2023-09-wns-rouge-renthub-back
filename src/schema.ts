@@ -10,7 +10,7 @@ import { buildSchema } from 'type-graphql'
 
 import { UsersResolver } from './resolvers/Users'
 import { customAuthChecker } from './auth'
-import { PictureResolver } from './resolvers/Pictures'
+import { PictureResolver } from './resolvers/Pictures.resolver'
 import { CategoriesResolver } from './resolvers/Category.resolver'
 import { VerificationCodeResolver } from './resolvers/VerificationCode'
 
