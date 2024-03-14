@@ -12,6 +12,7 @@ import { UsersResolver } from './resolvers/Users'
 import { customAuthChecker } from './auth'
 import { PictureResolver } from './resolvers/Pictures.resolver'
 import { CategoriesResolver } from './resolvers/Category.resolver'
+import { RolesResolver } from './resolvers/Roles.resolver'
 import { VerificationCodeResolver } from './resolvers/VerificationCode'
 
 export async function getSchema() {
@@ -21,6 +22,7 @@ export async function getSchema() {
       PictureResolver,
       CategoriesResolver,
       VerificationCodeResolver,
+      RolesResolver,
     ],
     authChecker: customAuthChecker,
   })
