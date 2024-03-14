@@ -1,10 +1,12 @@
-import { Arg, Mutation, Resolver } from 'type-graphql'
+import { Arg, ID, Mutation, Query, Resolver } from 'type-graphql'
 import {
   ProductReference,
   ProductReferenceCreateInput,
+  ProductReferenceUpdateInput,
 } from '../entities/ProductReference.entity'
 import { validate } from 'class-validator'
 import { Category } from '../entities/Category'
+import { formatValidationErrors } from '../utils/utils'
 
 @Resolver(() => ProductReference)
 export class ProductReferenceResolver {
@@ -14,13 +16,22 @@ export class ProductReferenceResolver {
   ): Promise<ProductReference> {
     try {
       const productReference = new ProductReference()
-      const currentCategory = await Category.findOne({
-        where: { id: data.category },
+      const currentCategory: any = await Category.findOne({
+        where: { id: data.category.id },
       })
-      Object.assign(productReference, data, { category: currentCategory })
+      if (!currentCategory) {
+        throw new Error('Aucune catégorie trouvé')
+      }
+      Object.assign(productReference, {
+        ...data,
+        category: {
+          id: data.category.id,
+        },
+      })
       const errors = await validate(productReference)
       if (errors.length > 0) {
-        throw new Error('Validation failed!')
+        const validationMessages = formatValidationErrors(errors)
+        throw new Error(validationMessages || 'Une erreur est survenue.')
       }
       await productReference.save()
       return productReference
@@ -29,27 +40,85 @@ export class ProductReferenceResolver {
     }
   }
 
-  // @Query(() => [ProductReference])
-  // async listCategories(): Promise<Category[]> {
-  //   const categories = await new CategoryService().list()
-  //   return categories
-  // }
+  @Query(() => [ProductReference])
+  async getProductsReferences(): Promise<ProductReference[]> {
+    try {
+      const productReferences = await ProductReference.find({
+        relations: {
+          category: true,
+        },
+      })
+      if (!productReferences) {
+        throw new Error('Aucun produit trouvé')
+      }
+      return productReferences
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
 
-  // @Query(() => Category)
-  // async findCategory(@Arg('id', () => ID) id: number) {
-  //   const categoryById = await new CategoryService().find(+id)
-  //   return categoryById
-  // }
+  @Query(() => ProductReference)
+  async getProductReference(@Arg('id', () => ID) id: number) {
+    try {
+      const productRef = await ProductReference.findOne({
+        where: { id },
+        relations: {
+          category: true,
+        },
+      })
+      if (!productRef) {
+        throw new Error('Aucun produit trouvé')
+      }
+      return productRef
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
 
-  // @Mutation(() => Category, { nullable: true })
-  // async updateCategory(@Arg('data') data: CategoryUpdateInput) {
-  //   const category = await new CategoryService().update(data)
-  //   return category
-  // }
+  @Mutation(() => ProductReference, { nullable: true })
+  async updateProductReference(@Arg('data') data: ProductReferenceUpdateInput) {
+    try {
+      const productRef = await ProductReference.findOne({
+        where: { id: data.id },
+        relations: {
+          category: true,
+        },
+      })
+      console.log('productRef', productRef)
+      if (!productRef) {
+        throw new Error('Aucun produit trouvé')
+      }
+      if (productRef) {
+        Object.assign(productRef, data)
+        const errors = await validate(productRef)
+        if (errors.length > 0) {
+          const validationMessages = formatValidationErrors(errors)
+          throw new Error(validationMessages || 'Une erreur est survenue.')
+        }
+        await productRef.save()
+      }
+      return productRef
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
 
-  // @Mutation(() => Boolean, { nullable: true })
-  // async deleteCategory(@Arg('id', () => ID) id: number) {
-  //   const isDelete = await new CategoryService().delete(+id)
-  //   return isDelete
-  // }
+  @Mutation(() => Boolean, { nullable: true })
+  async deleteProductReference(@Arg('id', () => ID) id: number) {
+    try {
+      const productRef = await ProductReference.findOne({
+        where: { id },
+        relations: {
+          category: true,
+        },
+      })
+      if (!productRef) {
+        throw new Error('Aucun produit trouvé')
+      }
+      await productRef.remove()
+      return true
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
 }

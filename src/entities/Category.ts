@@ -1,5 +1,6 @@
 import 'reflect-metadata'
 import {
+  BaseEntity,
   BeforeInsert,
   BeforeUpdate,
   Column,
@@ -18,21 +19,7 @@ import { ProductReference } from './ProductReference.entity'
 
 @Entity()
 @ObjectType()
-export class Category {
-  static findOne(categoryId: any) {
-    throw new Error('Method not implemented.')
-  }
-  @BeforeInsert()
-  updateDatesOnInsert() {
-    this.createdAt = new Date()
-    this.updatedAt = new Date()
-  }
-
-  @BeforeUpdate()
-  updateDatesOnUpdate() {
-    this.updatedAt = new Date()
-  }
-
+export class Category extends BaseEntity {
   @PrimaryGeneratedColumn()
   @Field(() => ID)
   id: number

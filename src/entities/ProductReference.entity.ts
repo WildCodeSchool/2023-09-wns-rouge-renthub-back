@@ -12,6 +12,7 @@ import { Field, Float, ID, InputType, ObjectType } from 'type-graphql'
 import { Category } from './Category'
 import { PictureProduct } from './PictureProduct.entity'
 import { IsBoolean, IsInt, Length } from 'class-validator'
+import { ObjectId } from './ObjectId'
 
 @Entity()
 @ObjectType()
@@ -21,12 +22,12 @@ export class ProductReference extends BaseEntity {
   id!: number
 
   @Column({ length: 150 })
-  // @Length(150)
+  @Length(2, 150)
   @Field()
   name!: string
 
   @Column({ type: 'text' })
-  // @Length(0, 5000)
+  @Length(10, 5000)
   @Field()
   description!: string
 
@@ -35,12 +36,12 @@ export class ProductReference extends BaseEntity {
   index!: number
 
   @Column({ default: true })
-  // @IsBoolean()
+  @IsBoolean()
   @Field(() => Boolean)
   display: boolean
 
   @Column({ length: 150 })
-  // @Length(150)
+  @Length(2, 150)
   @Field()
   brandName!: string
 
@@ -65,8 +66,8 @@ export class ProductReference extends BaseEntity {
   updatedAt!: Date
 
   @ManyToOne(() => Category, (category) => category.productReference)
-  @Field(() => Category)
-  category: Category
+  @Field(() => Category, { nullable: true })
+  category?: Category
 
   @OneToMany(
     () => PictureProduct,
@@ -99,9 +100,15 @@ export class ProductReferenceCreateInput {
   @Field()
   createdBy: string
 
-  @Field({ nullable: true })
-  updatedBy?: string
+  @Field()
+  category: ObjectId
+}
 
+@InputType()
+export class ProductReferenceUpdateInput extends ProductReferenceCreateInput {
   @Field(() => ID)
-  category: number
+  id: number
+
+  @Field({ nullable: true })
+  updatedBy: string
 }
