@@ -5,12 +5,14 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
 import { Field, ID, InputType, ObjectType } from 'type-graphql'
 import { Category } from './Category'
+import { PictureProduct } from './PictureProduct.entity'
 
 @Entity()
 @ObjectType()
@@ -61,6 +63,11 @@ export class Picture extends BaseEntity {
   @OneToOne(() => Category, (category) => category.picture)
   @Field(() => Category, { nullable: true })
   category: Category
+
+  @OneToMany(() => PictureProduct, (pictureProduct) => pictureProduct.picture, {
+    cascade: true,
+  })
+  pictureProduct!: PictureProduct[]
 }
 
 @InputType()

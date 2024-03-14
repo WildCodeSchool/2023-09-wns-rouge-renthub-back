@@ -14,10 +14,14 @@ import {
 } from 'typeorm'
 import { Field, ID, InputType, ObjectType } from 'type-graphql'
 import { Picture } from './Picture'
+import { ProductReference } from './ProductReference.entity'
 
 @Entity()
 @ObjectType()
 export class Category {
+  static findOne(categoryId: any) {
+    throw new Error('Method not implemented.')
+  }
   @BeforeInsert()
   updateDatesOnInsert() {
     this.createdAt = new Date()
@@ -78,6 +82,14 @@ export class Category {
   @JoinColumn({ name: 'pictureId', referencedColumnName: 'id' })
   @Field(() => Picture, { nullable: true })
   picture?: Picture
+
+  @OneToMany(
+    () => ProductReference,
+    (productReference) => productReference.category,
+    { cascade: true }
+  )
+  @Field(() => [ProductReference])
+  productReference: ProductReference[]
 }
 
 @InputType()
