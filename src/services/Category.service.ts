@@ -2,7 +2,7 @@ import {
   Category,
   CategoryCreateInput,
   CategoryUpdateInput,
-} from './../entities/Category'
+} from '../entities/Category'
 
 import { Repository } from 'typeorm'
 import { validate } from 'class-validator'
@@ -50,11 +50,6 @@ export class CategoryService {
       }
       Object.assign(newCategory, { parentCategory: parentCategoryIdExist })
     }
-
-    // TODO : FEATURED -- USE CASE ADD PICTURE
-    // if (categoryInput.picture) {
-
-    // }
     const newCategorySave = await this.db.save(newCategory)
     return newCategorySave
   }
@@ -74,7 +69,7 @@ export class CategoryService {
       throw new Error('Category not found')
     }
 
-    // modificaitno du parent :
+    // modification du parent :
     if (data.parentCategoryId !== undefined) {
       const parentCategoryIdExist = await this.db.findOne({
         where: { id: data.parentCategoryId },

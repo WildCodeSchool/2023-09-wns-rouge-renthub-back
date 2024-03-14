@@ -1,5 +1,5 @@
-import { CategoryService } from '../services/Category.services'
-import { Arg, ID, Mutation, Query, Resolver } from 'type-graphql'
+import { CategoryService } from '../services/Category.service'
+import { Arg, Authorized, ID, Mutation, Query, Resolver } from 'type-graphql'
 import {
   Category,
   CategoryCreateInput,
@@ -20,18 +20,21 @@ export class CategoriesResolver {
     return categoryById
   }
 
+  @Authorized('ADMIN')
   @Mutation(() => Category)
   async createCategory(@Arg('data') data: CategoryCreateInput) {
     const newCategory = await new CategoryService().create(data)
     return newCategory
   }
 
+  @Authorized('ADMIN')
   @Mutation(() => Category, { nullable: true })
   async updateCategory(@Arg('data') data: CategoryUpdateInput) {
     const category = await new CategoryService().update(data)
     return category
   }
 
+  @Authorized('ADMIN')
   @Mutation(() => Boolean, { nullable: true })
   async deleteCategory(@Arg('id', () => ID) id: number) {
     const isDelete = await new CategoryService().delete(+id)
