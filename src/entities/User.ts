@@ -18,7 +18,14 @@ import {
   Matches,
   IsDate,
 } from 'class-validator'
-import { Field, ID, InputType, ObjectType } from 'type-graphql'
+import {
+  Field,
+  ID,
+  InputType,
+  InputType,
+  InputType,
+  ObjectType,
+} from 'type-graphql'
 import { Picture } from './Picture'
 import { Role } from './Role'
 import { ObjectId } from './ObjectId'
@@ -217,4 +224,19 @@ export class VerifyEmailResponse {
 
   @Field({ nullable: true })
   message?: string
+}
+
+@InputType()
+export class VerifyEmailResponseInput {
+  @Field()
+  code!: string
+
+  @Field()
+  userId!: number
+}
+
+@InputType()
+export class ReSendVerificationCodeInput {
+  @Field()
+  userId!: number
 }

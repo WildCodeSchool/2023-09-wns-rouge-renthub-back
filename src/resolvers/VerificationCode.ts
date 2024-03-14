@@ -1,5 +1,5 @@
 import { Arg, Mutation, Resolver } from 'type-graphql'
-import { User } from '../entities/User'
+import { ReSendVerificationCodeInput, User } from '../entities/User'
 import { VerificationCode } from '../entities/VerificationCode'
 import { sendVerificationEmail } from '../utils/mailServices/verificationEmail'
 import { generateSecurityCode } from '../utils/utils'
@@ -7,19 +7,21 @@ import { typeCodeVerification } from '../utils/constant'
 
 @Resolver(VerificationCode)
 export class VerificationCodeResolver {
+  /* Generate a new verification code and send it to the user by email */
   @Mutation(() => Boolean)
   async generateNewVerificationCode(
-    @Arg('userId') userId: number
+    @Arg('data', () => ReSendVerificationCodeInput)
+    data: ReSendVerificationCodeInput
   ): Promise<boolean> {
     try {
-      const user = await User.findOneBy({ id: userId })
+      const user = await User.findOneBy({ id: data.userId })
       if (!user) {
         throw new Error('Utilisateur non trouvé')
       }
       const verificationCodeLength = 8
       const newCode = generateSecurityCode(verificationCodeLength)
       let verificationCode = await VerificationCode.findOneBy({
-        user: { id: userId },
+        user: { id: data.userId },
         type: typeCodeVerification,
       })
       if (verificationCode) {
@@ -39,12 +41,11 @@ export class VerificationCodeResolver {
       }
 
       await verificationCode.save()
-
       await sendVerificationEmail(user.id, user.email, newCode)
 
       return true
     } catch (error) {
-      return false
+      throw new Error(`Erreur lors de la génération du code: ${error}`)
     }
   }
 }

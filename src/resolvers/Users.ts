@@ -6,6 +6,7 @@ import {
   UserLoginInput,
   UserUpdateInput,
   VerifyEmailResponse,
+  VerifyEmailResponseInput,
 } from '../entities/User'
 import { validate } from 'class-validator'
 import * as argon2 from 'argon2'
@@ -115,12 +116,11 @@ export class UsersResolver {
 
   @Mutation(() => VerifyEmailResponse)
   async verifyEmail(
-    @Arg('userId') userId: number,
-    @Arg('code') code: string
+    @Arg('data', () => VerifyEmailResponseInput) data: VerifyEmailResponseInput
   ): Promise<VerifyEmailResponse> {
     try {
       /* Get the user */
-      const user = await User.findOneBy({ id: userId })
+      const user = await User.findOneBy({ id: data.userId })
       if (!user) {
         return { success: false, message: 'Utilisateur non trouvé' }
       }
@@ -131,30 +131,19 @@ export class UsersResolver {
       })
 
       if (!verificationCode) {
-        return {
-          success: false,
-          message: 'Code de vérification invalide ou expiré',
-        }
+        throw new Error('Code de vérification non trouvé')
       }
       /* Check if code is expired */
       const now = new Date()
       if (verificationCode.expirationDate < now) {
-        return {
-          success: false,
-          message: 'Code de vérification expiré',
-        }
+        throw new Error('Code de vérification expiré')
       }
-
       /* Check if maximumTry is greater than 3 */
       if (verificationCode.maximumTry == 3) {
-        return {
-          success: false,
-          message:
-            'Nombre maximal de tentatives atteint. Un nouveau code doit être généré.',
-        }
+        throw new Error('Nombre maximum de tentatives atteint')
       }
       /* Incremente maximumTry when user write wrong code */
-      if (verificationCode.code !== code) {
+      if (verificationCode.code !== data.code) {
         verificationCode.maximumTry++
         await verificationCode.save()
         return { success: false, message: 'Code de vérification invalide' }
@@ -171,7 +160,7 @@ export class UsersResolver {
     } catch (error) {
       return {
         success: false,
-        message: "Erreur lors de la vérification de l'email.",
+        message: `Un erreur est survenue : ${error}`,
       }
     }
   }
