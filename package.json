@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --detectOpenHandles --verbose",
+    "test:simple": "jest --detectOpenHandles --verbose",
+    "test": "docker stop pgtesting ; docker run --rm --name pgtesting -p 5571:5432 -e POSTGRES_PASSWORD=pgpassword -d postgres && DB_HOST=127.0.0.1 DB_PORT=5571 DB_USERNAME=postgres DB_PASSWORD=pgpassword DB_NAME=postgres jest",
     "start": "tsnd --poll --respawn --transpile-only ./src/index.ts",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
