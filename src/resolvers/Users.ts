@@ -54,7 +54,7 @@ export class UsersResolver {
       throw new Error('User already exists')
     }
 
-    const newUser = new User();
+    const newUser = new User()
     /* createdBy
      * newUser || adminUser
      * Depends if token is present in context.
@@ -86,14 +86,14 @@ export class UsersResolver {
     }
 
     // delete user's original password from data
-    const { password, ...dataWithoutPassword } = data;
+    const { ...dataWithoutPassword } = data
 
     Object.assign(newUser, dataWithoutPassword, {
       dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
       createdBy: adminUser || newUser,
-    });
+    })
 
-    const errors = await validate(newUser);
+    const errors = await validate(newUser)
     if (errors.length === 0) {
       await newUser.save()
 
@@ -175,7 +175,7 @@ export class UsersResolver {
       throw new Error('Email ou mot de passe incorrect')
     }
     if (!user.isVerified) {
-      throw new Error("Email non vérifié, consultez votre boite mail");
+      throw new Error('Email non vérifié, consultez votre boite mail')
     }
 
     const valid = await argon2.verify(user.hashedPassword, data.password)

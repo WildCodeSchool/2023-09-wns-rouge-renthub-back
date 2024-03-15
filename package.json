@@ -11,8 +11,8 @@
     "format": "prettier --write ."
   },
   "lint-staged": {
-    "./src/**/*.{ts,tsx,html,css,scss}": "prettier --write ",
-    "./src/**/*.{ts,tsx}": "eslint "
+    "./{src,tests}/**/*.{ts,tsx,html,css,scss}": "prettier --write ",
+    "./{src,tests}/**/*.{ts,tsx}": "eslint "
   },
   "author": "",
   "license": "ISC",

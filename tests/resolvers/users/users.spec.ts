@@ -1,19 +1,19 @@
-import { config } from "dotenv";
-config();
-import { describe, it, expect, beforeAll } from "@jest/globals";
-import { getSchema } from "../../../src/schema";
-import { GraphQLSchema, graphql, print } from "graphql";
-import { DataSource } from "typeorm";
-import { dataSourceOptions } from "../../../src/datasource";
-import { mutationUserCreate } from "./graphql/mutationUserCreate";
-import { mutationUserLogin } from "./graphql/mutationUserLogin";
-import { User } from "../../../src/entities/User";
-import { serialize, parse } from "cookie";
-import { queryMe } from "./graphql/queryMe";
-import { mutationVerifyEmail } from "./graphql/mutationVerifyEmail";
-import { VerificationCode } from "../../../src/entities/VerificationCode";
+import { config } from 'dotenv'
+config()
+import { describe, it, expect, beforeAll } from '@jest/globals'
+import { getSchema } from '../../../src/schema'
+import { GraphQLSchema, graphql, print } from 'graphql'
+import { DataSource } from 'typeorm'
+import { dataSourceOptions } from '../../../src/datasource'
+import { mutationUserCreate } from './graphql/mutationUserCreate'
+import { mutationUserLogin } from './graphql/mutationUserLogin'
+import { User } from '../../../src/entities/User'
+import { serialize, parse } from 'cookie'
+import { queryMe } from './graphql/queryMe'
+import { mutationVerifyEmail } from './graphql/mutationVerifyEmail'
+import { VerificationCode } from '../../../src/entities/VerificationCode'
 
-function mockContext(renthub_token?: string) {  
+function mockContext(renthub_token?: string) {
   const value: { context: any; renthub_token?: string } = {
     renthub_token,
     context: {
@@ -43,12 +43,12 @@ function mockContext(renthub_token?: string) {
 }
 
 //GLOBAL varibles for User test
-let schema: GraphQLSchema;
-let dataSource: DataSource;
-let renthub_token: string | undefined;
-const email = "example@gmail.com";
-const password = "Luk12345";
-const nickName = "testNickName";
+let schema: GraphQLSchema
+let dataSource: DataSource
+let renthub_token: string | undefined
+const email = 'example@gmail.com'
+const password = 'Luk12345'
+const nickName = 'testNickName'
 
 beforeAll(async () => {
   schema = await getSchema()
@@ -79,22 +79,24 @@ describe('TEST => users resolvers', () => {
       contextValue: mock.context,
     })) as any
 
-    const id = result?.data?.userCreate?.id;
-    
-    expect(result?.data?.userCreate?.id).toBe(id);
+    const id = result?.data?.userCreate?.id
 
-    const user = await User.findOneBy({ id });
+    expect(result?.data?.userCreate?.id).toBe(id)
 
-    expect(!!user).toBeTruthy();
-    expect(user?.email).toBe(email);
-  });
+    const user = await User.findOneBy({ id })
 
-  it("should verify email of new user", async () => {
-    const mock = mockContext(renthub_token);
-    const user = await User.findOneBy({ email });
-    const verificationCode = await VerificationCode.findOneBy({ user: {id: user?.id} });
-    const code = verificationCode?.code;
-    
+    expect(!!user).toBeTruthy()
+    expect(user?.email).toBe(email)
+  })
+
+  it('should verify email of new user', async () => {
+    const mock = mockContext(renthub_token)
+    const user = await User.findOneBy({ email })
+    const verificationCode = await VerificationCode.findOneBy({
+      user: { id: user?.id },
+    })
+    const code = verificationCode?.code
+
     const result = (await graphql({
       schema,
       source: print(mutationVerifyEmail), // print() is used to convert the gql string to a string
@@ -103,15 +105,15 @@ describe('TEST => users resolvers', () => {
         userId: user?.id,
       },
       contextValue: mock.context,
-    })) as any;
+    })) as any
 
-    const success = result?.data?.verifyEmail?.success;
+    const success = result?.data?.verifyEmail?.success
 
-    expect(success).toBe(true);
-  });
+    expect(success).toBe(true)
+  })
 
-  it("should connect a User with userLogin() resolver", async () => {
-    const mock = mockContext();
+  it('should connect a User with userLogin() resolver', async () => {
+    const mock = mockContext()
     const result = (await graphql({
       schema,
       source: print(mutationUserLogin), // print() is used to convert the gql string to a string
@@ -122,12 +124,12 @@ describe('TEST => users resolvers', () => {
         },
       },
       contextValue: mock.context,
-    })) as any;
-    
-    expect(result?.data?.userLogin?.id).toBe("1");
-    expect(!!mock.renthub_token).toBeTruthy();
-    renthub_token = mock.renthub_token;
-  });
+    })) as any
+
+    expect(result?.data?.userLogin?.id).toBe('1')
+    expect(!!mock.renthub_token).toBeTruthy()
+    renthub_token = mock.renthub_token
+  })
 
   it('should return null if NOT connected', async () => {
     const mock = mockContext()
@@ -140,8 +142,8 @@ describe('TEST => users resolvers', () => {
     expect(result?.data).toBeNull()
   })
 
-  it("should return user if connected(queryMe)", async () => {
-    const mock = mockContext(renthub_token);
+  it('should return user if connected(queryMe)', async () => {
+    const mock = mockContext(renthub_token)
     const result = (await graphql({
       schema,
       source: print(queryMe), // print() is used to convert the gql string to a string
