@@ -108,7 +108,7 @@ export class User extends BaseEntity {
   @OneToOne(() => Picture, { nullable: true })
   @IsOptional()
   @JoinColumn()
-  @Field({ nullable: true })
+  @Field(() => Picture, { nullable: true })
   picture?: Picture
 
   @OneToMany(

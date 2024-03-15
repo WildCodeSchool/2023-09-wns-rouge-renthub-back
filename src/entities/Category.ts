@@ -1,5 +1,6 @@
 import 'reflect-metadata'
 import {
+  BaseEntity,
   BeforeInsert,
   BeforeUpdate,
   Column,
@@ -14,21 +15,11 @@ import {
 } from 'typeorm'
 import { Field, ID, InputType, ObjectType } from 'type-graphql'
 import { Picture } from './Picture'
+import { ProductReference } from './ProductReference.entity'
 
 @Entity()
 @ObjectType()
-export class Category {
-  @BeforeInsert()
-  updateDatesOnInsert() {
-    this.createdAt = new Date()
-    this.updatedAt = new Date()
-  }
-
-  @BeforeUpdate()
-  updateDatesOnUpdate() {
-    this.updatedAt = new Date()
-  }
-
+export class Category extends BaseEntity {
   @PrimaryGeneratedColumn()
   @Field(() => ID)
   id: number
@@ -78,6 +69,14 @@ export class Category {
   @JoinColumn({ name: 'pictureId', referencedColumnName: 'id' })
   @Field(() => Picture, { nullable: true })
   picture?: Picture
+
+  @OneToMany(
+    () => ProductReference,
+    (productReference) => productReference.category,
+    { cascade: true }
+  )
+  @Field(() => [ProductReference])
+  productReference: ProductReference[]
 }
 
 @InputType()

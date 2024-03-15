@@ -14,6 +14,7 @@ import { PictureResolver } from './resolvers/Pictures.resolver'
 import { CategoriesResolver } from './resolvers/Category.resolver'
 import { RolesResolver } from './resolvers/Roles.resolver'
 import { VerificationCodeResolver } from './resolvers/VerificationCode'
+import { ProductReferenceResolver } from './resolvers/ProductReference.resolver'
 
 export async function getSchema() {
   const schema = await buildSchema({
@@ -23,6 +24,7 @@ export async function getSchema() {
       CategoriesResolver,
       VerificationCodeResolver,
       RolesResolver,
+      ProductReferenceResolver,
     ],
     authChecker: customAuthChecker,
   })
