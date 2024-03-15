@@ -7,8 +7,6 @@ import { generateSecurityCode } from '../../src/utils/utils'
 describe('UTILS functions', () => {
   it('should return true if length of code is correct', async () => {
     const length = 10
-
-    const a = 10
     const randomCode = generateSecurityCode(length)
 
     expect(typeof randomCode).toBe('string')
