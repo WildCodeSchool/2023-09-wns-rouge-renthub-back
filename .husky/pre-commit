@@ -1,5 +1,9 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-npx lint-staged
+npx lint-staged || {
+  echo '❌❌❌❌ You have lint errors. Please fix them before committing. ❌❌❌❌'
+  exit 1
+}
 
+echo '✅✅✅✅ You win this time... I am committing this now. ✅✅✅✅'
