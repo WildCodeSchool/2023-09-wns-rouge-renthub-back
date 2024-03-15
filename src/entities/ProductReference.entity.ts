@@ -1,22 +1,20 @@
 import {
-  BaseEntity,
   Column,
-  CreateDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm'
 import { Field, Float, ID, InputType, ObjectType } from 'type-graphql'
 import { Category } from './Category'
 import { PictureProduct } from './PictureProduct.entity'
-import { IsBoolean, IsInt, Length } from 'class-validator'
+import { IsBoolean, Length } from 'class-validator'
 import { ObjectId } from './ObjectId'
+import { EntityWithDefault } from './EntityWithDefault'
 
 @Entity()
 @ObjectType()
-export class ProductReference extends BaseEntity {
+export class ProductReference extends EntityWithDefault {
   @PrimaryGeneratedColumn()
   @Field(() => ID)
   id!: number
@@ -48,22 +46,6 @@ export class ProductReference extends BaseEntity {
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   @Field(() => Float)
   price!: number
-
-  @Column({ nullable: true })
-  @Field({ nullable: true })
-  createdBy?: string
-
-  @Column({ nullable: true })
-  @Field({ nullable: true })
-  updatedBy?: string
-
-  @CreateDateColumn({ type: 'timestamp' })
-  @Field()
-  createdAt: Date
-
-  @UpdateDateColumn({ type: 'timestamp', nullable: true })
-  @Field({ nullable: true })
-  updatedAt!: Date
 
   @ManyToOne(() => Category, (category) => category.productReference)
   @Field(() => Category, { nullable: true })
@@ -98,17 +80,35 @@ export class ProductReferenceCreateInput {
   price: number
 
   @Field()
-  createdBy: string
+  createdBy: ObjectId
 
   @Field()
   category: ObjectId
 }
 
 @InputType()
-export class ProductReferenceUpdateInput extends ProductReferenceCreateInput {
+export class ProductReferenceUpdateInput {
+  @Field({ nullable: true })
+  updatedBy: ObjectId
+
+  @Field()
+  name: string
+
+  @Field()
+  description: string
+
   @Field(() => ID)
-  id: number
+  index: number
+
+  @Field(() => Boolean, { nullable: true })
+  display: boolean
 
   @Field({ nullable: true })
-  updatedBy: string
+  brandName?: string
+
+  @Field(() => Float)
+  price: number
+
+  @Field()
+  category: ObjectId
 }

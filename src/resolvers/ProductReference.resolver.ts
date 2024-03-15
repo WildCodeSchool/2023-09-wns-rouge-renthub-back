@@ -46,6 +46,8 @@ export class ProductReferenceResolver {
       const productReferences = await ProductReference.find({
         relations: {
           category: true,
+          createdBy: true,
+          updatedBy: true,
         },
       })
       if (!productReferences) {
@@ -64,6 +66,8 @@ export class ProductReferenceResolver {
         where: { id },
         relations: {
           category: true,
+          createdBy: true,
+          updatedBy: true,
         },
       })
       if (!productRef) {
@@ -75,16 +79,18 @@ export class ProductReferenceResolver {
     }
   }
 
-  @Mutation(() => ProductReference, { nullable: true })
-  async updateProductReference(@Arg('data') data: ProductReferenceUpdateInput) {
+  @Mutation(() => ProductReference)
+  async updateProductReference(
+    @Arg('id', () => ID) id: number,
+    @Arg('data') data: ProductReferenceUpdateInput
+  ) {
     try {
       const productRef = await ProductReference.findOne({
-        where: { id: data.id },
+        where: { id: id },
         relations: {
           category: true,
         },
       })
-      console.log('productRef', productRef)
       if (!productRef) {
         throw new Error('Aucun produit trouvé')
       }
