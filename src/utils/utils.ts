@@ -1,4 +1,5 @@
-import { ObjectId } from "../entities/ObjectId";
+import { ObjectId } from '../entities/ObjectId'
+import { randomBytes } from 'crypto'
 
 /**
  * Merge some data on an existing database entity, it takes care of keeping existing many-to-many relations to avoid unicity constraints
@@ -17,18 +18,22 @@ export function merge(entity: any, data: any): any {
       if (!(key in entity)) {
         throw new Error(
           `missing key ${key} in your entity, did you forgot to fetch your relation?`
-        );
+        )
       }
       if (Array.isArray(entity[key])) {
         data[key] = data[key].map((entry: ObjectId) => {
           const existingEntry = entity[key].find(
             (entityEntry: ObjectId) => entityEntry.id == entry.id
-          );
-          return existingEntry || entry;
-        });
+          )
+          return existingEntry || entry
+        })
       }
     }
   }
-  Object.assign(entity, data);
-  return entity;
+  Object.assign(entity, data)
+  return entity
+}
+
+export const generateSecurityCode = (length: number): string => {
+  return randomBytes(length).toString('hex').substring(0, length)
 }

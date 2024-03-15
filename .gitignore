@@ -1,2 +1,28 @@
-node_modules
+# Node.js
+node_modules/
+package-lock.json
+
+# Next.js
+/.next/
+/out/
+
+# Environment variables
 .env
+.env.local
+.env.docker
+
+# Logs
+*.log
+
+# Backend service (Adjust as needed)
+node_modules/
+.next/
+out/
+
+# IDE-specific files (Adjust as needed)
+.vscode/
+.idea/
+
+# Temporary files
+.DS_Store
+Thumbs.db

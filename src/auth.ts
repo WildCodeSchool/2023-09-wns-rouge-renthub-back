@@ -1,46 +1,51 @@
-import { AuthChecker } from "type-graphql";
-import jwt from "jsonwebtoken";
-import Cookies from "cookies";
-import { MyContext } from "./index";
-import { User } from "./entities/User";
+import { AuthChecker } from 'type-graphql'
+import jwt from 'jsonwebtoken'
+import Cookies from 'cookies'
+import { MyContext } from './index'
+import { User } from './entities/User'
 
-export const customAuthChecker: AuthChecker<MyContext> = async (
-  { context },
-  roles
-): Promise<boolean> => {
-  const cookie = new Cookies(context.req, context.res);
-  const token = cookie.get("TGCookie");
-  if (!token) {
-    console.error("No Token");
-    return false;
+export async function getUserFromReq(req: any, res: any): Promise<User | null> {
+  // may be recalled if called on field
+  const cookies = new Cookies(req, res)
+  const renthub_token = cookies.get('renthub_token')
+
+  if (!renthub_token) {
+    // console.error("missing renthub_token");
+    return null
   }
 
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET_KEY || "");
+    const payload = jwt.verify(renthub_token, process.env.JWT_SECRET_KEY || '')
 
-    if (typeof payload === "object" && "userId" in payload) {
-      const user = await User.findOne({
-        where: { id: payload.userId },
-        relations: { picture: true },
-      });
-      if (user) {
-        context.user = {
-          id: user.id,
-          nickName: user.nickName,
-          role: user.role,
-          picture: user.picture?.filename || "",
-        };
-        return roles.length === 0 || roles.includes(user.role);
+    if (typeof payload === 'object' && 'userId' in payload) {
+      const user = await User.findOneBy({ id: payload.userId })
+
+      if (user !== null) {
+        return Object.assign(user, { hashedPassword: undefined })
       } else {
-        console.error("User not found");
-        return false;
+        console.error('user not found')
+        return null
       }
     } else {
-      console.error("Invalid token");
-      return false;
+      console.error('invalid renthub_token, msising userid')
+      return null
     }
-  } catch (error) {
-    console.error("Invalid token");
-    return false;
+  } catch {
+    console.error('invalid renthub_token')
+    return null
   }
-};
+}
+
+export const customAuthChecker: AuthChecker<MyContext> = async ({
+  context,
+}): Promise<boolean> => {
+  const connectedUser = await getUserFromReq(context.req, context.res)
+
+  if (connectedUser) {
+    // TODO find better way for picture and role
+    context.user = Object.assign(connectedUser, { picture: null, role: null })
+    return true
+  } else {
+    return false
+  }
+}
