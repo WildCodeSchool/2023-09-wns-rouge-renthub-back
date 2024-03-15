@@ -1,4 +1,4 @@
-import { gql } from "graphql-tag";
+import { gql } from 'graphql-tag'
 
 export const mutationVerifyEmail = gql`
   mutation ($code: String!, $userId: Float!) {
@@ -6,4 +6,4 @@ export const mutationVerifyEmail = gql`
       success
     }
   }
-`;
+`
