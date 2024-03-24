@@ -11,9 +11,6 @@ import { dataSource } from './datasource'
 //-----------------PICTURES----------------
 //-----------------------------------------
 
-import { uploadPicture } from './utils/pictureServices/multer'
-import { createImage } from './utils/pictureServices/pictureServices'
-
 //-----------------------------------------
 //----------GRAPHQL / APOLLO SERVER--------
 //-----------------------------------------
@@ -33,12 +30,12 @@ import { Role } from './entities/Role'
 //-----------------EXPRESS-----------------
 //-----------------------------------------
 
-import express from 'express'
+import express, { Request, Response } from 'express'
 import http from 'http'
 import cors from 'cors'
 import path from 'path'
-import axios from 'axios'
-import { Request, Response } from 'express'
+
+import { initializeRoute } from './routes'
 
 //-----------------------------------------
 //-----------------APOLLO SERVER-----------
@@ -80,6 +77,8 @@ async function start() {
   await dataSource.initialize()
   await server.start()
 
+  initializeRoute(app)
+
   app.use(
     '/',
     express.json({ limit: '50mb' }),
@@ -101,40 +100,15 @@ async function start() {
 
 start()
 
+// add upload image step
+
+// 1 - add multer to upload image
+// 2 - add image entity + relation
+// 3- read images with resolver
+// 4- resizer image on uploadPicture
+
 //-----------------------------------------
 //-----------EXPRESS MIDDLEWARES-----------
 //-----------------------------------------
 
 // Upload picture
-app.post('/picture', uploadPicture.single('file'), async (req, res) => {
-  if (req.file) {
-    try {
-      const picture = await createImage(req.file.filename)
-      res.json(picture)
-    } catch (error) {
-      res.status(500).send('Error saving picture')
-    }
-  } else {
-    res.status(400).send('No file was uploaded.')
-  }
-})
-
-// Api search adress.gouv
-app.get('/search-address', async (req: Request, res: Response) => {
-  try {
-    const query = req.query.q
-    const response = await axios.get(
-      `https://api-adresse.data.gouv.fr/search/?q=city=${query}&limit=5`
-    )
-    res.json(response.data)
-  } catch (error) {
-    console.error("Erreur lors de la requête à l'API:", error)
-    res.status(500).send('Erreur interne du serveur')
-  }
-})
-
-// Send contact email
-import { verifyRecaptchaToken } from './utils/reCaptcha'
-import { sendContactEmail } from './utils/mailServices/contactEmail'
-
-app.post('/sendcontactemail', verifyRecaptchaToken, sendContactEmail)

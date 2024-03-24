@@ -1,8 +1,6 @@
 import 'reflect-metadata'
 import {
   BaseEntity,
-  BeforeInsert,
-  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
