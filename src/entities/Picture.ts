@@ -1,7 +1,5 @@
 import {
   BaseEntity,
-  BeforeInsert,
-  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -17,24 +15,26 @@ import { PictureProduct } from './PictureProduct.entity'
 @Entity()
 @ObjectType()
 export class Picture extends BaseEntity {
-  @BeforeInsert()
-  updateDatesOnInsert() {
-    this.createdAt = new Date()
-    this.updatedAt = new Date()
-  }
-
-  @BeforeUpdate()
-  updateDatesOnUpdate() {
-    this.updatedAt = new Date()
-  }
-
   @PrimaryGeneratedColumn()
   @Field(() => ID)
   id: number
 
   @Column()
   @Field()
-  filename: string
+  name: string
+
+  @Field()
+  get uri(): string {
+    return `/api/images/${this.id}`
+  }
+
+  @Column({ nullable: true })
+  @Field({ nullable: true })
+  mimetype: string
+
+  @Column({ nullable: true })
+  //@Field({ nullable: true }) -- dont expose this path in graphql
+  path: string
 
   @Column({ nullable: true })
   @Field({ nullable: true })
@@ -73,7 +73,7 @@ export class Picture extends BaseEntity {
 @InputType()
 export class PictureCreateInput {
   @Field()
-  filename: string
+  name: string
 
   @Field()
   urlHD: string
@@ -85,7 +85,7 @@ export class PictureCreateInput {
 @InputType()
 export class PictureUpdate {
   @Field({ nullable: true })
-  filename: string
+  name: string
 
   @Field({ nullable: true })
   urlHD: string

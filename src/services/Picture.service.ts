@@ -16,15 +16,57 @@ export class PictureService {
     return listPicture
   }
 
-  async find(id: number) {
+  async find(id: number, includeCategory: boolean = true) {
+    const relations: string[] = []
+
+    if (includeCategory) {
+      relations.push('category')
+    }
+
     const picture = await this.db.findOne({
       where: { id },
-      relations: ['category'],
+      relations,
     })
+
     if (!picture) {
       throw new Error(`Picture with ${id} not found`)
     }
     return picture
+  }
+
+  async createImage(
+    domain: string,
+    filename: string,
+    name: string,
+    mimetype: string,
+    path: string
+  ) {
+    try {
+      console.log(
+        '---domain---',
+        domain,
+        '---filename---',
+        filename,
+        '---mimetype---',
+        mimetype,
+        '---path---',
+        path
+      )
+
+      const picture = this.db.create({
+        name,
+        mimetype,
+        path,
+        urlHD: ` http://${domain}/uploads/${filename}`,
+        urlMiniature: ` http://${domain}/uploads/${filename}`,
+        createdBy: 1,
+      })
+
+      const pictureSave = await picture.save()
+      return pictureSave
+    } catch (error) {
+      throw new Error('Error creating picture')
+    }
   }
 
   async createOnCategory(
