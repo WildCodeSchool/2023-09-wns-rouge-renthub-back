@@ -11,6 +11,7 @@ import { PictureProduct } from './PictureProduct.entity'
 import { IsBoolean, Length } from 'class-validator'
 import { ObjectId } from './ObjectId'
 import { EntityWithDefault } from './EntityWithDefault'
+import { Stock } from './Stock.entity'
 
 @Entity()
 @ObjectType()
@@ -57,6 +58,10 @@ export class ProductReference extends EntityWithDefault {
     { cascade: true }
   )
   pictureProduct!: PictureProduct[]
+
+  @OneToMany(() => Stock, (stock) => stock.productReference, { cascade: true, nullable: true })
+  @Field(() => [Stock])
+  stock!: Stock
 }
 
 @InputType()
