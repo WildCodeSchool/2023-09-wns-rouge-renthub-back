@@ -131,7 +131,6 @@ describe('TEST => users resolvers', () => {
       contextValue: mock.context,
     })) as any
 
-    console.log("result", result);
     const id = result?.data?.userLogin?.id
     
     expect(id).toBe('1')
