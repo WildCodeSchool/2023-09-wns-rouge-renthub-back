@@ -111,8 +111,7 @@ describe('TEST => users resolvers', () => {
       },
       contextValue: mock.context,
     })) as any
-    console.log("result", result);
-    
+
     const success = result?.data?.verifyEmail?.success
 
     expect(success).toBe(true)
@@ -132,7 +131,10 @@ describe('TEST => users resolvers', () => {
       contextValue: mock.context,
     })) as any
 
-    expect(result?.data?.userLogin?.id).toBe('1')
+    console.log("result", result);
+    const id = result?.data?.userLogin?.id
+    
+    expect(id).toBe('1')
     expect(!!mock.renthub_token).toBeTruthy()
     renthub_token = mock.renthub_token
   })
