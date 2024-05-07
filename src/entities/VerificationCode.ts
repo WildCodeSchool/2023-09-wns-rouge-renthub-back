@@ -27,7 +27,7 @@ export class VerificationCode extends BaseEntity {
   @Field(() => Date, { nullable: true })
   expirationDate!: Date
 
-  @ManyToOne(() => User, (user) => user.verificationCodes)
+  @ManyToOne(() => User, (user) => user.verificationCodes, { onDelete: 'CASCADE' })
   user!: User
 
   @Column({ default: 0 })
