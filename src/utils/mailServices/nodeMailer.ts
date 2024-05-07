@@ -9,6 +9,12 @@ export type EmailOptions = {
 }
 
 export const sendEmail = (emailOptions: EmailOptions) => {
+  console.log("totoototototo => ");
+  console.log("process.env.MAIL_HOST => ",process.env.MAIL_HOST);
+  console.log("process.env.MAIL_PORT => ",process.env.MAIL_PORT);
+  console.log("process.env.MAIL_USER => ",process.env.MAIL_USER);
+  console.log("process.env.MAIL_PASSWORD => ",process.env.MAIL_PASSWORD);
+  
   const transporter = nodemailer.createTransport({
     host: process.env.MAIL_HOST,
     port: Number(process.env.MAIL_PORT),
