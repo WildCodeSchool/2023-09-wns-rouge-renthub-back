@@ -10,6 +10,15 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: pgpassword
+          POSTGRES_DB: renthub
     steps:
       - name: Check out code
         uses: actions/checkout@v4

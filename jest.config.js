@@ -5,4 +5,5 @@ module.exports = {
   testMatch: [
     '**/tests/**/*.spec.ts',
   ],
+  testTimeout: 20000,
 }

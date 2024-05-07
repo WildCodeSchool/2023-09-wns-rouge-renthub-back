@@ -52,11 +52,14 @@ const nickName = 'testNickName'
 
 beforeAll(async () => {
   schema = await getSchema()
-
+ 
   dataSource = new DataSource({
     ...dataSourceOptions,
-    host: process.env.DB_HOST_LOCAL,
-    port: Number(process.env.DB_PORT_LOCAL),
+    username: process.env.POSTGRES_USER || 'postgres',
+    password: process.env.POSTGRES_PASSWORD || 'pgpassword',
+    database: process.env.POSTGRES_DB || 'renthub',
+    host: process.env.DB_HOST_LOCAL || '127.0.0.1',
+    port: Number(process.env.DB_PORT_LOCAL) || 5432,
     dropSchema: true,
   })
 
@@ -108,7 +111,8 @@ describe('TEST => users resolvers', () => {
       },
       contextValue: mock.context,
     })) as any
-
+    console.log("result", result);
+    
     const success = result?.data?.verifyEmail?.success
 
     expect(success).toBe(true)
