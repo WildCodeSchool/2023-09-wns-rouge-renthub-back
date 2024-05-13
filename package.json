@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --detectOpenHandles --verbose",
-    "test:docker": "docker stop pgtesting ; docker run --rm --name pgtesting -p 5433:5432 -e POSTGRES_PASSWORD=pgpassword -d postgres && DB_HOST=127.0.0.1 DB_PORT=5433 DB_USERNAME=postgres DB_PASSWORD=pgpassword DB_NAME=renthub jest",
+    "test:docker": "docker stop pgtesting ; docker run --rm --name pgtesting -p 5433:5432 -e POSTGRES_PASSWORD=pgpassword -d postgres && DB_HOST=127.0.0.1 DB_PORT=5433 DB_USERNAME=postgres DB_PASSWORD=pgpassword DB_NAME=renthub jest --verbose --detectOpenHandles",
     "start": "tsnd --poll --respawn --transpile-only ./src/index.ts",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
