@@ -2,7 +2,6 @@ import {
   BaseEntity,
   Column,
   Entity,
-  JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
@@ -20,8 +19,7 @@ export class Cart extends BaseEntity {
   @Field()
   totalPrice!: number
 
-  @OneToOne(() => User)
-  @JoinColumn()
+  @OneToOne(() => User, (user) => user.cart)
   @Field(() => User)
   owner!: User
 }

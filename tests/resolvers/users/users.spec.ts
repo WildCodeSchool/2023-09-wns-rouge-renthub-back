@@ -14,6 +14,7 @@ import { mutationVerifyEmail } from './graphql/mutationVerifyEmail'
 import { VerificationCode } from '../../../src/entities/VerificationCode'
 
 function mockContext(renthub_token?: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const value: { context: any; renthub_token?: string } = {
     renthub_token,
     context: {
@@ -67,7 +68,7 @@ beforeAll(async () => {
 })
 
 describe('TEST => users resolvers', () => {
-  it('should create new User', async () => {
+  it('should create new User with new Cart associated', async () => {
     const mock = mockContext();
     const result = (await graphql({
       schema,
@@ -80,16 +81,21 @@ describe('TEST => users resolvers', () => {
         },
       },
       contextValue: mock.context,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     })) as any
 
     const id = result?.data?.userCreate?.id
+    expect(id).toBe("1")
 
-    expect(result?.data?.userCreate?.id).toBe(id)
-
-    const user = await User.findOneBy({ id })
+    const user = await User.findOne({
+      where: { id },
+      relations: ["cart"]
+    })
 
     expect(!!user).toBeTruthy()
+    expect(user?.nickName).toBe(nickName)
     expect(user?.email).toBe(email)
+    expect(user?.cart?.id).toBe(1)
   })
 
   it('should verify email of new user', async () => {
@@ -110,6 +116,7 @@ describe('TEST => users resolvers', () => {
         }
       },
       contextValue: mock.context,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     })) as any
 
     const success = result?.data?.verifyEmail?.success
@@ -129,6 +136,7 @@ describe('TEST => users resolvers', () => {
         },
       },
       contextValue: mock.context,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     })) as any
 
     const id = result?.data?.userLogin?.id
@@ -144,6 +152,7 @@ describe('TEST => users resolvers', () => {
       schema,
       source: print(queryMe), // print() is used to convert the gql string to a string
       contextValue: mock.context,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     })) as any
 
     expect(result?.data).toBeNull()
@@ -155,6 +164,7 @@ describe('TEST => users resolvers', () => {
       schema,
       source: print(queryMe), // print() is used to convert the gql string to a string
       contextValue: mock.context,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     })) as any
 
     expect(!!result?.data?.me?.id).toBeTruthy()

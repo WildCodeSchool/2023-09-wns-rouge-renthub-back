@@ -23,6 +23,7 @@ import { Picture } from './Picture'
 import { Role } from './Role'
 import { ObjectId } from './ObjectId'
 import { VerificationCode } from './VerificationCode'
+import { Cart } from './Cart.entity'
 
 @Entity()
 @ObjectType()
@@ -122,6 +123,11 @@ export class User extends BaseEntity {
   @JoinColumn({ name: 'role' })
   @Field(() => Role, { nullable: true })
   role!: Role
+
+  @OneToOne(() => Cart, (cart) => cart.owner, {cascade: true, onDelete: 'CASCADE' })
+  @JoinColumn()
+  @Field(() => Cart)
+  cart!: Cart
 }
 
 @InputType()

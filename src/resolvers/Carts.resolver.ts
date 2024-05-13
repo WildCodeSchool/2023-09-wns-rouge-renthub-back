@@ -1,14 +1,13 @@
-import { Arg, Authorized, Ctx, ID, Mutation, Query, Resolver } from 'type-graphql'
+import { Arg, ID, Mutation, Query, Resolver } from 'type-graphql'
 
 import { Cart, CartUpdateInput } from '../entities/Cart.entity'
 import { CartService } from '../services/Cart.service'
-import { MyContext } from '..'
 import { User } from '../entities/User'
 
 @Resolver(() => Cart)
 export class CartResolver {
   @Query(() => [Cart])
-  async findAllCart(): Promise<Cart[]> {
+  async findAllCarts(): Promise<Cart[]> {
     const carts = await new CartService().findAll()
     return carts
   }
