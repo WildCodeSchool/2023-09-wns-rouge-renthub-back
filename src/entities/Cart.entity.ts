@@ -26,6 +26,6 @@ export class Cart extends BaseEntity {
 
 @InputType()
 export class CartUpdateInput {
-  @Field()
-  totalPrice!: number
+  @Field({ nullable: true })
+  totalPrice?: number
 }

@@ -18,23 +18,12 @@ export class CartResolver {
     return cart
   }
 
-  @Mutation(() => Cart)
-  async createCart(
-    owner: User
-  ) {    
-    const newCart = await new CartService().create(owner)
-    return newCart
-  }
-
   @Mutation(() => Cart, { nullable: true })
-  async updateCart(@Arg('data') data: CartUpdateInput) {
-    const cartCart = await new CartService().update(data)
+  async updateCart(
+    @Arg('id', () => ID) id: number,
+    @Arg('data') data: CartUpdateInput
+  ) {
+    const cartCart = await new CartService().update(id, data)
     return cartCart
-  }
-
-  @Mutation(() => Boolean, { nullable: true })
-  async deleteCart(@Arg('id', () => ID) id: number) {
-    const isDelete = await new CartService().delete(+id)
-    return isDelete
   }
 }

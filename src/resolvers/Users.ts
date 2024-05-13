@@ -31,7 +31,7 @@ export class UsersResolver {
   //TODO  : delete eslint flag when context is used and function implemented correctly
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async usersGetAll(@Ctx() context: MyContext): Promise<User[]> {
-    const users = await User.find({relations: {cart: true} })
+    const users = await User.find({relations: { cart: true }})
     return users
   }
 
@@ -88,7 +88,7 @@ export class UsersResolver {
 
     // delete user's original password from data
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const {password, ...dataWithoutPassword } = data
+    const { password, ...dataWithoutPassword } = data
 
     Object.assign(newUser, dataWithoutPassword, {
       dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
@@ -298,7 +298,7 @@ export class UsersResolver {
       if (pictureId) {
         await deletePicture(pictureId)
       }
-      user
+      // user  =>??? mistake
     } else {
       throw new Error(`Error delete user`)
     }

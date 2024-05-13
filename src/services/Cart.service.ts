@@ -2,7 +2,6 @@ import { Repository } from 'typeorm'
 import { validate } from 'class-validator'
 import { dataSource } from '../datasource'
 import { Cart, CartUpdateInput } from '../entities/Cart.entity'
-import { User } from '../entities/User'
 
 export class CartService {
   db: Repository<Cart>
@@ -28,42 +27,20 @@ export class CartService {
     return cartCart
   }
 
-  async create(owner: User) {
-    const newCart = this.db.create()
-    newCart.owner = owner
-    const newCartSave = await this.db.save(newCart)
-    return newCartSave
-  }
-
-  async update(data: CartUpdateInput) {
-    const errors = await validate(data)
-    if (errors.length > 0) {
-      throw new Error('Validation failed!')
-    }
-
-    const cartCart = await this.db.findOne({
-      where: { id: 1 },
-      relations: ['productReference'],
-    })
-
-    if (!cartCart) {
-      throw new Error('Cart not found')
-    }
-
-    const updatedCart = await this.db.save(cartCart)
-    return updatedCart
-  }
-
-  async delete(id: number) {
-    const cartCart = await this.db.findOne({
+  async update(id: number, data: CartUpdateInput) {
+    const cart = await this.db.findOne({
       where: { id },
-      relations: ['productReference'],
+      relations: { owner: true },
     })
-    if (!cartCart) {
-      throw new Error("Cart doesn't exist")
-    }
 
-    this.db.remove(cartCart)
-    return true
+    if (!cart) throw new Error('Cart not found')
+
+    Object.assign(cart, data)
+
+    const errors = await validate(cart)
+    if (errors.length > 0) throw new Error(`Validation failed! ${errors}`)
+
+    const updatedCart = await this.db.save(cart)
+    return updatedCart
   }
 }

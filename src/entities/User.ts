@@ -124,7 +124,10 @@ export class User extends BaseEntity {
   @Field(() => Role, { nullable: true })
   role!: Role
 
-  @OneToOne(() => Cart, (cart) => cart.owner, {cascade: true, onDelete: 'CASCADE' })
+  @OneToOne(() => Cart, (cart) => cart.owner, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   @Field(() => Cart)
   cart!: Cart
