@@ -15,25 +15,36 @@ export class ProductReferenceResolver {
     @Arg('data') data: ProductReferenceCreateInput
   ): Promise<ProductReference> {
     try {
-      const productReference = new ProductReference()
+      const newProductReference = new ProductReference()
       const currentCategory: any = await Category.findOne({
         where: { id: data.category.id },
       })
       if (!currentCategory) {
         throw new Error('Aucune catégorie trouvé')
       }
-      Object.assign(productReference, {
+      Object.assign(newProductReference, {
         ...data,
         category: {
           id: data.category.id,
         },
       })
-      const errors = await validate(productReference)
+      const errors = await validate(newProductReference)
       if (errors.length > 0) {
         const validationMessages = formatValidationErrors(errors)
         throw new Error(validationMessages || 'Une erreur est survenue.')
       }
-      await productReference.save()
+      const { id } = await newProductReference.save()
+      if(!id) throw new Error('ProductReference not created')
+
+      const productReference = await ProductReference.findOne({
+        where: { id },
+        relations: {
+          category: true,
+          createdBy: true,
+          updatedBy: true,
+        },
+      })
+      if (!productReference) throw new Error(`ProductReference created with id => < ${id} > but it was not found!`)
       return productReference
     } catch (error: any) {
       throw new Error(error.message)
@@ -48,6 +59,7 @@ export class ProductReferenceResolver {
           category: true,
           createdBy: true,
           updatedBy: true,
+          stock: true,
         },
       })
       if (!productReferences) {
@@ -109,20 +121,23 @@ export class ProductReferenceResolver {
     }
   }
 
-  @Mutation(() => Boolean, { nullable: true })
+  @Mutation(() => ProductReference)
   async deleteProductReference(@Arg('id', () => ID) id: number) {
     try {
       const productRef = await ProductReference.findOne({
         where: { id },
         relations: {
           category: true,
+          stock: true,
         },
       })
       if (!productRef) {
         throw new Error('Aucun produit trouvé')
       }
       await productRef.remove()
-      return true
+      
+      Object.assign(productRef, { id })
+      return productRef
     } catch (error: any) {
       throw new Error(error.message)
     }

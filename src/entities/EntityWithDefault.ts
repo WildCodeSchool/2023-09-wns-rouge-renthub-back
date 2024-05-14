@@ -10,12 +10,12 @@ import { Field, ObjectType } from 'type-graphql'
 
 @ObjectType()
 export abstract class EntityWithDefault extends BaseEntity {
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'createdBy' })
   @Field(() => User, { nullable: true })
   createdBy!: User
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'updatedBy' })
   @Field(() => User, { nullable: true })
   updatedBy!: User

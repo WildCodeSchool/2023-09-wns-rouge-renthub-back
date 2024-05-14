@@ -31,7 +31,9 @@ export class UsersResolver {
   //TODO  : delete eslint flag when context is used and function implemented correctly
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async usersGetAll(@Ctx() context: MyContext): Promise<User[]> {
-    const users = await User.find({relations: { cart: true }})
+    const users = await User.find({
+      relations: { cart: { productCart: { productReference: true } } },
+    })
     return users
   }
 
@@ -96,8 +98,8 @@ export class UsersResolver {
     })
 
     // creation of a brand new Cart for a new User
-    const newCart = new Cart();
-    newUser.cart = newCart;
+    const newCart = new Cart()
+    newUser.cart = newCart
 
     const errorsNewUser = await validate(newUser)
     const errorsNewCart = await validate(newCart)
@@ -288,20 +290,26 @@ export class UsersResolver {
   ): Promise<User | null> {
     const user = await User.findOne({
       where: { id: id },
+      relations: {
+        picture: true,
+        role: true,
+        cart: { productCart: { productReference: { category: true } } },
+      },
     })
     if (
-      user &&
-      user.id === context.user?.id //  || context.user?.role
+      user
+      // &&
+      // user.id === context.user?.id //  || context.user?.role
     ) {
       const pictureId = user.picture?.id
       await user.remove()
       if (pictureId) {
         await deletePicture(pictureId)
       }
-      // user  =>??? mistake
     } else {
       throw new Error(`Error delete user`)
     }
+    Object.assign(user, { id })
     return user
   }
 }

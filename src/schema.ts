@@ -17,6 +17,7 @@ import { VerificationCodeResolver } from './resolvers/VerificationCode'
 import { ProductReferenceResolver } from './resolvers/ProductReference.resolver'
 import { StockResolver } from './resolvers/Stocks.resolver'
 import { CartResolver } from './resolvers/Carts.resolver'
+import { ProductCartResolver } from './resolvers/ProductCart.resolver'
 
 export async function getSchema() {
   const schema = await buildSchema({
@@ -28,7 +29,8 @@ export async function getSchema() {
       RolesResolver,
       ProductReferenceResolver,
       StockResolver,
-      CartResolver
+      CartResolver,
+      ProductCartResolver
     ],
     authChecker: customAuthChecker,
   })

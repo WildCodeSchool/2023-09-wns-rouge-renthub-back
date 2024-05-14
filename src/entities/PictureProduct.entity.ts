@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
-import { Field, ID, ObjectType } from 'type-graphql'
+import { Field, ID, Int, ObjectType } from 'type-graphql'
 import { Picture } from './Picture'
 import { ProductReference } from './ProductReference.entity'
 
@@ -16,8 +16,8 @@ export class PictureProduct extends BaseEntity {
   @Field(() => ID)
   id!: number
 
-  @Column({ type: 'int' })
-  @Field()
+  @Column()
+  @Field(() => Int)
   index!: number
 
   @ManyToOne(() => Picture, (picture) => picture.pictureProduct)

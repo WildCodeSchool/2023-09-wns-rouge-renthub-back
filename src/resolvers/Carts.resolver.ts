@@ -2,7 +2,6 @@ import { Arg, ID, Mutation, Query, Resolver } from 'type-graphql'
 
 import { Cart, CartUpdateInput } from '../entities/Cart.entity'
 import { CartService } from '../services/Cart.service'
-import { User } from '../entities/User'
 
 @Resolver(() => Cart)
 export class CartResolver {
@@ -23,7 +22,7 @@ export class CartResolver {
     @Arg('id', () => ID) id: number,
     @Arg('data') data: CartUpdateInput
   ) {
-    const cartCart = await new CartService().update(id, data)
-    return cartCart
+    const updatedCart = await new CartService().update(id, data)
+    return updatedCart
   }
 }
