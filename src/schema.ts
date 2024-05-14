@@ -30,7 +30,7 @@ export async function getSchema() {
       ProductReferenceResolver,
       StockResolver,
       CartResolver,
-      ProductCartResolver
+      ProductCartResolver,
     ],
     authChecker: customAuthChecker,
   })

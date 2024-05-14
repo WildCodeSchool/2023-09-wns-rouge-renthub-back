@@ -1,4 +1,12 @@
-import { Arg, Query, Resolver, Mutation, Ctx, ID } from 'type-graphql'
+import {
+  Arg,
+  Query,
+  Resolver,
+  Mutation,
+  Ctx,
+  ID,
+  Authorized,
+} from 'type-graphql'
 import {
   User,
   UserContext,
@@ -187,7 +195,6 @@ export class UsersResolver {
     if (!user.isVerified) {
       throw new Error('Email non vérifié, consultez votre boite mail')
     }
-
     const valid = await argon2.verify(user.hashedPassword, data.password)
     if (!valid) {
       throw new Error('Email ou mot de passe incorrect')
@@ -202,6 +209,7 @@ export class UsersResolver {
     )
 
     const cookie = new Cookies(context.req, context.res)
+
     cookie.set('renthub_token', token, {
       httpOnly: true,
       secure: false,
