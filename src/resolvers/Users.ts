@@ -23,6 +23,7 @@ import { getUserFromReq } from '../auth'
 import { generateSecurityCode } from '../utils/utils'
 import { VerificationCode } from '../entities/VerificationCode'
 import { typeCodeVerification } from '../utils/constant'
+import { Cart } from '../entities/Cart.entity'
 
 @Resolver(User)
 export class UsersResolver {
@@ -30,7 +31,7 @@ export class UsersResolver {
   //TODO  : delete eslint flag when context is used and function implemented correctly
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async usersGetAll(@Ctx() context: MyContext): Promise<User[]> {
-    const users = await User.find()
+    const users = await User.find({relations: { cart: true }})
     return users
   }
 
@@ -86,15 +87,22 @@ export class UsersResolver {
     }
 
     // delete user's original password from data
-    const { ...dataWithoutPassword } = data
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...dataWithoutPassword } = data
 
     Object.assign(newUser, dataWithoutPassword, {
       dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
       createdBy: adminUser || newUser,
     })
 
-    const errors = await validate(newUser)
-    if (errors.length === 0) {
+    // creation of a brand new Cart for a new User
+    const newCart = new Cart();
+    newUser.cart = newCart;
+
+    const errorsNewUser = await validate(newUser)
+    const errorsNewCart = await validate(newCart)
+
+    if (errorsNewUser.length === 0 && errorsNewCart.length === 0) {
       await newUser.save()
 
       const verificationCodeLength = 8
@@ -290,7 +298,7 @@ export class UsersResolver {
       if (pictureId) {
         await deletePicture(pictureId)
       }
-      user
+      // user  =>??? mistake
     } else {
       throw new Error(`Error delete user`)
     }
