@@ -18,7 +18,7 @@ import {
   Matches,
   IsDate,
 } from 'class-validator'
-import { Field, ID, InputType, ObjectType } from 'type-graphql'
+import { Field, ID, InputType, Int, ObjectType } from 'type-graphql'
 import { Picture } from './Picture'
 import { Role } from './Role'
 import { ObjectId } from './ObjectId'
@@ -106,7 +106,7 @@ export class User extends BaseEntity {
   @Field(() => User, { nullable: true })
   updatedBy!: User
 
-  @OneToOne(() => Picture, { nullable: true })
+  @OneToOne(() => Picture, { nullable: true, onDelete: 'CASCADE' })
   @IsOptional()
   @JoinColumn()
   @Field(() => Picture, { nullable: true })
@@ -115,7 +115,7 @@ export class User extends BaseEntity {
   @OneToMany(
     () => VerificationCode,
     (verificationCode) => verificationCode.user,
-    { cascade: true }
+    { cascade: true, onDelete: 'CASCADE' }
   )
   verificationCodes!: VerificationCode[]
 
@@ -194,7 +194,7 @@ export class UserUpdateInput {
   @Field(() => ID, { nullable: true })
   updatedBy?: number
 
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   pictureId?: number
 }
 
@@ -233,12 +233,12 @@ export class VerifyEmailResponseInput {
   @Field()
   code!: string
 
-  @Field()
+  @Field(() => Int)
   userId!: number
 }
 
 @InputType()
 export class ReSendVerificationCodeInput {
-  @Field()
+  @Field(() => Int)
   userId!: number
 }

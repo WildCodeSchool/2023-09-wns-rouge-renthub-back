@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
-import { Field, ID, ObjectType } from 'type-graphql'
+import { Field, ID, Int, ObjectType } from 'type-graphql'
 import { User } from './User'
 
 @Entity()
@@ -31,6 +31,6 @@ export class VerificationCode extends BaseEntity {
   user!: User
 
   @Column({ default: 0 })
-  @Field()
+  @Field(() => Int)
   maximumTry!: number
 }
