@@ -21,16 +21,10 @@ import { expressMiddleware } from '@apollo/server/express4'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
 
 //-----------------------------------------
-//------------ENTIETIES / TYPES------------
-//-----------------------------------------
-
-import { Role } from './entities/Role'
-
-//-----------------------------------------
 //-----------------EXPRESS-----------------
 //-----------------------------------------
 
-import express, { Request, Response } from 'express'
+import express from 'express'
 import http from 'http'
 import cors from 'cors'
 import path from 'path'
@@ -40,18 +34,6 @@ import { initializeRoute } from './routes'
 //-----------------------------------------
 //-----------------APOLLO SERVER-----------
 //-----------------------------------------
-export type UserContext = {
-  id: number
-  nickName: string
-  picture: string
-  role: Role
-}
-
-export interface MyContext {
-  req: Request
-  res: Response
-  user?: UserContext
-}
 
 const app = express()
 const corsOptions = {
