@@ -73,7 +73,7 @@ export class Category extends BaseEntity {
     (productReference) => productReference.category,
     { cascade: true }
   )
-  @Field(() => [ProductReference])
+  @Field(() => [ProductReference], { nullable: true })
   productReference: ProductReference[]
 }
 
