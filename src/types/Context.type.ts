@@ -5,5 +5,4 @@ export interface MyContext {
   req: Request
   res: Response
   user?: User
-  role?: string
 }
