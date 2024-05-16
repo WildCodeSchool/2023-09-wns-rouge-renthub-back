@@ -40,7 +40,9 @@ export class UsersResolver {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async usersGetAll(@Ctx() context: MyContext): Promise<User[]> {
     const users = await User.find({
-      relations: { cart: { productCart: { productReference: {category: true} } } },
+      relations: {
+        cart: { productCart: { productReference: { category: true } } },
+      },
     })
     return users
   }
@@ -263,7 +265,7 @@ export class UsersResolver {
   @Mutation(() => Boolean)
   async userSignOut(@Ctx() context: MyContext): Promise<boolean> {
     const cookie = new Cookies(context.req, context.res)
-    cookie.set('TGCookie', '', {
+    cookie.set('renthub_token', '', {
       httpOnly: true,
       secure: false,
       maxAge: 0,
