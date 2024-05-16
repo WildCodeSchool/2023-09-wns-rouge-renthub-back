@@ -8,8 +8,8 @@ import {
   Query,
 } from 'type-graphql'
 import { Picture, PictureCreateInput, PictureUpdate } from '../entities/Picture'
-import { MyContext } from '../index'
 import { PictureService } from '../services/Picture.service'
+import { MyContext } from '../types/Context.type'
 
 @Resolver(Picture)
 export class PictureResolver {
