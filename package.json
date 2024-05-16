@@ -9,7 +9,8 @@
     "start": "tsnd --poll --respawn --transpile-only ./src/index.ts",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "seed": "ts-node src/seeding/seed.ts"
   },
   "lint-staged": {
     "./{src,tests}/**/*.{ts,tsx,html,css,scss}": "prettier --write ",
@@ -19,6 +20,7 @@
   "license": "ISC",
   "dependencies": {
     "@apollo/server": "^4.9.5",
+    "@faker-js/faker": "^8.4.1",
     "argon2": "^0.31.2",
     "axios": "^1.6.2",
     "class-validator": "^0.14.0",
@@ -37,7 +39,8 @@
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
     "type-graphql": "^2.0.0-beta.3",
-    "typeorm": "^0.3.17"
+    "typeorm": "^0.3.17",
+    "typeorm-extension": "^3.5.1"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
