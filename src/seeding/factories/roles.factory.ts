@@ -5,6 +5,6 @@ import { Role } from "../../entities/Role";
 export const RolesFactory = setSeederFactory(Role, (faker: Faker) => {
   const role = new Role();
   role.name = faker.lorem.word();
-  role.right = "User"
+  role.right = "USER"
   return role;
 });

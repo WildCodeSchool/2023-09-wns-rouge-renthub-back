@@ -1,5 +1,14 @@
-import { Arg, Query, Resolver, Mutation, Ctx, ID } from 'type-graphql'
 import {
+  Arg,
+  Query,
+  Resolver,
+  Mutation,
+  Ctx,
+  ID,
+  Authorized,
+} from 'type-graphql'
+import {
+  MeUser,
   User,
   UserContext,
   UserCreateInput,
@@ -11,7 +20,7 @@ import {
 import { validate } from 'class-validator'
 import * as argon2 from 'argon2'
 import jwt from 'jsonwebtoken'
-import { MyContext } from '../index'
+import { MyContext } from '../types/Context.type'
 import Cookies from 'cookies'
 import { Picture } from '../entities/Picture'
 import { deletePicture } from '../utils/pictureServices/pictureServices'
@@ -19,7 +28,6 @@ import {
   sendVerificationEmail,
   sendConfirmationEmail,
 } from '../utils/mailServices/verificationEmail'
-import { getUserFromReq } from '../auth'
 import { generateSecurityCode } from '../utils/utils'
 import { VerificationCode } from '../entities/VerificationCode'
 import { typeCodeVerification } from '../utils/constant'
@@ -175,6 +183,7 @@ export class UsersResolver {
     }
   }
 
+  // @TODO : Add date of last connection //
   @Mutation(() => User)
   async userLogin(
     @Ctx() context: MyContext,
@@ -187,7 +196,6 @@ export class UsersResolver {
     if (!user.isVerified) {
       throw new Error('Email non vérifié, consultez votre boite mail')
     }
-
     const valid = await argon2.verify(user.hashedPassword, data.password)
     if (!valid) {
       throw new Error('Email ou mot de passe incorrect')
@@ -202,6 +210,7 @@ export class UsersResolver {
     )
 
     const cookie = new Cookies(context.req, context.res)
+
     cookie.set('renthub_token', token, {
       httpOnly: true,
       secure: false,
@@ -209,20 +218,46 @@ export class UsersResolver {
     })
     return user
   }
-
+  // THIS RESOLVER IS ONLY USED TO VERIFY THAT A USER IS CONNECTED & HIS ROLE //
+  @Authorized('ADMIN', 'USER')
   @Query(() => UserContext)
-  async meContext(@Ctx() context: MyContext): Promise<UserContext> {
+  async meContext(@Ctx() context: MyContext): Promise<UserContext | null> {
     if (!context.user) {
       throw new Error('User not found')
     }
-    const user = context.user as UserContext
-    return user
+    const userContext = {
+      lastName: context.user?.lastName,
+      firstName: context.user?.firstName,
+      role: context.user?.role.right,
+    }
+
+    return userContext
   }
 
-  @Query(() => User)
-  async me(@Ctx() context: MyContext): Promise<User | null> {
-    const user = await getUserFromReq(context.req, context.res)
-    return user
+  // THIS RESOLVER IS USED TO RETRIEVE A COMPLETE SET OF INFORMATION ABOUT THE CURRENTLY LOGGED IN USER //
+  @Authorized('ADMIN', 'USER')
+  @Query(() => MeUser)
+  async me(@Ctx() context: MyContext): Promise<MeUser | null> {
+    if (!context.user) {
+      throw new Error('User not found')
+    }
+
+    const meUser = {
+      id: context.user?.id,
+      email: context.user?.email,
+      firstName: context.user?.firstName,
+      lastName: context.user?.lastName,
+      nickName: context.user?.nickName,
+      phoneNumber: context.user?.phoneNumber,
+      dateOfBirth: context.user?.dateOfBirth,
+      createdBy: context.user?.createdBy,
+      updatedBy: context.user?.updatedBy,
+      createdAt: context.user?.createdAt,
+      updatedAt: context.user?.updatedAt,
+      lastConnectionDate: context.user?.lastConnectionDate,
+    }
+
+    return meUser
   }
 
   @Mutation(() => Boolean)

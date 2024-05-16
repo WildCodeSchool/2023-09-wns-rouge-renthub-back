@@ -31,8 +31,8 @@ export class Role extends BaseEntity {
 
   @Column({
     type: 'enum',
-    enum: ['Admin', 'User'],
-    default: 'User',
+    enum: ['ADMIN', 'USER'],
+    default: 'USER',
   })
   @Field()
   right!: string

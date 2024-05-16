@@ -30,4 +30,4 @@ WORKDIR /app
 COPY package.json package.json
 RUN npm i --omit=dev
 COPY --from=build /app/dist dist 
-CMD cd dist && node index.js
+CMD cd dist && node index.js    

@@ -12,8 +12,8 @@ export default async function rolesSeeder(
   const roleFactory = factoryManager.get(Role)
   
   const rolesNames = [
-    { groupName: 'Developer', rightForGroup: 'Admin' },
-    { groupName: 'User', rightForGroup: 'User' },
+    { groupName: 'Developers', rightForGroup: 'ADMIN' },
+    { groupName: 'Users', rightForGroup: 'USER' },
   ]
   const countRoles = rolesNames.length
   const roles = await roleFactory.saveMany(countRoles) // Save a single role (Admin)

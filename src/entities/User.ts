@@ -207,16 +207,17 @@ export class UserLoginInput {
   password!: string
 }
 
+// OBJ TYPE FOR VERIFY IF USER IS LOGGED IN & HIS ROLE //
 @ObjectType()
 export class UserContext {
   @Field()
-  id!: number
+  firstName!: string
 
   @Field()
-  nickName!: string
+  lastName!: string
 
   @Field()
-  picture!: string
+  role!: string
 }
 
 @ObjectType()
@@ -241,4 +242,44 @@ export class VerifyEmailResponseInput {
 export class ReSendVerificationCodeInput {
   @Field(() => Int)
   userId!: number
+}
+
+// OBJ TYPE FOR ME GETTING THE WHOLE USER //
+@ObjectType()
+export class MeUser {
+  @Field(() => ID)
+  id!: number
+
+  @Field()
+  email!: string
+
+  @Field()
+  firstName!: string
+
+  @Field()
+  lastName!: string
+
+  @Field({ nullable: true })
+  nickName!: string
+
+  @Field({ nullable: true })
+  phoneNumber!: string
+
+  @Field(() => Date, { nullable: true })
+  dateOfBirth!: Date
+
+  @Field(() => User, { nullable: true })
+  createdBy!: User
+
+  @Field(() => User, { nullable: true })
+  updatedBy!: User
+
+  @Field(() => Date)
+  createdAt!: Date
+
+  @Field(() => Date, { nullable: true })
+  updatedAt!: Date
+
+  @Field(() => Date, { nullable: true })
+  lastConnectionDate!: Date
 }
