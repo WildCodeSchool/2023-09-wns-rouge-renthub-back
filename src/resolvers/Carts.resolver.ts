@@ -17,14 +17,15 @@ export class CartResolver {
   @Query(() => [Cart])
   async findAllCarts(): Promise<Cart[]> {
     const carts = await new CartService().findAll()
+
     return carts
   }
 
   @Authorized('ADMIN', 'USER')
   @Query(() => Cart)
-  async findCart(@Arg('id', () => ID) id: number, @Ctx() context: MyContext) {
-    console.log(context.user)
+  async findCart(@Arg('id', () => ID) id: number) {
     const cart = await new CartService().find(+id)
+
     return cart
   }
 
@@ -32,9 +33,11 @@ export class CartResolver {
   @Mutation(() => Cart, { nullable: true })
   async updateCart(
     @Arg('id', () => ID) id: number,
-    @Arg('data') data: CartUpdateInput
+    @Arg('data') data: CartUpdateInput,
+    @Ctx() context: MyContext
   ) {
-    const updatedCart = await new CartService().update(id, data)
+    const updatedCart = await new CartService().update(id, data, context)
+
     return updatedCart
   }
 }
