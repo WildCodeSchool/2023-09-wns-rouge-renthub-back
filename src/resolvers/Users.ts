@@ -40,7 +40,7 @@ export class UsersResolver {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async usersGetAll(@Ctx() context: MyContext): Promise<User[]> {
     const users = await User.find({
-      relations: { cart: { productCart: { productReference: true } } },
+      relations: { cart: { productCart: { productReference: {category: true} } } },
     })
     return users
   }
