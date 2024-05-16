@@ -10,35 +10,40 @@ export class CartService {
   }
 
   async findAll() {
-    const listCart = this.db.find({
-      relations: ['owner'],
+    const carts = this.db.find({
+      relations: {
+        owner: true,
+        productCart: { productReference: { category: true } },
+      },
     })
-    return listCart
+    return carts
   }
 
   async find(id: number) {
-    const cartCart = await this.db.findOne({
+    const cart = await this.db.findOne({
       where: { id },
-      relations: ['owner'],
+      relations: {
+        owner: true,
+        productCart: { productReference: { category: true } },
+      },
     })
-    if (!cartCart) {
+    if (!cart) {
       throw new Error('Cart not found')
     }
-    return cartCart
+    return cart
   }
 
   async update(id: number, data: CartUpdateInput) {
+    const errors = await validate(data)
+    if (errors.length > 0) throw new Error(`Validation failed! ${errors}`)
+
     const cart = await this.db.findOne({
       where: { id },
       relations: { owner: true },
     })
-
     if (!cart) throw new Error('Cart not found')
 
     Object.assign(cart, data)
-
-    const errors = await validate(cart)
-    if (errors.length > 0) throw new Error(`Validation failed! ${errors}`)
 
     const updatedCart = await this.db.save(cart)
     return updatedCart

@@ -16,7 +16,12 @@ export class CategoryService {
 
   async list() {
     const listCategory = this.db.find({
-      relations: ['childCategories', 'parentCategory', 'picture'],
+      relations: {
+        childCategories: true,
+        parentCategory: true,
+        picture: true,
+        productReference: true,
+      },
     })
     return listCategory
   }
@@ -24,7 +29,12 @@ export class CategoryService {
   async find(id: number) {
     const category = await this.db.findOne({
       where: { id },
-      relations: ['childCategories', 'parentCategory', 'picture'],
+      relations: {
+        childCategories: true,
+        parentCategory: true,
+        picture: true,
+        productReference: true,
+      },
     })
     if (!category) {
       throw new Error('Category not found')
@@ -50,7 +60,10 @@ export class CategoryService {
       }
       Object.assign(newCategory, { parentCategory: parentCategoryIdExist })
     }
-    const newCategorySave = await this.db.save(newCategory)
+    const { id } = await this.db.save(newCategory)
+    if (!id) throw new Error('Category not saved')
+    const newCategorySave = await this.find(id)
+
     return newCategorySave
   }
 

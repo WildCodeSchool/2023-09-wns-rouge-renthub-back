@@ -5,13 +5,14 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm'
-import { Field, Float, ID, InputType, ObjectType } from 'type-graphql'
+import { Field, ID, InputType, Int, ObjectType } from 'type-graphql'
 import { Category } from './Category'
 import { PictureProduct } from './PictureProduct.entity'
 import { IsBoolean, Length } from 'class-validator'
 import { ObjectId } from './ObjectId'
 import { EntityWithDefault } from './EntityWithDefault'
 import { Stock } from './Stock.entity'
+import { ProductCart } from './ProductCart.entity'
 
 @Entity()
 @ObjectType()
@@ -30,8 +31,8 @@ export class ProductReference extends EntityWithDefault {
   @Field()
   description!: string
 
-  @Column({ type: 'int' })
-  @Field()
+  @Column()
+  @Field(() => Int)
   index!: number
 
   @Column({ default: true })
@@ -44,12 +45,12 @@ export class ProductReference extends EntityWithDefault {
   @Field()
   brandName!: string
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  @Field(() => Float)
+  @Column()
+  @Field(() => Int)
   price!: number
 
   @ManyToOne(() => Category, (category) => category.productReference)
-  @Field(() => Category, { nullable: true })
+  @Field(() => Category)
   category?: Category
 
   @OneToMany(
@@ -59,9 +60,17 @@ export class ProductReference extends EntityWithDefault {
   )
   pictureProduct!: PictureProduct[]
 
-  @OneToMany(() => Stock, (stock) => stock.productReference, { cascade: true, nullable: true })
+  @OneToMany(() => Stock, (stock) => stock.productReference, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   @Field(() => [Stock])
   stock!: Stock
+
+  @OneToMany(() => ProductCart, (productCart) => productCart.productReference, {
+    cascade: true,
+  })
+  productCart!: ProductCart[]
 }
 
 @InputType()
@@ -72,7 +81,7 @@ export class ProductReferenceCreateInput {
   @Field()
   description: string
 
-  @Field(() => ID)
+  @Field(() => Int)
   index: number
 
   @Field(() => Boolean, { nullable: true })
@@ -81,7 +90,7 @@ export class ProductReferenceCreateInput {
   @Field({ nullable: true })
   brandName?: string
 
-  @Field(() => Float)
+  @Field(() => Int)
   price: number
 
   @Field()
@@ -102,7 +111,7 @@ export class ProductReferenceUpdateInput {
   @Field()
   description: string
 
-  @Field(() => ID)
+  @Field(() => Int)
   index: number
 
   @Field(() => Boolean, { nullable: true })
@@ -111,7 +120,7 @@ export class ProductReferenceUpdateInput {
   @Field({ nullable: true })
   brandName?: string
 
-  @Field(() => Float)
+  @Field(() => Int)
   price: number
 
   @Field()

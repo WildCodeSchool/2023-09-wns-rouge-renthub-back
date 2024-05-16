@@ -32,12 +32,12 @@ export class Stock extends EntityWithDefault {
   @Field({ nullable: true })
   isAvailable!: boolean
 
-  @Column({ length: 50, nullable: true })
+  @Column({ length: 50 })
   @Length(2, 50, { message: 'Entre 2 et 50 caractères' })
   @Field()
   serialNumber!: string
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'timestamp with time zone' })
   @IsOptional()
   @IsDate({ message: 'Doit être une date valide' })
   @Field(() => Date, { nullable: true })

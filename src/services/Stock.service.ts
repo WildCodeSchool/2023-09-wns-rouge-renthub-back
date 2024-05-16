@@ -1,7 +1,11 @@
 import { Repository } from 'typeorm'
 import { validate } from 'class-validator'
 import { dataSource } from '../datasource'
-import { Stock, StockCreateInput, StockUpdateInput } from '../entities/Stock.entity'
+import {
+  Stock,
+  StockCreateInput,
+  StockUpdateInput,
+} from '../entities/Stock.entity'
 
 export class StockService {
   db: Repository<Stock>
@@ -10,16 +14,16 @@ export class StockService {
   }
 
   async findAll() {
-    const listStock = this.db.find({
-      relations: ['productReference'],
+    const stocks = this.db.find({
+      relations: { productReference: { category: true } },
     })
-    return listStock
+    return stocks
   }
 
   async find(id: number) {
     const stock = await this.db.findOne({
       where: { id },
-      relations: ['productReference'],
+      relations: { productReference: { category: true } },
     })
     if (!stock) {
       throw new Error('Stock not found')
@@ -29,15 +33,20 @@ export class StockService {
 
   async create(stockInput: StockCreateInput) {
     const errors = await validate(stockInput)
-
-    if (errors.length > 0) {
-      throw new Error('Validation failed!')
-    }
+    if (errors.length > 0) throw new Error('Validation failed!')
 
     const newStock = this.db.create(stockInput)
+    if (!newStock) throw new Error('Stock not created')
 
-    const newStockSave = await this.db.save(newStock)
-    return newStockSave
+    const { id } = await this.db.save(newStock)
+    if (!id) throw new Error('Stock not saved')
+
+    const stock = await this.find(id)
+    if (!stock) {
+      throw new Error(`Stock saved with id => < ${id} > but not found!`)
+    }
+
+    return stock
   }
 
   async update(data: StockUpdateInput) {
@@ -48,12 +57,9 @@ export class StockService {
     data.id = +data.id
     const stock = await this.db.findOne({
       where: { id: data.id },
-      relations: ['productReference'],
+      relations: { productReference: true },
     })
-
-    if (!stock) {
-      throw new Error('Stock not found')
-    }
+    if (!stock) throw new Error('Stock not found')
 
     // modification du parent :
     if (data.productReference !== undefined) {

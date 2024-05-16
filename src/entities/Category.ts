@@ -11,7 +11,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { Field, ID, InputType, ObjectType } from 'type-graphql'
+import { Field, ID, InputType, Int, ObjectType } from 'type-graphql'
 import { Picture } from './Picture'
 import { ProductReference } from './ProductReference.entity'
 
@@ -28,7 +28,7 @@ export class Category extends BaseEntity {
 
   // index permet ordonner les catégories pour l'affichage
   @Column({})
-  @Field(() => ID)
+  @Field(() => Int)
   index: number
 
   @Column({ default: true })
@@ -82,7 +82,7 @@ export class CategoryCreateInput {
   @Field()
   name: string
 
-  @Field(() => ID)
+  @Field(() => Int)
   index: number
 
   @Field(() => Boolean, { nullable: true })
@@ -106,7 +106,7 @@ export class CategoryUpdateInput {
   @Field({ nullable: true })
   name?: string
 
-  @Field(() => ID, { nullable: true })
+  @Field(() => Int, { nullable: true })
   index?: number
 
   @Field(() => Boolean, { nullable: true })
