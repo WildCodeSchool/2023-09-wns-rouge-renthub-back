@@ -32,9 +32,11 @@ import { generateSecurityCode } from '../utils/utils'
 import { VerificationCode } from '../entities/VerificationCode'
 import { typeCodeVerification } from '../utils/constant'
 import { Cart } from '../entities/Cart.entity'
+import { getOrCreateUserRole } from '../services/User.service'
 
 @Resolver(User)
 export class UsersResolver {
+  @Authorized('ADMIN')
   @Query(() => [User])
   //TODO  : delete eslint flag when context is used and function implemented correctly
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -42,6 +44,7 @@ export class UsersResolver {
     const users = await User.find({
       relations: {
         cart: { productCart: { productReference: { category: true } } },
+        role: true,
       },
     })
     return users
@@ -101,10 +104,12 @@ export class UsersResolver {
     // delete user's original password from data
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...dataWithoutPassword } = data
+    const role = await getOrCreateUserRole()
 
     Object.assign(newUser, dataWithoutPassword, {
       dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
       createdBy: adminUser || newUser,
+      role: role,
     })
 
     // creation of a brand new Cart for a new User
@@ -262,6 +267,7 @@ export class UsersResolver {
     return meUser
   }
 
+  @Authorized('ADMIN', 'USER')
   @Mutation(() => Boolean)
   async userSignOut(@Ctx() context: MyContext): Promise<boolean> {
     const cookie = new Cookies(context.req, context.res)
@@ -272,22 +278,26 @@ export class UsersResolver {
     })
     return true
   }
-
+  @Authorized('ADMIN', 'USER')
   @Mutation(() => User, { nullable: true })
   async userUpdate(
     @Ctx() context: MyContext,
     @Arg('data') data: UserUpdateInput
   ): Promise<User | null> {
-    const userId = context.user?.id
+    const userIdInContext = context.user?.id
 
     const user = await User.findOne({
-      where: { id: userId },
+      where: { id: userIdInContext },
       relations: { picture: true },
     })
 
+    if (!user) {
+      throw new Error('User not found')
+    }
+
     if (
-      user &&
-      user.id === context.user?.id //  || context.user?.role
+      context.user?.role.right === 'ADMIN' ||
+      (context.user?.role.right === 'USER' && user.id === userIdInContext)
     ) {
       let oldPictureId: number | null = null
       if (data.pictureId && user.picture?.id) {
@@ -311,7 +321,7 @@ export class UsersResolver {
         }
 
         return await User.findOne({
-          where: { id: userId },
+          where: { id: userIdInContext },
         })
       } else {
         throw new Error(`Error occured: ${JSON.stringify(errors)}`)
@@ -320,6 +330,7 @@ export class UsersResolver {
     return user
   }
 
+  @Authorized('ADMIN')
   @Mutation(() => User, { nullable: true })
   async userDelete(
     @Ctx() context: MyContext,

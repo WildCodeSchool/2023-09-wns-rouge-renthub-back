@@ -11,12 +11,14 @@ export class CategoriesResolver {
   @Query(() => [Category])
   async listCategories(): Promise<Category[]> {
     const categories = await new CategoryService().list()
+
     return categories
   }
 
   @Query(() => Category)
   async findCategory(@Arg('id', () => ID) id: number) {
     const categoryById = await new CategoryService().find(+id)
+
     return categoryById
   }
 
@@ -24,6 +26,7 @@ export class CategoriesResolver {
   @Mutation(() => Category)
   async createCategory(@Arg('data') data: CategoryCreateInput) {
     const newCategory = await new CategoryService().create(data)
+
     return newCategory
   }
 
@@ -31,6 +34,7 @@ export class CategoriesResolver {
   @Mutation(() => Category, { nullable: true })
   async updateCategory(@Arg('data') data: CategoryUpdateInput) {
     const category = await new CategoryService().update(data)
+
     return category
   }
 
@@ -38,6 +42,7 @@ export class CategoriesResolver {
   @Mutation(() => Boolean, { nullable: true })
   async deleteCategory(@Arg('id', () => ID) id: number) {
     const isDelete = await new CategoryService().delete(+id)
+
     return isDelete
   }
 }
