@@ -1,4 +1,4 @@
-import { Arg, ID, Mutation, Query, Resolver } from 'type-graphql'
+import { Arg, Authorized, ID, Mutation, Query, Resolver } from 'type-graphql'
 import {
   ProductReference,
   ProductReferenceCreateInput,
@@ -10,6 +10,7 @@ import { formatValidationErrors } from '../utils/utils'
 
 @Resolver(() => ProductReference)
 export class ProductReferenceResolver {
+  @Authorized('ADMIN')
   @Mutation(() => ProductReference)
   async createProductReference(
     @Arg('data') data: ProductReferenceCreateInput
@@ -34,7 +35,7 @@ export class ProductReferenceResolver {
         throw new Error(validationMessages || 'Une erreur est survenue.')
       }
       const { id } = await newProductReference.save()
-      if(!id) throw new Error('ProductReference not created')
+      if (!id) throw new Error('ProductReference not created')
 
       const productReference = await ProductReference.findOne({
         where: { id },
@@ -44,7 +45,10 @@ export class ProductReferenceResolver {
           updatedBy: true,
         },
       })
-      if (!productReference) throw new Error(`ProductReference created with id => < ${id} > but it was not found!`)
+      if (!productReference)
+        throw new Error(
+          `ProductReference created with id => < ${id} > but it was not found!`
+        )
       return productReference
     } catch (error: any) {
       throw new Error(error.message)
@@ -91,6 +95,7 @@ export class ProductReferenceResolver {
     }
   }
 
+  @Authorized('ADMIN')
   @Mutation(() => ProductReference)
   async updateProductReference(
     @Arg('id', () => ID) id: number,
@@ -121,6 +126,7 @@ export class ProductReferenceResolver {
     }
   }
 
+  @Authorized('ADMIN')
   @Mutation(() => ProductReference)
   async deleteProductReference(@Arg('id', () => ID) id: number) {
     try {
@@ -135,7 +141,7 @@ export class ProductReferenceResolver {
         throw new Error('Aucun produit trouvé')
       }
       await productRef.remove()
-      
+
       Object.assign(productRef, { id })
       return productRef
     } catch (error: any) {

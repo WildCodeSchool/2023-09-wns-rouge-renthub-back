@@ -196,6 +196,9 @@ export class UserUpdateInput {
 
   @Field(() => Int, { nullable: true })
   pictureId?: number
+
+  @Field(() => ID, { nullable: true })
+  role!: Role
 }
 
 @InputType()

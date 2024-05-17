@@ -19,7 +19,7 @@ export class PictureResolver {
     return pictureById
   }
 
-  @Authorized('ADMIN', 'USER')
+  @Authorized('ADMIN')
   @Mutation(() => Picture)
   async createPictureOnCategory(
     @Ctx() context: MyContext,
@@ -55,7 +55,7 @@ export class PictureResolver {
       context.user.id
     )
   }
-  // suppression du code sur la featured multer ( accessible dans le commit )
+  // @TODO: suppression du code sur la featured multer ( accessible dans le commit )
   @Authorized('ADMIN')
   @Mutation(() => Picture, { nullable: true })
   async deletePicture(
