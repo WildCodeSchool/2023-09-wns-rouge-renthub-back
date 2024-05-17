@@ -7,6 +7,7 @@ import {
 import { validate } from 'class-validator'
 import { Category } from '../entities/Category'
 import { formatValidationErrors } from '../utils/utils'
+import { PictureProduct } from '../entities/PictureProduct.entity'
 
 @Resolver(() => ProductReference)
 export class ProductReferenceResolver {
@@ -16,7 +17,7 @@ export class ProductReferenceResolver {
   ): Promise<ProductReference> {
     try {
       const newProductReference = new ProductReference()
-      const currentCategory: any = await Category.findOne({
+      const currentCategory = await Category.findOne({
         where: { id: data.category.id },
       })
       if (!currentCategory) {
@@ -34,7 +35,7 @@ export class ProductReferenceResolver {
         throw new Error(validationMessages || 'Une erreur est survenue.')
       }
       const { id } = await newProductReference.save()
-      if(!id) throw new Error('ProductReference not created')
+      if (!id) throw new Error('ProductReference not created')
 
       const productReference = await ProductReference.findOne({
         where: { id },
@@ -44,7 +45,10 @@ export class ProductReferenceResolver {
           updatedBy: true,
         },
       })
-      if (!productReference) throw new Error(`ProductReference created with id => < ${id} > but it was not found!`)
+      if (!productReference)
+        throw new Error(
+          `ProductReference created with id => < ${id} > but it was not found!`
+        )
       return productReference
     } catch (error: any) {
       throw new Error(error.message)
@@ -60,6 +64,7 @@ export class ProductReferenceResolver {
           createdBy: true,
           updatedBy: true,
           stock: true,
+          pictureProduct: true,
         },
       })
       if (!productReferences) {
@@ -80,8 +85,28 @@ export class ProductReferenceResolver {
           category: true,
           createdBy: true,
           updatedBy: true,
+          pictureProduct: true,
         },
       })
+
+      if (productRef) {
+        for (const item of productRef.pictureProduct) {
+          if (item.id) {
+            const pictureProduct = await PictureProduct.findOne({
+              where: { id: item.id },
+              relations: {
+                picture: true,
+              },
+            })
+            if (pictureProduct) {
+              // Remplace l'élément actuel par l'élément enrichi avec les relations
+              Object.assign(item, pictureProduct)
+            }
+          }
+        }
+      }
+      console.log('--------------------', productRef?.pictureProduct)
+
       if (!productRef) {
         throw new Error('Aucun produit trouvé')
       }
@@ -135,7 +160,7 @@ export class ProductReferenceResolver {
         throw new Error('Aucun produit trouvé')
       }
       await productRef.remove()
-      
+
       Object.assign(productRef, { id })
       return productRef
     } catch (error: any) {

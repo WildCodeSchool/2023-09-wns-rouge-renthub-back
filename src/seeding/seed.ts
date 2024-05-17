@@ -17,9 +17,9 @@ const options: DataSourceOptions & SeederOptions = {
   type: 'postgres',
   // host: process.env.DB_HOST_LOCAL,
   host: '127.0.0.1',
-  port: 5435,
-  username: 'lukasz',
-  password: 'pass',
+  port: 5434,
+  username: 'postgres',
+  password: 'r541bCPpxFwBBZB8',
   database: 'renthub',
   entities: [`${__dirname}/factories/*.ts`],
   factories: [

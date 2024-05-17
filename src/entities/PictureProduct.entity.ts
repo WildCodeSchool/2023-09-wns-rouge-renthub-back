@@ -21,8 +21,13 @@ export class PictureProduct extends BaseEntity {
   index!: number
 
   @ManyToOne(() => Picture, (picture) => picture.pictureProduct)
+  @Field(() => Picture, { nullable: true })
   picture!: Picture
 
-  @ManyToOne(() => ProductReference, (picture) => picture.pictureProduct)
+  @ManyToOne(
+    () => ProductReference,
+    (productReference) => productReference.pictureProduct
+  )
+  @Field(() => ProductReference, { nullable: true })
   productReference!: ProductReference
 }

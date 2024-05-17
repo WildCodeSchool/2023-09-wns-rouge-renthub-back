@@ -23,6 +23,7 @@ export class CategoryService {
         productReference: true,
       },
     })
+
     return listCategory
   }
 
@@ -36,6 +37,10 @@ export class CategoryService {
         productReference: true,
       },
     })
+
+    console.log('-----------------------------ss------')
+    console.log('----------listCategory', category)
+
     if (!category) {
       throw new Error('Category not found')
     }
