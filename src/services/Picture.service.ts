@@ -42,17 +42,6 @@ export class PictureService {
     path: string
   ) {
     try {
-      console.log(
-        '---domain---',
-        domain,
-        '---filename---',
-        filename,
-        '---mimetype---',
-        mimetype,
-        '---path---',
-        path
-      )
-
       const picture = this.db.create({
         name,
         mimetype,
@@ -143,7 +132,7 @@ export class PictureService {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { raw, affected } = await this.db.delete(picture.id)
+    const { affected } = await this.db.delete(picture.id)
     if (affected === 0) throw new Error('no delete affected on picture')
     return picture
   }

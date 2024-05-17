@@ -6,6 +6,8 @@ import {
   ProductCartUpdateInput,
 } from '../entities/ProductCart.entity'
 import { validate } from 'class-validator'
+import { MyContext } from '../types/Context.type'
+import { isRightUser } from '../utils/utils'
 
 export class ProductCartService {
   db: Repository<ProductCart>
@@ -51,7 +53,7 @@ export class ProductCartService {
   @Field({ nullable: true })
   dateTimeEnd?: Date
  */
-  async update(id: number, data: ProductCartUpdateInput) {
+  async update(id: number, data: ProductCartUpdateInput, context: MyContext) {
     const errors = await validate(data)
     if (errors.length > 0) throw new Error(`Validation failed! ${errors}`)
 
@@ -62,6 +64,14 @@ export class ProductCartService {
         cartReference: { owner: true },
       },
     })
+
+    // CHECK IF THE USER IS THE OWNER OF THE CART
+    const rightUser = isRightUser(
+      productCart?.cartReference?.owner.id as number,
+      context
+    )
+
+    if (!rightUser) throw new Error('You are not the owner of this cart')
 
     if (!productCart) throw new Error('ProductCart not found')
 

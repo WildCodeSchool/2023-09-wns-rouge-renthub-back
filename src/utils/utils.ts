@@ -1,6 +1,8 @@
 import { ValidationError } from 'class-validator'
 import { ObjectId } from '../entities/ObjectId'
 import { randomBytes } from 'crypto'
+import { MyContext } from '../types/Context.type'
+import { User } from '../entities/User'
 
 /**
  * Merge some data on an existing database entity, it takes care of keeping existing many-to-many relations to avoid unicity constraints
@@ -54,4 +56,18 @@ export function formatValidationErrors(errors: ValidationError[]): string {
     })
     .join('; ')
   return validationMessages
+}
+
+/**
+ * Checks if the given user is the right user based on the provided context.
+ * @param User - The user object to compare.
+ * @param context - The context object containing user information.
+ * @returns A boolean indicating whether the user is the right user.
+ * True = The user is the right user.
+ */
+export const isRightUser = (userId: number, context: MyContext): boolean => {
+  return (
+    (context.user?.role.right === 'USER' && context.user?.id === userId) ||
+    context.user?.role.right === 'ADMIN'
+  )
 }
