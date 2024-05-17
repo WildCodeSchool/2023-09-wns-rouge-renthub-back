@@ -1,4 +1,4 @@
-import { Arg, ID, Mutation, Query, Resolver } from 'type-graphql'
+import { Arg, Authorized, ID, Mutation, Query, Resolver } from 'type-graphql'
 import {
   ProductReference,
   ProductReferenceCreateInput,
@@ -11,6 +11,7 @@ import { PictureProduct } from '../entities/PictureProduct.entity'
 
 @Resolver(() => ProductReference)
 export class ProductReferenceResolver {
+  @Authorized('ADMIN')
   @Mutation(() => ProductReference)
   async createProductReference(
     @Arg('data') data: ProductReferenceCreateInput
@@ -116,6 +117,7 @@ export class ProductReferenceResolver {
     }
   }
 
+  @Authorized('ADMIN')
   @Mutation(() => ProductReference)
   async updateProductReference(
     @Arg('id', () => ID) id: number,
@@ -146,6 +148,7 @@ export class ProductReferenceResolver {
     }
   }
 
+  @Authorized('ADMIN')
   @Mutation(() => ProductReference)
   async deleteProductReference(@Arg('id', () => ID) id: number) {
     try {

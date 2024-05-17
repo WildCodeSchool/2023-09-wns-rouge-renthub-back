@@ -1,15 +1,17 @@
-import { Resolver, Mutation, Query, Arg, ID } from 'type-graphql'
+import { Resolver, Mutation, Query, Arg, ID, Authorized } from 'type-graphql'
 import { Role, RoleCreateInput, RoleUpdateInput } from '../entities/Role'
 import { validate } from 'class-validator'
 
 @Resolver(Role)
 export class RolesResolver {
+  @Authorized('ADMIN')
   @Query(() => [Role])
   async rolesGetAll(): Promise<Role[]> {
     const roles = await Role.find({ relations: { user: true } })
     return roles
   }
 
+  @Authorized('ADMIN')
   @Query(() => Role)
   async roleById(@Arg('id', () => ID) id: number): Promise<Role> {
     const role = await Role.findOne({
@@ -22,6 +24,7 @@ export class RolesResolver {
     return role
   }
 
+  @Authorized('ADMIN')
   @Mutation(() => Role)
   async roleCreate(
     @Arg('data', () => RoleCreateInput) data: RoleCreateInput
@@ -44,6 +47,7 @@ export class RolesResolver {
     }
   }
 
+  @Authorized('ADMIN')
   @Mutation(() => Role)
   async roleUpdate(
     @Arg('id', () => ID) id: number,
@@ -64,6 +68,7 @@ export class RolesResolver {
     return role
   }
 
+  @Authorized('ADMIN')
   @Mutation(() => Boolean)
   async roleDelete(@Arg('id', () => ID) id: number): Promise<boolean> {
     const role = await Role.findOne({ where: { id } })
