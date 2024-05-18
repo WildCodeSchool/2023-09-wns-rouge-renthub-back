@@ -37,7 +37,7 @@ export function initializeRoute(app: Express) {
         req.file.mimetype,
         req.file.path
       )
-      console.log('newPicture', newPicture)
+      console.info('picture info', newPicture)
       res.json({ message: true })
     } else {
       res.json({ message: false })
@@ -56,8 +56,6 @@ export function initializeRoute(app: Express) {
         categoryOnPicture
       )
       if (picture) {
-        console.log('picture', picture)
-
         res.sendFile(picture.path)
       } else {
         res.status(404).json({ message: 'No picture found' })

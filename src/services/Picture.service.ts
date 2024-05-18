@@ -126,7 +126,7 @@ export class PictureService {
       })
       if (category) {
         Object.assign(category, { picture: null })
-        console.log('----0--', category)
+
         await dataSource.getRepository(Category).save(category)
       }
     }

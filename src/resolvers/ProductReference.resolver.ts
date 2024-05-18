@@ -100,14 +100,11 @@ export class ProductReferenceResolver {
               },
             })
             if (pictureProduct) {
-              // Remplace l'élément actuel par l'élément enrichi avec les relations
               Object.assign(item, pictureProduct)
             }
           }
         }
       }
-      console.log('--------------------', productRef?.pictureProduct)
-
       if (!productRef) {
         throw new Error('Aucun produit trouvé')
       }
