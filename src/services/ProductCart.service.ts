@@ -19,14 +19,16 @@ export class ProductCartService {
     const newProductCart = this.db.create(data)
     const errors = await validate(newProductCart)
     if (errors.length > 0) throw new Error(`Validation failed! ${errors}`)
+      console.log("TOTO" ,errors);
     const { id } = await this.db.save(newProductCart)
+
     const productCart = await this.find(id)
     return productCart
   }
 
   async findAll() {
     const listProductCarts = this.db.find({
-      relations: { productReference: true, cartReference: true },
+      relations: { productReference: { category: true }, cartReference: true },
     })
     return listProductCarts
   }
@@ -41,18 +43,7 @@ export class ProductCartService {
     }
     return productCart
   }
-  /**
- * 
- ProductCartUpdateInput {
-  @Field(() => Int, { nullable: true })
-  quantity?: number
 
-  @Field({ nullable: true })
-  dateTimeStart?: Date
-
-  @Field({ nullable: true })
-  dateTimeEnd?: Date
- */
   async update(id: number, data: ProductCartUpdateInput, context: MyContext) {
     const errors = await validate(data)
     if (errors.length > 0) throw new Error(`Validation failed! ${errors}`)

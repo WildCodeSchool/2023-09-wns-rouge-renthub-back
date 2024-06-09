@@ -4,6 +4,7 @@ import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConne
 export const dataSourceOptions: PostgresConnectionOptions = {
   type: 'postgres',
   entities: [`${__dirname}/entities/*.ts`],
+  subscribers: [`${__dirname}/subscribers/*.ts`],
   synchronize: true,
   logging: process.env.DOCKER_LOGS === 'true' ? true : false,
 }

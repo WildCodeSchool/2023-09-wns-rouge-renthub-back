@@ -70,6 +70,7 @@ export class ProductReference extends EntityWithDefault {
   @OneToMany(() => ProductCart, (productCart) => productCart.productReference, {
     cascade: true,
   })
+  @Field(() => [ProductCart])
   productCart!: ProductCart[]
 }
 

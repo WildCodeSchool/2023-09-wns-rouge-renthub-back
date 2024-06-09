@@ -2,7 +2,6 @@ import { ValidationError } from 'class-validator'
 import { ObjectId } from '../entities/ObjectId'
 import { randomBytes } from 'crypto'
 import { MyContext } from '../types/Context.type'
-import { User } from '../entities/User'
 
 /**
  * Merge some data on an existing database entity, it takes care of keeping existing many-to-many relations to avoid unicity constraints
