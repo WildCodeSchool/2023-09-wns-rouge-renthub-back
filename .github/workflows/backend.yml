@@ -30,7 +30,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
       - name: Goto backend and run tests
-        run: npm i && npm run test
+        run: npm i && npm run test:docker
   docker:
     needs: test
     if: github.ref == 'refs/heads/main'
