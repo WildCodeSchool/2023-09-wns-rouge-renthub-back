@@ -19,7 +19,6 @@ export class ProductCartService {
     const newProductCart = this.db.create(data)
     const errors = await validate(newProductCart)
     if (errors.length > 0) throw new Error(`Validation failed! ${errors}`)
-      console.log("TOTO" ,errors);
     const { id } = await this.db.save(newProductCart)
 
     const productCart = await this.find(id)
@@ -55,6 +54,7 @@ export class ProductCartService {
         cartReference: { owner: true },
       },
     })
+    if (!productCart) throw new Error('ProductCart not found')
 
     // CHECK IF THE USER IS THE OWNER OF THE CART
     const rightUser = isRightUser(
@@ -64,12 +64,10 @@ export class ProductCartService {
 
     if (!rightUser) throw new Error('You are not the owner of this cart')
 
-    if (!productCart) throw new Error('ProductCart not found')
-
     Object.assign(productCart, data)
 
-    const updatedCart = await this.db.save(productCart)
-    return updatedCart
+    const updatedProductCart = await this.db.save(productCart)
+    return updatedProductCart
   }
 
   async delete(id: number) {

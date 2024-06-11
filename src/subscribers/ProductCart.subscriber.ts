@@ -6,26 +6,10 @@ import {
   UpdateEvent,
 } from 'typeorm'
 import { ProductCart } from '../entities/ProductCart.entity'
-import { Cart } from '../entities/Cart.entity'
 import { dataSource } from '../datasource'
 import { ProductReference } from '../entities/ProductReference.entity'
-
-/**
- * Calculates the number of days between two dates.
- * @param dateStart - The start date.
- * @param dateEnd - The end date.
- * @returns The number of days between the two dates.
- */
-function calculateDaysBetweenDates(dateStart: Date, dateEnd: Date): number {
-  const start = new Date(dateStart)
-  const end = new Date(dateEnd)
-  start.setUTCHours(0, 0, 0, 0)
-  end.setUTCHours(0, 0, 0, 0)
-  if (start.toDateString() === end.toDateString()) return 1
-  const timeDifference = end.getTime() - start.getTime()
-  const dayDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24))
-  return dayDifference
-}
+import { CartService } from '../services/Cart.service'
+import { calculateDaysBetweenDates } from '../utils/utils'
 
 @EventSubscriber()
 export class ProductCartSubscriber
@@ -40,135 +24,128 @@ export class ProductCartSubscriber
   }
 
   /**
-   * Handles the afterInsert event triggered when a new ProductCart entity is inserted.
-   * It updates the total price of the cart to which the new ProductCart belongs.
-   * @remarks The total price is calculated by multiplying the quantity of the product by the price of the product and the number of days the product is rented.
+   * Retrieves a ProductReference entity by its ID.
+   * @param productReferenceId - The ID of the ProductReference entity.
+   * @returns A Promise that resolves with the ProductReference entity.
+   */
+  private async getProductReferenceById(
+    productReferenceId: number
+  ): Promise<ProductReference> {
+    const productReference = await dataSource
+      .getRepository(ProductReference)
+      .findOneBy({ id: productReferenceId })
+    if (!productReference)
+      throw new Error(
+        `ProductReference with ID ${productReferenceId} not found`
+      )
+    return productReference
+  }
+
+  /**
+   * Handles the afterInsert event triggered when a new ProductCart is inserted to DB.
+   * It updates the total price of the cart to which the new ProductCart belongs by adding the price of the new ProductCart to a current totalPrice of a Cart.
    * @param event - The InsertEvent object containing the inserted entity.
    * @returns A Promise that resolves when the operation is complete.
    */
   async afterInsert(event: InsertEvent<ProductCart>): Promise<void> {
     try {
-      const cartId = event.entity.cartReference.id
-      const insertedProductId = event.entity.productReference.id
-      const insertedProductCart = event.entity
+      const {
+        cartReference: { id: cartId },
+        productReference: { id: productReferenceId },
+        dateTimeStart,
+        dateTimeEnd,
+        quantity,
+      } = event.entity
 
-      const currentCart = await dataSource.getRepository(Cart).findOne({
-        where: { id: cartId },
-        relations: {
-          productCart: { productReference: { category: true } },
-        },
-      })
-      if (!currentCart) throw new Error('Cart not found')
+      const productReference =
+        await this.getProductReferenceById(productReferenceId)
 
-      const insertedProductReference = await dataSource
-        .getRepository(ProductReference)
-        .findOne({ where: { id: insertedProductId } })
-      if (!insertedProductReference)
-        throw new Error('ProductReference not found')
+      const cart = await new CartService().find(cartId)
 
-      const newTotalPrice =
-        currentCart.totalPrice +
-        insertedProductCart.quantity *
-          insertedProductReference.price *
-          calculateDaysBetweenDates(
-            insertedProductCart.dateTimeStart,
-            insertedProductCart.dateTimeEnd
-          )
+      const currentTotalPrice = CartService.calculateTotalPrice(cart)
 
-      currentCart.totalPrice = newTotalPrice
+      const daysCount = calculateDaysBetweenDates(dateTimeStart, dateTimeEnd)
 
-      await currentCart.save()
+      const newProductCartTotalPrice =
+        quantity * productReference.price * daysCount
+
+      cart.totalPrice += currentTotalPrice + newProductCartTotalPrice
+
+      await cart.save()
     } catch (error) {
       console.error(error)
     }
   }
 
   /**
-   * Handles the afterRemove event triggered when a ProductCart entity is removed.
-   * It updates the total price of the cart to which the removed ProductCart belongs.
+   * Handles the afterRemove event triggered when a ProductCart is removed from DB.
+   * It updates the total price of the cart to which the removed ProductCart belonged.
    * @remarks The total price is calculated by multiplying the quantity of the product by the price of the product and the number of days the product is rented.
    * @param event - The RemoveEvent object containing the removed entity.
    * @returns A Promise that resolves when the operation is complete.
    */
   async afterRemove(event: RemoveEvent<ProductCart>): Promise<void> {
     try {
-      const cartId = event.entity?.cartReference.id
-      if (!cartId) throw new Error('CartId not found')
+      if (!event.entity)
+        throw new Error('Removed ProductCart not found in event')
 
-      const removedProductCart = event.entity
-      if (!removedProductCart)
-        throw new Error('RemovedProductCart event.entity not found')
+      const {
+        cartReference: { id: cartId },
+        productReference,
+        dateTimeStart,
+        dateTimeEnd,
+        quantity,
+      } = event.entity
 
-      const currentCart = await dataSource.getRepository(Cart).findOne({
-        where: { id: cartId },
-        relations: {
-          productCart: { productReference: { category: true } },
-        },
-      })
+      const cart = await new CartService().find(cartId)
 
-      if (!currentCart) throw new Error('Cart not found')
+      const currentTotalPrice = CartService.calculateTotalPrice(cart)
 
-      const removedProductCartPrice =
-        removedProductCart.quantity *
-        removedProductCart.productReference.price *
-        calculateDaysBetweenDates(
-          removedProductCart.dateTimeStart,
-          removedProductCart.dateTimeEnd
-        )
-      currentCart.totalPrice -= removedProductCartPrice
-      await currentCart.save()
+      const daysCountRemovedProductCart = calculateDaysBetweenDates(
+        dateTimeStart,
+        dateTimeEnd
+      )
+
+      const totalPriceRemovedProductCart =
+        quantity * productReference.price * daysCountRemovedProductCart
+
+      cart.totalPrice = currentTotalPrice - totalPriceRemovedProductCart
+      await cart.save()
     } catch (error) {
       console.error(error)
     }
   }
 
   /**
-   * Handles the afterUpdate event triggered when a ProductCart entity is updated.
+   * Handles the afterUpdate event triggered when a ProductCart is updated from DB.
    * It updates the total price of the cart to which the updated ProductCart belongs.
    * @remarks The total price is calculated by multiplying the quantity of the product by the price of the product and the number of days the product is rented.
-   * @remarks The updated columns are checked to determine which properties of the ProductCart entity have been updated.
-   * @remarks If the quantity, dateTimeStart, or dateTimeEnd properties have been updated, the total price of the cart is recalculated.
    * @param event - The UpdateEvent object containing the updated entity.
    * @returns A Promise that resolves when the operation is complete.
    */
   async afterUpdate(event: UpdateEvent<ProductCart>): Promise<void> {
     try {
       const updatedProductCart = event.entity
+      if (!updatedProductCart) {
+        return
+      }
 
-      if (!updatedProductCart) throw new Error('ProductCart not found in event')
-
-      const updatedColumns = event.updatedColumns.map(
-        (column) => column.propertyName
-      )
-
-      const quantity = updatedColumns.includes('quantity')
-        ? updatedProductCart.quantity
-        : event.databaseEntity.quantity
-      const dateTimeStart = updatedColumns.includes('dateTimeStart')
-        ? updatedProductCart.dateTimeStart
-        : event.databaseEntity.dateTimeStart
-      const dateTimeEnd = updatedColumns.includes('dateTimeEnd')
-        ? updatedProductCart.dateTimeEnd
-        : event.databaseEntity.dateTimeEnd
-      const productReferencePrice: number =
-        updatedProductCart.productReference.price
+      const cartId = updatedProductCart.cartReference.id
+      const cart = await new CartService().find(cartId)
 
       const countDays = calculateDaysBetweenDates(
-        new Date(dateTimeStart),
-        new Date(dateTimeEnd)
+        new Date(updatedProductCart.dateTimeStart),
+        new Date(updatedProductCart.dateTimeEnd)
       )
 
-      const newTotalPrice = quantity * productReferencePrice * countDays
+      const newTotalPrice =
+        updatedProductCart.quantity *
+        updatedProductCart.productReference.price *
+        countDays
 
-      const cartId: number = updatedProductCart.cartReference.id
-      const currentCart = await dataSource.getRepository(Cart).findOne({
-        where: { id: cartId },
-      })
-      if (!currentCart) throw new Error('Cart not found')
+      cart.totalPrice = newTotalPrice
 
-      currentCart.totalPrice = newTotalPrice
-
-      await currentCart.save()
+      await cart.save()
     } catch (error) {
       console.error(error)
     }
