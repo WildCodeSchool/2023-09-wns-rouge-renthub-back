@@ -1,26 +1,20 @@
 import { Resolver, Mutation, Query, Arg, ID, Authorized } from 'type-graphql'
 import { Role, RoleCreateInput, RoleUpdateInput } from '../entities/Role'
-import { validate } from 'class-validator'
+import { RoleService } from '../services/Role.service'
 
 @Resolver(Role)
 export class RolesResolver {
   @Authorized('ADMIN')
   @Query(() => [Role])
   async rolesGetAll(): Promise<Role[]> {
-    const roles = await Role.find({ relations: { user: true } })
+    const roles = await new RoleService().findAll()
     return roles
   }
 
   @Authorized('ADMIN')
   @Query(() => Role)
   async roleById(@Arg('id', () => ID) id: number): Promise<Role> {
-    const role = await Role.findOne({
-      where: { id },
-      relations: { user: true },
-    })
-    if (!role) {
-      throw new Error('Role not found')
-    }
+    const role = await new RoleService().find(id)
     return role
   }
 
@@ -29,22 +23,8 @@ export class RolesResolver {
   async roleCreate(
     @Arg('data', () => RoleCreateInput) data: RoleCreateInput
   ): Promise<Role> {
-    const newRole = new Role()
-    Object.assign(newRole, data)
-    const roleName: string = data.name
-    // Verify if already exists
-    const existingRoleName = await Role.findOne({ where: { name: roleName } })
-    if (existingRoleName) {
-      throw new Error('Role already exists')
-    } else {
-      // Validate before save
-      const errors = await validate(newRole)
-      if (errors.length === 0) {
-        await newRole.save()
-        return newRole
-      }
-      throw new Error(`Error occured: ${JSON.stringify(errors)}`)
-    }
+    const newRole = new RoleService().create(data)
+    return newRole
   }
 
   @Authorized('ADMIN')
@@ -53,33 +33,14 @@ export class RolesResolver {
     @Arg('id', () => ID) id: number,
     @Arg('data', () => RoleUpdateInput) data: RoleUpdateInput
   ): Promise<Role> {
-    const role = await Role.findOne({ where: { id } })
-    if (!role) {
-      throw new Error('Role not found')
-    }
-
-    Object.assign(role, data)
-    const errors = await validate(role)
-    if (errors.length === 0) {
-      await role.save()
-    } else {
-      throw new Error(`Error occured: ${JSON.stringify(errors)}`)
-    }
+    const role = await new RoleService().update(id, data)
     return role
   }
 
   @Authorized('ADMIN')
-  @Mutation(() => Boolean)
-  async roleDelete(@Arg('id', () => ID) id: number): Promise<boolean> {
-    const role = await Role.findOne({ where: { id } })
-    if (!role) {
-      throw new Error('Role not found')
-    }
-    try {
-      await role.remove()
-      return true
-    } catch (error) {
-      throw new Error(`Error occured: ${error}`)
-    }
+  @Mutation(() => Role)
+  async roleDelete(@Arg('id', () => ID) id: number): Promise<Role> {
+    const deletedRole = await new RoleService().delete(id)
+    return deletedRole
   }
 }

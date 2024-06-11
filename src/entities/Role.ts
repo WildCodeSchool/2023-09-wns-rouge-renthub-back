@@ -20,7 +20,7 @@ export class Role extends BaseEntity {
   @Field(() => ID)
   id!: number
 
-  @Column({ length: 50 })
+  @Column({ length: 50, unique: true})
   @Length(2, 50, { message: 'Entre 2 et 50 caractères' })
   @Matches(/^[a-zA-ZÀ-ÿ0-9-]+$/, {
     message:
