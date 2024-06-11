@@ -196,7 +196,10 @@ export class UsersResolver {
     @Ctx() context: MyContext,
     @Arg('data', () => UserLoginInput) data: UserLoginInput
   ) {
-    const user = await User.findOne({ where: { email: data.email } })
+    const user = await User.findOne({
+      where: { email: data.email },
+      relations: { role: true },
+    })
     if (!user) {
       throw new Error('Email ou mot de passe incorrect')
     }

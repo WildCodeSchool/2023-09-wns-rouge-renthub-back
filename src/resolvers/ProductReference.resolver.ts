@@ -4,9 +4,7 @@ import {
   ProductReferenceCreateInput,
   ProductReferenceUpdateInput,
 } from '../entities/ProductReference.entity'
-import { validate } from 'class-validator'
-import { Category } from '../entities/Category'
-import { formatValidationErrors } from '../utils/utils'
+import { ProductReferenceService } from '../services/ProductReference.service'
 
 @Resolver(() => ProductReference)
 export class ProductReferenceResolver {
@@ -15,84 +13,20 @@ export class ProductReferenceResolver {
   async createProductReference(
     @Arg('data') data: ProductReferenceCreateInput
   ): Promise<ProductReference> {
-    try {
-      const newProductReference = new ProductReference()
-      const currentCategory: any = await Category.findOne({
-        where: { id: data.category.id },
-      })
-      if (!currentCategory) {
-        throw new Error('Aucune catégorie trouvé')
-      }
-      Object.assign(newProductReference, {
-        ...data,
-        category: {
-          id: data.category.id,
-        },
-      })
-      const errors = await validate(newProductReference)
-      if (errors.length > 0) {
-        const validationMessages = formatValidationErrors(errors)
-        throw new Error(validationMessages || 'Une erreur est survenue.')
-      }
-      const { id } = await newProductReference.save()
-      if (!id) throw new Error('ProductReference not created')
-
-      const productReference = await ProductReference.findOne({
-        where: { id },
-        relations: {
-          category: true,
-          createdBy: true,
-          updatedBy: true,
-        },
-      })
-      if (!productReference)
-        throw new Error(
-          `ProductReference created with id => < ${id} > but it was not found!`
-        )
-      return productReference
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    const newProductReference = new ProductReferenceService().create(data)
+    return newProductReference
   }
 
   @Query(() => [ProductReference])
   async getProductsReferences(): Promise<ProductReference[]> {
-    try {
-      const productReferences = await ProductReference.find({
-        relations: {
-          category: true,
-          createdBy: true,
-          updatedBy: true,
-          stock: true,
-        },
-      })
-      if (!productReferences) {
-        throw new Error('Aucun produit trouvé')
-      }
-      return productReferences
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    const productReferences = await new ProductReferenceService().findAll()
+    return productReferences
   }
 
   @Query(() => ProductReference)
   async getProductReference(@Arg('id', () => ID) id: number) {
-    try {
-      const productRef = await ProductReference.findOne({
-        where: { id },
-        relations: {
-          category: true,
-          createdBy: true,
-          updatedBy: true,
-        },
-      })
-      if (!productRef) {
-        throw new Error('Aucun produit trouvé')
-      }
-      return productRef
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    const productReference = await new ProductReferenceService().find(id)
+    return productReference
   }
 
   @Authorized('ADMIN')
@@ -101,51 +35,19 @@ export class ProductReferenceResolver {
     @Arg('id', () => ID) id: number,
     @Arg('data') data: ProductReferenceUpdateInput
   ) {
-    try {
-      const productRef = await ProductReference.findOne({
-        where: { id: id },
-        relations: {
-          category: true,
-        },
-      })
-      if (!productRef) {
-        throw new Error('Aucun produit trouvé')
-      }
-      if (productRef) {
-        Object.assign(productRef, data)
-        const errors = await validate(productRef)
-        if (errors.length > 0) {
-          const validationMessages = formatValidationErrors(errors)
-          throw new Error(validationMessages || 'Une erreur est survenue.')
-        }
-        await productRef.save()
-      }
-      return productRef
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    const updatedProductReference = await new ProductReferenceService().update(
+      id,
+      data
+    )
+    return updatedProductReference
   }
 
   @Authorized('ADMIN')
   @Mutation(() => ProductReference)
   async deleteProductReference(@Arg('id', () => ID) id: number) {
-    try {
-      const productRef = await ProductReference.findOne({
-        where: { id },
-        relations: {
-          category: true,
-          stock: true,
-        },
-      })
-      if (!productRef) {
-        throw new Error('Aucun produit trouvé')
-      }
-      await productRef.remove()
-
-      Object.assign(productRef, { id })
-      return productRef
-    } catch (error: any) {
-      throw new Error(error.message)
-    }
+    const deletedProductReference = await new ProductReferenceService().delete(
+      id
+    )
+    return deletedProductReference
   }
 }
