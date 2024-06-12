@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm'
 import { Field, ID, InputType, Int, ObjectType } from 'type-graphql'
-import { User } from './User'
+import { User } from './User.entity'
 import { ProductCart } from './ProductCart.entity'
 
 @Entity()
@@ -30,7 +30,7 @@ export class Cart extends BaseEntity {
     onDelete: 'CASCADE',
   })
   @Field(() => [ProductCart], { nullable: true })
-  productCart!: ProductCart[]
+  productCarts!: ProductCart[]
 }
 
 @InputType()

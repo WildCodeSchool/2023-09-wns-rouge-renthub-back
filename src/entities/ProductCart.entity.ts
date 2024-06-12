@@ -31,12 +31,12 @@ export class ProductCart extends BaseEntity {
 
   @ManyToOne(
     () => ProductReference,
-    (productReference) => productReference.productCart
+    (productReference) => productReference.productCarts
   )
   @Field(() => ProductReference)
   productReference!: ProductReference
 
-  @ManyToOne(() => Cart, (cart) => cart.productCart)
+  @ManyToOne(() => Cart, (cart) => cart.productCarts)
   @Field(() => Cart)
   cartReference!: Cart
 }

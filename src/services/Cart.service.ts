@@ -12,7 +12,7 @@ export class CartService {
   public static calculateTotalPrice(cart: Cart) {
     let totalPrice = 0
 
-    for (const productCart of cart.productCart) {
+    for (const productCart of cart.productCarts) {
       const daysCount = calculateDaysBetweenDates(
         productCart.dateTimeStart,
         productCart.dateTimeEnd
@@ -29,7 +29,7 @@ export class CartService {
       where: { id },
       relations: {
         owner: true,
-        productCart: { productReference: { category: true } },
+        productCarts: { productReference: { category: true } },
       },
     })
     if (!cart) throw new Error('Cart not found')

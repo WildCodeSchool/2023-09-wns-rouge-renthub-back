@@ -19,10 +19,10 @@ import {
   IsDate,
 } from 'class-validator'
 import { Field, ID, InputType, Int, ObjectType } from 'type-graphql'
-import { Picture } from './Picture'
-import { Role } from './Role'
+import { Picture } from './Picture.entity'
+import { Role } from './Role.entity'
 import { ObjectId } from './ObjectId'
-import { VerificationCode } from './VerificationCode'
+import { VerificationCode } from './VerificationCode.entity'
 import { Cart } from './Cart.entity'
 
 @Entity()
@@ -56,7 +56,7 @@ export class User extends BaseEntity {
   @Field({ nullable: true })
   nickName!: string
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'timestamp with time zone', nullable: true })
   @IsOptional()
   @IsDate({ message: 'Doit être une date valide' })
   @Field(() => Date, { nullable: true })
@@ -144,8 +144,8 @@ export class UserCreateInput {
   @Field({ nullable: true })
   nickName!: string
 
-  @Field({ nullable: true })
-  dateOfBirth!: string
+  @Field(() => Date, { nullable: true })
+  dateOfBirth!: Date
 
   @Field()
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()_+]{8,}$/, {

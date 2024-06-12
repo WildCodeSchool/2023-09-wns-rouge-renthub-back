@@ -40,18 +40,18 @@ export class ProductReferenceSubscriber
 
       const carts = await dataSource.getRepository(Cart).find({
         where: {
-          productCart: {
+          productCarts: {
             productReference: {
               id: originalProductReference.id,
             },
           },
         },
-        relations: { productCart: { productReference: true } },
+        relations: { productCarts: { productReference: true } },
       })
 
       await Promise.all(
         carts.map(async (cart) => {
-          const productCarts = cart.productCart
+          const productCarts = cart.productCarts
 
           const productCartassociated = productCarts.find(
             (productCart) =>

@@ -1,6 +1,6 @@
 import { Arg, Mutation, Resolver } from 'type-graphql'
-import { ReSendVerificationCodeInput, User } from '../entities/User'
-import { VerificationCode } from '../entities/VerificationCode'
+import { ReSendVerificationCodeInput, User } from '../entities/User.entity'
+import { VerificationCode } from '../entities/VerificationCode.entity'
 import { sendVerificationEmail } from '../utils/mailServices/verificationEmail'
 import { generateSecurityCode } from '../utils/utils'
 import { typeCodeVerification } from '../utils/constant'

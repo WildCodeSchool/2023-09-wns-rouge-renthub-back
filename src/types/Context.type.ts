@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { User } from '../entities/User'
+import { User } from '../entities/User.entity'
 
 export interface MyContext {
   req: Request
