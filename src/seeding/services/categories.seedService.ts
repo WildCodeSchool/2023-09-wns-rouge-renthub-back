@@ -1,6 +1,6 @@
 import { SeederFactoryManager } from 'typeorm-extension'
-import { User } from '../../entities/User'
-import { Category } from '../../entities/Category'
+import { User } from '../../entities/User.entity'
+import { Category } from '../../entities/Category.entity'
 
 export type CategoriesSeederTypes = {
   categoriesSaved: Category[]

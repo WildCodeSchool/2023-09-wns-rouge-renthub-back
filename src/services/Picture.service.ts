@@ -1,5 +1,5 @@
-import { Category } from './../entities/Category'
-import { Picture, PictureCreateInput, PictureUpdate } from '../entities/Picture'
+import { Category } from '../entities/Category.entity'
+import { Picture, PictureCreateInput, PictureUpdate } from '../entities/Picture.entity'
 import { Repository } from 'typeorm'
 import { validate } from 'class-validator'
 import { dataSource } from '../datasource'

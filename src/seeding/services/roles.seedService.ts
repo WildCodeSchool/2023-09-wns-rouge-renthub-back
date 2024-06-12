@@ -1,5 +1,5 @@
 import { SeederFactoryManager } from 'typeorm-extension'
-import { Role } from '../../entities/Role'
+import { Role } from '../../entities/Role.entity'
 
 export type RolesSeederTypes = {
   rolesSaved: Role[]

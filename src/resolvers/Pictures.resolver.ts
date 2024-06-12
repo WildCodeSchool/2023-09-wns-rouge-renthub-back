@@ -7,7 +7,7 @@ import {
   Authorized,
   Query,
 } from 'type-graphql'
-import { Picture, PictureCreateInput, PictureUpdate } from '../entities/Picture'
+import { Picture, PictureCreateInput, PictureUpdate } from '../entities/Picture.entity'
 import { PictureService } from '../services/Picture.service'
 import { MyContext } from '../types/Context.type'
 

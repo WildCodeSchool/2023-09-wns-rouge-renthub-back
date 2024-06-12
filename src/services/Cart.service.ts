@@ -15,7 +15,7 @@ export class CartService {
     const carts = this.db.find({
       relations: {
         owner: true,
-        productCart: { productReference: { category: true } },
+        productCarts: { productReference: { category: true } },
       },
     })
     return carts
@@ -26,7 +26,7 @@ export class CartService {
       where: { id },
       relations: {
         owner: true,
-        productCart: { productReference: { category: true } },
+        productCarts: { productReference: { category: true } },
       },
     })
     if (!cart) {

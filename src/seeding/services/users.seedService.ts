@@ -1,7 +1,7 @@
 import { SeederFactoryManager } from 'typeorm-extension'
-import { Role } from '../../entities/Role'
+import { Role } from '../../entities/Role.entity'
 import { Cart } from '../../entities/Cart.entity'
-import { User } from '../../entities/User'
+import { User } from '../../entities/User.entity'
 
 export type UsersSeederTypes = {
   usersSaved: User[]
@@ -75,7 +75,7 @@ export default async function usersSeeder(
 
   for (let i = 0; i < users.length; i++) {
     const user = users[i]
-    
+
     if (i < countDevs) {
       user.firstName = devsAccounts[i].firstname
       user.lastName = devsAccounts[i].lastname
@@ -85,7 +85,7 @@ export default async function usersSeeder(
     } else {
       user.role = roles[1]
     }
-    
+
     user.cart = carts[i]
     carts[i].owner = user
     cartsSaved.push(carts[i])

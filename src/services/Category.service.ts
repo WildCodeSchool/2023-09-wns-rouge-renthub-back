@@ -2,7 +2,7 @@ import {
   Category,
   CategoryCreateInput,
   CategoryUpdateInput,
-} from '../entities/Category'
+} from '../entities/Category.entity'
 
 import { Repository } from 'typeorm'
 import { validate } from 'class-validator'
@@ -20,7 +20,7 @@ export class CategoryService {
         childCategories: true,
         parentCategory: true,
         picture: true,
-        productReference: true,
+        productReferences: true,
       },
     })
     return listCategory
@@ -33,7 +33,7 @@ export class CategoryService {
         childCategories: true,
         parentCategory: true,
         picture: true,
-        productReference: true,
+        productReferences: true,
       },
     })
     if (!category) {

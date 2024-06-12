@@ -1,5 +1,5 @@
 import { SeederFactoryManager } from 'typeorm-extension'
-import { Category } from '../../entities/Category'
+import { Category } from '../../entities/Category.entity'
 import { ProductReference } from '../../entities/ProductReference.entity'
 
 export type ProductReferencesSeederTypes = {

@@ -1,6 +1,6 @@
 import { Faker } from "@faker-js/faker";
 import { setSeederFactory } from "typeorm-extension";
-import { Picture } from "../../entities/Picture";
+import { Picture } from "../../entities/Picture.entity";
 
 export const PicturesFactory = setSeederFactory(Picture, (faker: Faker) => {
   const picture = new Picture();

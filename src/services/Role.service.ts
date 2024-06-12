@@ -1,6 +1,6 @@
 import { Repository } from 'typeorm'
 import { dataSource } from '../datasource'
-import { Role, RoleCreateInput, RoleUpdateInput } from '../entities/Role'
+import { Role, RoleCreateInput, RoleUpdateInput } from '../entities/Role.entity'
 import { validate } from 'class-validator'
 import { formatValidationErrors } from '../utils/utils'
 

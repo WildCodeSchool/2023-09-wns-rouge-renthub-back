@@ -22,7 +22,7 @@ export class ProductReferenceService {
         createdBy: true,
         updatedBy: true,
         stock: true,
-        productCart: { cartReference: { owner: { role: true } } },
+        productCarts: { cartReference: { owner: { role: true } } },
       },
     })
     if (!productReferences) {
@@ -39,7 +39,7 @@ export class ProductReferenceService {
         createdBy: true,
         updatedBy: true,
         stock: true,
-        productCart: { cartReference: { owner: { role: true } } },
+        productCarts: { cartReference: { owner: { role: true } } },
       },
     })
     if (!productReference) {
@@ -96,7 +96,7 @@ export class ProductReferenceService {
       const errors = await validate(productReference)
       if (errors.length > 0) {
         const validationMessages = formatValidationErrors(errors)
-        throw new Error(validationMessages || 'Une erreur est survenue.')
+        throw new Error(validationMessages || 'Validation error occured')
       }
       await productReference.save()
     }

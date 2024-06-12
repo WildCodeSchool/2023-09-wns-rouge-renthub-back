@@ -11,7 +11,7 @@ import {
 } from 'typeorm'
 import { Field, ID, InputType, ObjectType } from 'type-graphql'
 import { Length, Matches } from 'class-validator'
-import { User } from './User'
+import { User } from './User.entity'
 
 @Entity()
 @ObjectType()

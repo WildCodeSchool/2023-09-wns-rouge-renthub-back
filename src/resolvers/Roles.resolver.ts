@@ -1,5 +1,5 @@
 import { Resolver, Mutation, Query, Arg, ID, Authorized } from 'type-graphql'
-import { Role, RoleCreateInput, RoleUpdateInput } from '../entities/Role'
+import { Role, RoleCreateInput, RoleUpdateInput } from '../entities/Role.entity'
 import { RoleService } from '../services/Role.service'
 
 @Resolver(Role)

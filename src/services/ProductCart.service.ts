@@ -41,18 +41,7 @@ export class ProductCartService {
     }
     return productCart
   }
-  /**
- * 
- ProductCartUpdateInput {
-  @Field(() => Int, { nullable: true })
-  quantity?: number
 
-  @Field({ nullable: true })
-  dateTimeStart?: Date
-
-  @Field({ nullable: true })
-  dateTimeEnd?: Date
- */
   async update(id: number, data: ProductCartUpdateInput, context: MyContext) {
     const errors = await validate(data)
     if (errors.length > 0) throw new Error(`Validation failed! ${errors}`)
@@ -88,7 +77,7 @@ export class ProductCartService {
         productReference: {
           pictureProduct: true,
           stock: true,
-          productCart: true,
+          productCarts: true,
           category: true,
         },
         cartReference: true,

@@ -12,7 +12,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm'
 import { Field, ID, InputType, Int, ObjectType } from 'type-graphql'
-import { Picture } from './Picture'
+import { Picture } from './Picture.entity'
 import { ProductReference } from './ProductReference.entity'
 
 @Entity()
@@ -74,7 +74,7 @@ export class Category extends BaseEntity {
     { cascade: true }
   )
   @Field(() => [ProductReference], { nullable: true })
-  productReference: ProductReference[]
+  productReferences: ProductReference[]
 }
 
 @InputType()
