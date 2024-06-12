@@ -5,11 +5,7 @@ import {
   JoinColumn,
   ManyToOne,
 } from 'typeorm'
-import {
-  IsOptional,
-  Length,
-  IsDate,
-} from 'class-validator'
+import { IsOptional, Length, IsDate } from 'class-validator'
 import { Field, ID, InputType, ObjectType } from 'type-graphql'
 import { ProductReference } from './ProductReference.entity'
 import { EntityWithDefault } from './EntityWithDefault'
@@ -49,14 +45,16 @@ export class Stock extends EntityWithDefault {
   @Field({ nullable: true })
   supplier!: string
 
-
   @Column({ length: 50, nullable: true })
   @IsOptional()
   @Length(2, 50, { message: 'Entre 2 et 50 caractères' })
   @Field({ nullable: true })
   sku!: string
 
-  @ManyToOne(() => ProductReference, (productReference) => productReference.stock)
+  @ManyToOne(
+    () => ProductReference,
+    (productReference) => productReference.stock
+  )
   @JoinColumn({ name: 'productReference' })
   @Field(() => ProductReference)
   productReference!: ProductReference

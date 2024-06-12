@@ -30,7 +30,7 @@ export function initializeRoute(app: Express) {
       //     .toFile(`/app/uploads/${filename}`)
 
       const servicePicture = new PictureService()
-      const newPicture = servicePicture.createImage(
+      const newPicture = await servicePicture.createImage(
         req.get('host') || 'http://localhost:5000',
         req.file.filename,
         req.file.originalname,
