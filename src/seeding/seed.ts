@@ -15,31 +15,6 @@ import { RolesFactory } from './factories/roles.factory'
 import { StocksFactory } from './factories/stocks.factory'
 import { UsersFactory } from './factories/users.factory'
 
-<<<<<<< VDG/product-picture
-const options: DataSourceOptions & SeederOptions = {
-  type: 'postgres',
-  // host: process.env.DB_HOST_LOCAL,
-  host: '127.0.0.1',
-  port: 5434,
-  username: 'postgres',
-  password: 'r541bCPpxFwBBZB8',
-  database: 'renthub',
-  entities: [`${__dirname}/factories/*.ts`],
-  factories: [
-    CartsFactory,
-    CategoriesFactory,
-    PicturesFactory,
-    PictureProductsFactory,
-    ProductCartsFactory,
-    ProductReferencesFactory,
-    RolesFactory,
-    StocksFactory,
-    UsersFactory,
-  ],
-  seeds: [MainSeeder],
-}
-const dataSource = new DataSource(options)
-=======
 // Change OPTIONS in dataSource
 ;(dataSource.options as any).host = process.env.DB_HOST_LOCAL
 ;(dataSource.options as any).port = process.env.DB_PORT_LOCAL
@@ -57,7 +32,6 @@ const dataSource = new DataSource(options)
   UsersFactory,
 ]
 ;(dataSource.options as any).seeds = [MainSeeder]
->>>>>>> dev
 
 dataSource
   .initialize()
