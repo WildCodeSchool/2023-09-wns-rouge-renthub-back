@@ -23,6 +23,7 @@ export class CategoryService {
         productReferences: true,
       },
     })
+
     return listCategory
   }
 
@@ -36,6 +37,7 @@ export class CategoryService {
         productReferences: true,
       },
     })
+
     if (!category) {
       throw new Error('Category not found')
     }

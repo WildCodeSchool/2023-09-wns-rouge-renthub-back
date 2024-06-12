@@ -54,7 +54,7 @@ export default class MainSeeder implements Seeder {
         factoryManager
       )
 
-    // Count Categories and 1st level subcategories 
+    // Count Categories and 1st level subcategories
     const countCategories = categoriesSaved.filter(
       (category) => !category.parentCategory
     ).length
@@ -62,7 +62,7 @@ export default class MainSeeder implements Seeder {
       (category) => category.parentCategory !== null
     ).length
 
-    console.log('SEED DONE 🎉')
+    console.info('SEED DONE 🎉')
     console.table({
       '✅ Admins seeded': 5,
       '✅ Users seeded': numUsers,

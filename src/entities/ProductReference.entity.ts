@@ -58,13 +58,14 @@ export class ProductReference extends EntityWithDefault {
     (pictureProduct) => pictureProduct.productReference,
     { cascade: true }
   )
+  @Field(() => [PictureProduct], { nullable: true })
   pictureProduct!: PictureProduct[]
 
   @OneToMany(() => Stock, (stock) => stock.productReference, {
     cascade: true,
     onDelete: 'CASCADE',
   })
-  @Field(() => [Stock])
+  @Field(() => [Stock], { nullable: true })
   stock!: Stock
 
   @OneToMany(() => ProductCart, (productCart) => productCart.productReference, {
@@ -107,23 +108,23 @@ export class ProductReferenceUpdateInput {
   updatedBy: ObjectId
 
   @Field({ nullable: true })
-  name: string
+  name?: string
 
   @Field({ nullable: true })
-  description: string
+  description?: string
 
   @Field(() => Int, { nullable: true })
-  index: number
+  index?: number
 
   @Field(() => Boolean, { nullable: true })
-  display: boolean
+  display?: boolean
 
   @Field({ nullable: true })
   brandName?: string
 
   @Field(() => Int, { nullable: true })
-  price: number
+  price?: number
 
   @Field({ nullable: true })
-  category: ObjectId
+  category?: ObjectId
 }
