@@ -126,6 +126,10 @@ export class PictureService {
       })
       if (category) {
         Object.assign(category, { picture: null })
+<<<<<<< VDG/product-picture
+
+=======
+>>>>>>> dev
         await dataSource.getRepository(Category).save(category)
       }
     }

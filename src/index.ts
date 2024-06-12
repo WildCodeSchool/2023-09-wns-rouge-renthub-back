@@ -80,7 +80,7 @@ async function start() {
   await new Promise<void>((resolve) =>
     httpServer.listen({ port: port }, resolve)
   )
-  console.log(`🚀 Server ready at port ${port}  🚀`)
+  console.info(`🚀 Server ready at port ${port}  🚀`)
 }
 
 start()

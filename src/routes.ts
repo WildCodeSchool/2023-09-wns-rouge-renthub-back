@@ -37,7 +37,7 @@ export function initializeRoute(app: Express) {
         req.file.mimetype,
         req.file.path
       )
-      console.log('newPicture', newPicture)
+      console.info('picture info', newPicture)
       res.json({ message: true })
     } else {
       res.json({ message: false })

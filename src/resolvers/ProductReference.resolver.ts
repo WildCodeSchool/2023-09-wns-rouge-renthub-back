@@ -7,6 +7,7 @@ import {
 import { validate } from 'class-validator'
 import { Category } from '../entities/Category'
 import { formatValidationErrors } from '../utils/utils'
+import { PictureProduct } from '../entities/PictureProduct.entity'
 
 @Resolver(() => ProductReference)
 export class ProductReferenceResolver {
@@ -17,7 +18,7 @@ export class ProductReferenceResolver {
   ): Promise<ProductReference> {
     try {
       const newProductReference = new ProductReference()
-      const currentCategory: any = await Category.findOne({
+      const currentCategory = await Category.findOne({
         where: { id: data.category.id },
       })
       if (!currentCategory) {
@@ -64,6 +65,7 @@ export class ProductReferenceResolver {
           createdBy: true,
           updatedBy: true,
           stock: true,
+          pictureProduct: true,
         },
       })
       if (!productReferences) {
@@ -85,8 +87,25 @@ export class ProductReferenceResolver {
           productCart: { cartReference: { owner: true } },
           createdBy: true,
           updatedBy: true,
+          pictureProduct: true,
         },
       })
+
+      if (productRef) {
+        for (const item of productRef.pictureProduct) {
+          if (item.id) {
+            const pictureProduct = await PictureProduct.findOne({
+              where: { id: item.id },
+              relations: {
+                picture: true,
+              },
+            })
+            if (pictureProduct) {
+              Object.assign(item, pictureProduct)
+            }
+          }
+        }
+      }
       if (!productRef) {
         throw new Error('Aucun produit trouvé')
       }

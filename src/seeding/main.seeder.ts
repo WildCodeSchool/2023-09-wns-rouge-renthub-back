@@ -54,7 +54,7 @@ export default class MainSeeder implements Seeder {
         factoryManager
       )
 
-    // Count Categories and 1st level subcategories 
+    // Count Categories and 1st level subcategories
     const countCategories = categoriesSaved.filter(
       (category) => !category.parentCategory
     ).length

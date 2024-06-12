@@ -1,4 +1,4 @@
--- Active: 1707156826205@@localhost@5434@postgres@public
+-- Active: 1710102669817@@127.0.0.1@5434@renthub
 CREATE DATABASE renthub;
 
 -- fill category table to product location sportINSERT INTO category (name)
@@ -44,9 +44,14 @@ VALUES
 
 
 -- image to category fake data
-INSERT INTO picture (filename, "createdBy", "updatedBy", "urlHD", "urlMiniature")
+INSERT INTO picture ("name", "mimetype", "path", "urlHD", "urlMiniature", "createdBy", "updatedBy", "createdAt", "updatedAt")
 VALUES 
-    ('surfboard.jpg', 'admin', NULL, 'http://example.com/images/surfboard_hd.jpg', 'http://example.com/images/surfboard_thumb.jpg'),
-    ('ski.jpg', 'admin', NULL, 'http://example.com/images/ski_hd.jpg', 'http://example.com/images/ski_thumb.jpg'),
-    ('bicycle.jpg', 'admin', NULL, 'http://example.com/images/bicycle_hd.jpg', 'http://example.com/images/bicycle_thumb.jpg'),
-    ('hiking_boots.jpg', 'admin', NULL, 'http://example.com/images/hiking_boots_hd.jpg', 'http://example.com/images/hiking_boots_thumb.jpg');
+    ('surfboard.jpg', 'image/jpeg', '/images/surfboard.jpg', 'http://example.com/images/surfboard_hd.jpg', 'http://example.com/images/surfboard_thumb.jpg', 1, NULL, now(), NULL),
+    ('ski.jpg', 'image/jpeg', '/images/ski.jpg', 'http://example.com/images/ski_hd.jpg', 'http://example.com/images/ski_thumb.jpg', 1, NULL, now(), NULL),
+    ('bicycle.jpg', 'image/jpeg', '/images/bicycle.jpg', 'http://example.com/images/bicycle_hd.jpg', 'http://example.com/images/bicycle_thumb.jpg', 1, NULL, now(), NULL),
+    ('hiking_boots.jpg', 'image/jpeg', '/images/hiking_boots.jpg', 'http://example.com/images/hiking_boots_hd.jpg', 'http://example.com/images/hiking_boots_thumb.jpg', 1, NULL, now(), NULL);
+
+
+
+
+
