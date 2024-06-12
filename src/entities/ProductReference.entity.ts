@@ -58,20 +58,25 @@ export class ProductReference extends EntityWithDefault {
     (pictureProduct) => pictureProduct.productReference,
     { cascade: true }
   )
+  @Field(() => [PictureProduct], { nullable: true })
   pictureProduct!: PictureProduct[]
 
   @OneToMany(() => Stock, (stock) => stock.productReference, {
     cascade: true,
     onDelete: 'CASCADE',
   })
-  @Field(() => [Stock])
+  @Field(() => [Stock], { nullable: true })
   stock!: Stock
 
   @OneToMany(() => ProductCart, (productCart) => productCart.productReference, {
     cascade: true,
   })
   @Field(() => [ProductCart])
+<<<<<<< HEAD
   productCarts!: ProductCart[]
+=======
+  productCart!: ProductCart[]
+>>>>>>> 298666a384255480e5436e0df250a8ecc63dd327
 }
 
 @InputType()
@@ -107,6 +112,7 @@ export class ProductReferenceUpdateInput {
   updatedBy: ObjectId
 
   @Field({ nullable: true })
+<<<<<<< HEAD
   name: string
 
   @Field({ nullable: true })
@@ -114,16 +120,32 @@ export class ProductReferenceUpdateInput {
 
   @Field(() => Int, { nullable: true })
   index: number
+=======
+  name?: string
+
+  @Field({ nullable: true })
+  description?: string
+
+  @Field(() => Int, { nullable: true })
+  index?: number
+>>>>>>> 298666a384255480e5436e0df250a8ecc63dd327
 
   @Field(() => Boolean, { nullable: true })
-  display: boolean
+  display?: boolean
 
   @Field({ nullable: true })
   brandName?: string
 
   @Field(() => Int, { nullable: true })
+<<<<<<< HEAD
   price: number
 
   @Field({ nullable: true })
   category: ObjectId
+=======
+  price?: number
+
+  @Field({ nullable: true })
+  category?: ObjectId
+>>>>>>> 298666a384255480e5436e0df250a8ecc63dd327
 }

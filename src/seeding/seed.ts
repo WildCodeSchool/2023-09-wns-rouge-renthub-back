@@ -1,6 +1,8 @@
 import 'reflect-metadata'
-import { DataSource, DataSourceOptions } from 'typeorm'
-import { runSeeders, SeederOptions } from 'typeorm-extension'
+import { config } from 'dotenv'
+config()
+import { runSeeders } from 'typeorm-extension'
+import { dataSource } from '../datasource'
 
 import MainSeeder from './main.seeder'
 import { CartsFactory } from './factories/carts.factory'
@@ -13,29 +15,23 @@ import { RolesFactory } from './factories/roles.factory'
 import { StocksFactory } from './factories/stocks.factory'
 import { UsersFactory } from './factories/users.factory'
 
-const options: DataSourceOptions & SeederOptions = {
-  type: 'postgres',
-  // host: process.env.DB_HOST_LOCAL,
-  host: '127.0.0.1',
-  port: 5435,
-  username: 'lukasz',
-  password: 'pass',
-  database: 'renthub',
-  entities: [`${__dirname}/factories/*.ts`],
-  factories: [
-    CartsFactory,
-    CategoriesFactory,
-    PicturesFactory,
-    PictureProductsFactory,
-    ProductCartsFactory,
-    ProductReferencesFactory,
-    RolesFactory,
-    StocksFactory,
-    UsersFactory,
-  ],
-  seeds: [MainSeeder],
-}
-const dataSource = new DataSource(options)
+// Change OPTIONS in dataSource
+;(dataSource.options as any).host = process.env.DB_HOST_LOCAL
+;(dataSource.options as any).port = process.env.DB_PORT_LOCAL
+
+// Add seeding OPTIONS to dataSource
+;(dataSource.options as any).factories = [
+  CartsFactory,
+  CategoriesFactory,
+  PicturesFactory,
+  PictureProductsFactory,
+  ProductCartsFactory,
+  ProductReferencesFactory,
+  RolesFactory,
+  StocksFactory,
+  UsersFactory,
+]
+;(dataSource.options as any).seeds = [MainSeeder]
 
 dataSource
   .initialize()
