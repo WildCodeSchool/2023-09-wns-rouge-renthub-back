@@ -3,25 +3,17 @@ import { ProductCart } from '../../entities/ProductCart.entity'
 import { ProductReference } from '../../entities/ProductReference.entity'
 import { Cart } from '../../entities/Cart.entity'
 
-function calculateDaysBetweenDates(dateStart: Date, dateEnd: Date): number {
-  const start = new Date(dateStart)
-  const end = new Date(dateEnd)
-  start.setUTCHours(0, 0, 0, 0)
-  end.setUTCHours(0, 0, 0, 0)
-
-  if (start.toDateString() === end.toDateString()) return 1
-
-  const timeDifference = end.getTime() - start.getTime()
-
-  const dayDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24))
-
-  return dayDifference
-}
-
 export type ProductCartsSeederTypes = {
   productCartsSaved: ProductCart[]
 }
 
+/**
+ * Seed the product carts by associating random products with each cart.
+ * @param cartsSaved - The array of saved carts.
+ * @param productReferences - The array of product references.
+ * @param factoryManager - The seeder factory manager.
+ * @returns An object containing the saved product carts.
+ */
 export default async function productCartsSeeder(
   cartsSaved: Cart[],
   productReferences: ProductReference[],
@@ -35,7 +27,6 @@ export default async function productCartsSeeder(
 
     const productReferencesToSave: ProductReference[] = []
 
-    let totalPrice = 0
     for (let i = 0; i < randomCountProducts; i++) {
       const listOfProductsReferencesLeft = productReferences.filter(
         (el) => !productReferencesToSave.find((el2) => el.id === el2.id)
@@ -54,19 +45,9 @@ export default async function productCartsSeeder(
 
       productCart.cartReference = cart
 
-      const countDays = calculateDaysBetweenDates(
-        productCart.dateTimeStart,
-        productCart.dateTimeEnd
-      )
-
-      totalPrice += productCart.quantity * productCart.productReference.price * countDays
-      
       await productCart.save()
       productCartsSaved.push(productCart)
     }
-    cart.totalPrice = totalPrice
-    await cart.save()
   }
-
   return { productCartsSaved }
 }
