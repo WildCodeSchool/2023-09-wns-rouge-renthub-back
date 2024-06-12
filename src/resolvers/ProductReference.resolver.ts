@@ -82,6 +82,7 @@ export class ProductReferenceResolver {
         where: { id },
         relations: {
           category: true,
+          productCart: { cartReference: { owner: true } },
           createdBy: true,
           updatedBy: true,
         },

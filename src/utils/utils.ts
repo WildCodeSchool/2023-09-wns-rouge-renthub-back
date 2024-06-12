@@ -2,7 +2,6 @@ import { ValidationError } from 'class-validator'
 import { ObjectId } from '../entities/ObjectId'
 import { randomBytes } from 'crypto'
 import { MyContext } from '../types/Context.type'
-import { User } from '../entities/User'
 
 /**
  * Merge some data on an existing database entity, it takes care of keeping existing many-to-many relations to avoid unicity constraints
@@ -70,4 +69,24 @@ export const isRightUser = (userId: number, context: MyContext): boolean => {
     (context.user?.role.right === 'USER' && context.user?.id === userId) ||
     context.user?.role.right === 'ADMIN'
   )
+}
+
+/**
+ * Calculates the number of days between two dates.
+ * @param dateStart - The start date.
+ * @param dateEnd - The end date.
+ * @returns The number of days between the two dates.
+ */
+export function calculateDaysBetweenDates(
+  dateStart: Date,
+  dateEnd: Date
+): number {
+  const start = new Date(dateStart)
+  const end = new Date(dateEnd)
+  start.setUTCHours(0, 0, 0, 0)
+  end.setUTCHours(0, 0, 0, 0)
+  if (start.toDateString() === end.toDateString()) return 1
+  const timeDifference = end.getTime() - start.getTime()
+  const dayDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24))
+  return dayDifference
 }

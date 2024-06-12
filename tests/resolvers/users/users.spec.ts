@@ -3,8 +3,7 @@ config()
 import { describe, it, expect, beforeAll } from '@jest/globals'
 import { getSchema } from '../../../src/schema'
 import { GraphQLSchema, graphql, print } from 'graphql'
-import { DataSource } from 'typeorm'
-import { dataSourceOptions } from '../../../src/datasource'
+import { dataSource } from '../../../src/datasource'
 import { mutationUserCreate } from './graphql/mutationUserCreate'
 import { mutationUserLogin } from './graphql/mutationUserLogin'
 import { User } from '../../../src/entities/User'
@@ -45,7 +44,6 @@ function mockContext(renthub_token?: string) {
 
 //GLOBAL varibles for User test
 let schema: GraphQLSchema
-let dataSource: DataSource
 let renthub_token: string | undefined
 const email = 'example@gmail.com'
 const password = 'Azerty@123'
@@ -53,23 +51,21 @@ const nickName = 'testNickName'
 
 beforeAll(async () => {
   schema = await getSchema()
- 
-  dataSource = new DataSource({
-    ...dataSourceOptions,
-    username: process.env.POSTGRES_USER || 'postgres',
-    password: process.env.POSTGRES_PASSWORD || 'pgpassword',
-    database: process.env.POSTGRES_DB || 'renthub',
-    host: process.env.DB_HOST_LOCAL || '127.0.0.1',
-    port: Number(process.env.DB_PORT_LOCAL) || 5432,
-    dropSchema: true,
-  })
+
+  // Change OPTIONS in dataSource
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(dataSource.options as any).host = process.env.DB_HOST_LOCAL
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(dataSource.options as any).port = process.env.DB_PORT_LOCAL
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(dataSource.options as any).dropSchema = true
 
   await dataSource.initialize()
 })
 
 describe('TEST => users resolvers', () => {
   it('should create new User with new Cart associated', async () => {
-    const mock = mockContext();
+    const mock = mockContext()
     const result = (await graphql({
       schema,
       source: print(mutationUserCreate), // print() is used to convert the gql string to a string
@@ -81,15 +77,15 @@ describe('TEST => users resolvers', () => {
         },
       },
       contextValue: mock.context,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     })) as any
 
     const id = result?.data?.userCreate?.id
-    expect(id).toBe("1")
+    expect(id).toBe('1')
 
     const user = await User.findOne({
       where: { id },
-      relations: ["cart"]
+      relations: ['cart'],
     })
 
     expect(!!user).toBeTruthy()
@@ -113,10 +109,10 @@ describe('TEST => users resolvers', () => {
         data: {
           code,
           userId: user?.id,
-        }
+        },
       },
       contextValue: mock.context,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     })) as any
 
     const success = result?.data?.verifyEmail?.success
@@ -136,11 +132,11 @@ describe('TEST => users resolvers', () => {
         },
       },
       contextValue: mock.context,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     })) as any
 
     const id = result?.data?.userLogin?.id
-    
+
     expect(id).toBe('1')
     expect(!!mock.renthub_token).toBeTruthy()
     renthub_token = mock.renthub_token
@@ -152,7 +148,7 @@ describe('TEST => users resolvers', () => {
       schema,
       source: print(queryMe), // print() is used to convert the gql string to a string
       contextValue: mock.context,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     })) as any
 
     expect(result?.data).toBeNull()
@@ -164,7 +160,7 @@ describe('TEST => users resolvers', () => {
       schema,
       source: print(queryMe), // print() is used to convert the gql string to a string
       contextValue: mock.context,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     })) as any
 
     expect(!!result?.data?.me?.id).toBeTruthy()

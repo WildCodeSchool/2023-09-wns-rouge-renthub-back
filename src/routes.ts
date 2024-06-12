@@ -30,7 +30,7 @@ export function initializeRoute(app: Express) {
       //     .toFile(`/app/uploads/${filename}`)
 
       const servicePicture = new PictureService()
-      const newPicture = servicePicture.createImage(
+      const newPicture = await servicePicture.createImage(
         req.get('host') || 'http://localhost:5000',
         req.file.filename,
         req.file.originalname,
@@ -56,8 +56,6 @@ export function initializeRoute(app: Express) {
         categoryOnPicture
       )
       if (picture) {
-        console.log('picture', picture)
-
         res.sendFile(picture.path)
       } else {
         res.status(404).json({ message: 'No picture found' })

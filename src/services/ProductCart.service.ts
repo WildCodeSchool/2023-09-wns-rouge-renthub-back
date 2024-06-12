@@ -20,13 +20,14 @@ export class ProductCartService {
     const errors = await validate(newProductCart)
     if (errors.length > 0) throw new Error(`Validation failed! ${errors}`)
     const { id } = await this.db.save(newProductCart)
+
     const productCart = await this.find(id)
     return productCart
   }
 
   async findAll() {
     const listProductCarts = this.db.find({
-      relations: { productReference: true, cartReference: true },
+      relations: { productReference: { category: true }, cartReference: true },
     })
     return listProductCarts
   }
@@ -41,18 +42,7 @@ export class ProductCartService {
     }
     return productCart
   }
-  /**
- * 
- ProductCartUpdateInput {
-  @Field(() => Int, { nullable: true })
-  quantity?: number
 
-  @Field({ nullable: true })
-  dateTimeStart?: Date
-
-  @Field({ nullable: true })
-  dateTimeEnd?: Date
- */
   async update(id: number, data: ProductCartUpdateInput, context: MyContext) {
     const errors = await validate(data)
     if (errors.length > 0) throw new Error(`Validation failed! ${errors}`)
@@ -64,6 +54,7 @@ export class ProductCartService {
         cartReference: { owner: true },
       },
     })
+    if (!productCart) throw new Error('ProductCart not found')
 
     // CHECK IF THE USER IS THE OWNER OF THE CART
     const rightUser = isRightUser(
@@ -73,12 +64,10 @@ export class ProductCartService {
 
     if (!rightUser) throw new Error('You are not the owner of this cart')
 
-    if (!productCart) throw new Error('ProductCart not found')
-
     Object.assign(productCart, data)
 
-    const updatedCart = await this.db.save(productCart)
-    return updatedCart
+    const updatedProductCart = await this.db.save(productCart)
+    return updatedProductCart
   }
 
   async delete(id: number) {
