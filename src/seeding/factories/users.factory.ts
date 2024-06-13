@@ -1,6 +1,6 @@
 import { Faker } from '@faker-js/faker'
 import { setSeederFactory } from 'typeorm-extension'
-import { User } from '../../entities/User'
+import { User } from '../../entities/User.entity'
 
 export const UsersFactory = setSeederFactory(User, (faker: Faker) => {
   const firstname = faker.person.firstName()
@@ -11,7 +11,7 @@ export const UsersFactory = setSeederFactory(User, (faker: Faker) => {
   user.email = `${firstname.toLowerCase()}.${lastname.toLowerCase()}${Math.floor(Math.random() * 1000)}@gmail.com`
   user.nickName = `${firstname.substring(0, 2)}${firstname.substring(0, 2).toLowerCase()}`
   user.phoneNumber = '06' + faker.string.numeric(8)
-  user.dateOfBirth = new Date()
+  user.dateOfBirth = new Date("2024-06-12T00:00:00.000Z")
   user.hashedPassword = //password: Azerty@123
     '$argon2id$v=19$m=65536,t=3,p=4$jTqXIhRXrLmgpBknU6HtYA$eTwliyGdxEgF4pYEQq/r1TYE9nQEVAvSbw6OeAAMlpc'
   user.isVerified = true

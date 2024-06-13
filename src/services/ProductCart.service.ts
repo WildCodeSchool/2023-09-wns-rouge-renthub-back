@@ -77,7 +77,7 @@ export class ProductCartService {
         productReference: {
           pictureProduct: true,
           stock: true,
-          productCart: true,
+          productCarts: true,
           category: true,
         },
         cartReference: true,

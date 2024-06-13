@@ -4,7 +4,7 @@ import {
   Category,
   CategoryCreateInput,
   CategoryUpdateInput,
-} from '../entities/Category'
+} from '../entities/Category.entity'
 
 @Resolver(() => Category)
 export class CategoriesResolver {

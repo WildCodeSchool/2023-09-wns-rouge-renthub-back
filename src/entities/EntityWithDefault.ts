@@ -5,7 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { User } from './User'
+import { User } from './User.entity'
 import { Field, ObjectType } from 'type-graphql'
 
 @ObjectType()

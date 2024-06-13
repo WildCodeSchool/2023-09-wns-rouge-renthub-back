@@ -2,7 +2,7 @@ import { AuthChecker } from 'type-graphql'
 import jwt from 'jsonwebtoken'
 import Cookies from 'cookies'
 import { MyContext } from './types/Context.type'
-import { User } from './entities/User'
+import { User } from './entities/User.entity'
 
 /**
  * Custom authentication checker function.

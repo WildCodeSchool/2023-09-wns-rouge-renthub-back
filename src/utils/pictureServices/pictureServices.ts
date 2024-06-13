@@ -1,4 +1,4 @@
-import { Picture } from '../../entities/Picture'
+import { Picture } from '../../entities/Picture.entity'
 import path from 'path'
 import { promises as fsPromises } from 'fs'
 

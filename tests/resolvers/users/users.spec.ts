@@ -6,11 +6,11 @@ import { GraphQLSchema, graphql, print } from 'graphql'
 import { dataSource } from '../../../src/datasource'
 import { mutationUserCreate } from './graphql/mutationUserCreate'
 import { mutationUserLogin } from './graphql/mutationUserLogin'
-import { User } from '../../../src/entities/User'
+import { User } from '../../../src/entities/User.entity'
 import { serialize, parse } from 'cookie'
 import { queryMe } from './graphql/queryMe'
 import { mutationVerifyEmail } from './graphql/mutationVerifyEmail'
-import { VerificationCode } from '../../../src/entities/VerificationCode'
+import { VerificationCode } from '../../../src/entities/VerificationCode.entity'
 
 function mockContext(renthub_token?: string) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

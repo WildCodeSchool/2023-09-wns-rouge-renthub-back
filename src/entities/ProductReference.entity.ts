@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm'
 import { Field, ID, InputType, Int, ObjectType } from 'type-graphql'
-import { Category } from './Category'
+import { Category } from './Category.entity'
 import { PictureProduct } from './PictureProduct.entity'
 import { IsBoolean, Length } from 'class-validator'
 import { ObjectId } from './ObjectId'
@@ -49,7 +49,7 @@ export class ProductReference extends EntityWithDefault {
   @Field(() => Int)
   price!: number
 
-  @ManyToOne(() => Category, (category) => category.productReference)
+  @ManyToOne(() => Category, (category) => category.productReferences)
   @Field(() => Category)
   category?: Category
 
@@ -72,7 +72,7 @@ export class ProductReference extends EntityWithDefault {
     cascade: true,
   })
   @Field(() => [ProductCart])
-  productCart!: ProductCart[]
+  productCarts!: ProductCart[]
 }
 
 @InputType()

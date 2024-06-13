@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm'
 import { Field, ID, InputType, ObjectType } from 'type-graphql'
-import { Category } from './Category'
+import { Category } from './Category.entity'
 import { PictureProduct } from './PictureProduct.entity'
 
 @Entity()

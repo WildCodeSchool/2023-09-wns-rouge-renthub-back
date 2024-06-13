@@ -5,7 +5,7 @@ import productReferencesSeeder, {
 } from './services/productReferences.seedService'
 import usersSeeder, {
   UsersSeederTypes,
-} from './services/users&Carts.seedService'
+} from './services/users.seedService'
 import categoriesSeeder, {
   CategoriesSeederTypes,
 } from './services/categories.seedService'
@@ -54,7 +54,7 @@ export default class MainSeeder implements Seeder {
         factoryManager
       )
 
-    // Count Categories and 1st level subcategories
+    // Count Categories and 1st level subcategories 
     const countCategories = categoriesSaved.filter(
       (category) => !category.parentCategory
     ).length
@@ -62,8 +62,7 @@ export default class MainSeeder implements Seeder {
       (category) => category.parentCategory !== null
     ).length
 
-    console.info('SEED DONE 🎉')
-    console.table({
+    console.warn({
       '✅ Admins seeded': 5,
       '✅ Users seeded': numUsers,
       '✅ Carts seeded': usersSaved.length,
