@@ -196,7 +196,10 @@ export class UsersResolver {
     @Ctx() context: MyContext,
     @Arg('data', () => UserLoginInput) data: UserLoginInput
   ) {
-    const user = await User.findOne({ where: { email: data.email } })
+    const user = await User.findOne({
+      where: { email: data.email },
+      relations: ['role'],
+    })
     if (!user) {
       throw new Error('Email ou mot de passe incorrect')
     }
@@ -226,19 +229,48 @@ export class UsersResolver {
     return user
   }
   // THIS RESOLVER IS ONLY USED TO VERIFY THAT A USER IS CONNECTED & HIS ROLE //
-  @Authorized('ADMIN', 'USER')
-  @Query(() => UserContext)
+  @Query(() => UserContext, { nullable: true })
   async meContext(@Ctx() context: MyContext): Promise<UserContext | null> {
-    if (!context.user) {
-      throw new Error('User not found')
-    }
-    const userContext = {
-      lastName: context.user?.lastName,
-      firstName: context.user?.firstName,
-      role: context.user?.role.right,
+    // Get if cookie is present in context
+    const cookies = new Cookies(context.req, context.res)
+    const renthub_token = cookies.get('renthub_token')
+
+    if (!renthub_token) {
+      return null
     }
 
-    return userContext
+    try {
+      // Verify token
+      const payload = jwt.verify(
+        renthub_token,
+        process.env.JWT_SECRET_KEY || ''
+      )
+      // Get user from payload
+      if (typeof payload === 'object' && 'userId' in payload) {
+        const user = await User.findOne({
+          where: { id: payload.userId },
+          relations: {
+            role: true,
+          },
+        })
+        // if user is found, return user context
+        if (user) {
+          const userContext = {
+            lastName: user.lastName,
+            firstName: user.firstName,
+            role: user.role.right,
+          }
+          return userContext
+        } else {
+          return null
+        }
+      }
+    } catch (err) {
+      console.error('Error verifying token:', err)
+      return null
+    }
+
+    return null
   }
 
   // THIS RESOLVER IS USED TO RETRIEVE A COMPLETE SET OF INFORMATION ABOUT THE CURRENTLY LOGGED IN USER //
@@ -271,7 +303,7 @@ export class UsersResolver {
   @Mutation(() => Boolean)
   async userSignOut(@Ctx() context: MyContext): Promise<boolean> {
     const cookie = new Cookies(context.req, context.res)
-    cookie.set('TGCookie', '', {
+    cookie.set('renthub_token', '', {
       httpOnly: true,
       secure: false,
       maxAge: 0,

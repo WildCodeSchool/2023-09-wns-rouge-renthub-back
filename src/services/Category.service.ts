@@ -38,9 +38,6 @@ export class CategoryService {
       },
     })
 
-    console.log('-----------------------------ss------')
-    console.log('----------listCategory', category)
-
     if (!category) {
       throw new Error('Category not found')
     }
