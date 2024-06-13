@@ -19,7 +19,7 @@ import { OrderStock } from './OrderStock.entity'
 
 export enum StatusEnum {
   CANCEL = 'CANCEL',
-  INPROGESS = 'INPROGESS',
+  INPROGRESS = 'IN PROGRESS',
   DONE = 'DONE',
 }
 registerEnumType(StatusEnum, {
