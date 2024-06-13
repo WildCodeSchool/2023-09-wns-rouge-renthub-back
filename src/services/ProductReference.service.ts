@@ -38,7 +38,7 @@ export class ProductReferenceService {
         category: { parentCategory: true },
         createdBy: true,
         updatedBy: true,
-        stock: true,
+        stock: { orderStocks: true },
         productCarts: { cartReference: { owner: { role: true } } },
       },
     })

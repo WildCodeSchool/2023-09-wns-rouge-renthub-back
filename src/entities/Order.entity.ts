@@ -7,13 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm'
 import { EntityWithDefault } from './EntityWithDefault'
-import {
-  Field,
-  ID,
-  InputType,
-  ObjectType,
-  registerEnumType,
-} from 'type-graphql'
+import { Field, ID, ObjectType, registerEnumType } from 'type-graphql'
 import { User } from './User.entity'
 import { OrderStock } from './OrderStock.entity'
 
@@ -48,16 +42,4 @@ export class Order extends EntityWithDefault {
   @OneToMany(() => OrderStock, (orderStock) => orderStock.order)
   @Field(() => [OrderStock], { nullable: true })
   orderStocks!: OrderStock[]
-}
-
-@InputType()
-export class OrderCreateInput {
-  //   @Field(() => StatusEnum)
-  //   status!: StatusEnum
-
-  @Field(() => ID, { nullable: true })
-  user!: number
-
-  //   @Field(() => [ID])
-  //   orderStocks!: number[]
 }
