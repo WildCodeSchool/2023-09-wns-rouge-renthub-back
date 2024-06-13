@@ -24,6 +24,7 @@ import { Role } from './Role.entity'
 import { ObjectId } from './ObjectId'
 import { VerificationCode } from './VerificationCode.entity'
 import { Cart } from './Cart.entity'
+import { Order } from './Order.entity'
 
 @Entity()
 @ObjectType()
@@ -118,6 +119,10 @@ export class User extends BaseEntity {
     { cascade: true, onDelete: 'CASCADE' }
   )
   verificationCodes!: VerificationCode[]
+
+  @OneToMany(() => Order, (order) => order.user)
+  @Field(() => [Order], { nullable: true })
+  orders!: Order[]
 
   @ManyToOne(() => Role, (role) => role.user)
   @JoinColumn({ name: 'role' })
