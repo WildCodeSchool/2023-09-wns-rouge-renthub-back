@@ -51,6 +51,8 @@ export class UserService {
         },
         role: true,
         picture: true,
+        createdBy: true,
+        updatedBy: true,
       },
     })
     return users
