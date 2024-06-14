@@ -6,19 +6,21 @@ import { User } from '../../entities/User.entity'
 export type UsersSeederTypes = {
   usersSaved: User[]
   cartsSaved: Cart[]
+  admins: User[]
 }
 
 export default async function usersSeeder(
   roles: Role[],
   numberOfUsers: number = 5,
   factoryManager: SeederFactoryManager
-) {
+): Promise<UsersSeederTypes> {
   const cartsSaved: Cart[] = []
   const usersSaved: User[] = []
 
   const cartFactory = factoryManager.get(Cart)
   const userFactory = factoryManager.get(User)
 
+  const admins: User[] = []
   const devsAccounts = [
     {
       firstname: 'Hugo',
@@ -82,6 +84,7 @@ export default async function usersSeeder(
       user.nickName = devsAccounts[i].nickname
       user.email = devsAccounts[i].email
       user.role = roles[0]
+      admins.push(user)
     } else {
       user.role = roles[1]
     }
@@ -95,5 +98,5 @@ export default async function usersSeeder(
     usersSaved.push(userSaved)
   }
 
-  return { usersSaved, cartsSaved }
+  return { usersSaved, cartsSaved, admins }
 }
