@@ -20,12 +20,12 @@ export class OrderStock extends BaseEntity {
   @Column({ type: 'timestamp with time zone', nullable: true })
   @IsDate({ message: 'Doit être une date valide' })
   @Field(() => Date)
-  dateStartTime!: Date
+  dateTimeStart!: Date
 
   @Column({ type: 'timestamp with time zone', nullable: true })
   @IsDate({ message: 'Doit être une date valide' })
   @Field(() => Date)
-  dateEndTime!: Date
+  dateTimeEnd!: Date
 
   @ManyToOne(() => Order, (order) => order.orderStocks)
   @Field(() => Order)

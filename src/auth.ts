@@ -31,6 +31,7 @@ export const customAuthChecker: AuthChecker<MyContext> = async (
         where: { id: payload.userId },
         relations: {
           role: true,
+          cart: true,
         },
       })
       if (!user) {
