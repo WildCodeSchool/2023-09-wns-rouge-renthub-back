@@ -26,6 +26,7 @@ export class ProductReferenceResolver {
   @Query(() => ProductReference)
   async getProductReference(@Arg('id', () => ID) id: number) {
     const productReference = await new ProductReferenceService().find(id)
+
     return productReference
   }
 

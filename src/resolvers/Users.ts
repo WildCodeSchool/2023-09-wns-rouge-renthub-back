@@ -16,20 +16,20 @@ import {
   UserUpdateInput,
   VerifyEmailResponse,
   VerifyEmailResponseInput,
-} from '../entities/User'
+} from '../entities/User.entity'
 import { validate } from 'class-validator'
 import * as argon2 from 'argon2'
 import jwt from 'jsonwebtoken'
 import { MyContext } from '../types/Context.type'
 import Cookies from 'cookies'
-import { Picture } from '../entities/Picture'
+import { Picture } from '../entities/Picture.entity'
 import { deletePicture } from '../utils/pictureServices/pictureServices'
 import {
   sendVerificationEmail,
   sendConfirmationEmail,
 } from '../utils/mailServices/verificationEmail'
 import { generateSecurityCode } from '../utils/utils'
-import { VerificationCode } from '../entities/VerificationCode'
+import { VerificationCode } from '../entities/VerificationCode.entity'
 import { typeCodeVerification } from '../utils/constant'
 import { Cart } from '../entities/Cart.entity'
 import { getOrCreateUserRole } from '../services/User.service'
@@ -43,7 +43,7 @@ export class UsersResolver {
   async usersGetAll(@Ctx() context: MyContext): Promise<User[]> {
     const users = await User.find({
       relations: {
-        cart: { productCart: { productReference: { category: true } } },
+        cart: { productCarts: { productReference: { category: true } } },
         role: true,
       },
     })
@@ -373,7 +373,7 @@ export class UsersResolver {
       relations: {
         picture: true,
         role: true,
-        cart: { productCart: { productReference: { category: true } } },
+        cart: { productCarts: { productReference: { category: true } } },
       },
     })
     if (
