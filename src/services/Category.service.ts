@@ -105,7 +105,7 @@ export class CategoryService {
       relations: ['childCategories', 'parentCategory'],
     })
     if (!category) {
-      throw new Error('Category does exist')
+      throw new Error('Category does not exist')
     }
 
     // delete cascade children
@@ -113,6 +113,8 @@ export class CategoryService {
       await Promise.all(
         category.childCategories.map(async (childCategory) => {
           await this.db.delete(childCategory.id)
+          // ajouter la suppresion des categories petits enfants  via appel recursif
+          // ...
         })
       )
     }
