@@ -1,5 +1,14 @@
-import { Arg, Query, Resolver, Mutation, Ctx, ID } from 'type-graphql'
 import {
+  Arg,
+  Query,
+  Resolver,
+  Mutation,
+  Ctx,
+  ID,
+  Authorized,
+} from 'type-graphql'
+import {
+  MeUser,
   User,
   UserContext,
   UserCreateInput,
@@ -7,30 +16,37 @@ import {
   UserUpdateInput,
   VerifyEmailResponse,
   VerifyEmailResponseInput,
-} from '../entities/User'
+} from '../entities/User.entity'
 import { validate } from 'class-validator'
 import * as argon2 from 'argon2'
 import jwt from 'jsonwebtoken'
-import { MyContext } from '../index'
+import { MyContext } from '../types/Context.type'
 import Cookies from 'cookies'
-import { Picture } from '../entities/Picture'
+import { Picture } from '../entities/Picture.entity'
 import { deletePicture } from '../utils/pictureServices/pictureServices'
 import {
   sendVerificationEmail,
   sendConfirmationEmail,
 } from '../utils/mailServices/verificationEmail'
-import { getUserFromReq } from '../auth'
 import { generateSecurityCode } from '../utils/utils'
-import { VerificationCode } from '../entities/VerificationCode'
+import { VerificationCode } from '../entities/VerificationCode.entity'
 import { typeCodeVerification } from '../utils/constant'
+import { Cart } from '../entities/Cart.entity'
+import { getOrCreateUserRole } from '../services/User.service'
 
 @Resolver(User)
 export class UsersResolver {
+  @Authorized('ADMIN')
   @Query(() => [User])
   //TODO  : delete eslint flag when context is used and function implemented correctly
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async usersGetAll(@Ctx() context: MyContext): Promise<User[]> {
-    const users = await User.find()
+    const users = await User.find({
+      relations: {
+        cart: { productCarts: { productReference: { category: true } } },
+        role: true,
+      },
+    })
     return users
   }
 
@@ -86,15 +102,24 @@ export class UsersResolver {
     }
 
     // delete user's original password from data
-    const { ...dataWithoutPassword } = data
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...dataWithoutPassword } = data
+    const role = await getOrCreateUserRole()
 
     Object.assign(newUser, dataWithoutPassword, {
       dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
       createdBy: adminUser || newUser,
+      role: role,
     })
 
-    const errors = await validate(newUser)
-    if (errors.length === 0) {
+    // creation of a brand new Cart for a new User
+    const newCart = new Cart()
+    newUser.cart = newCart
+
+    const errorsNewUser = await validate(newUser)
+    const errorsNewCart = await validate(newCart)
+
+    if (errorsNewUser.length === 0 && errorsNewCart.length === 0) {
       await newUser.save()
 
       const verificationCodeLength = 8
@@ -165,19 +190,22 @@ export class UsersResolver {
     }
   }
 
+  // @TODO : Add date of last connection //
   @Mutation(() => User)
   async userLogin(
     @Ctx() context: MyContext,
     @Arg('data', () => UserLoginInput) data: UserLoginInput
   ) {
-    const user = await User.findOne({ where: { email: data.email } })
+    const user = await User.findOne({
+      where: { email: data.email },
+      relations: ['role'],
+    })
     if (!user) {
       throw new Error('Email ou mot de passe incorrect')
     }
     if (!user.isVerified) {
       throw new Error('Email non vérifié, consultez votre boite mail')
     }
-
     const valid = await argon2.verify(user.hashedPassword, data.password)
     if (!valid) {
       throw new Error('Email ou mot de passe incorrect')
@@ -192,6 +220,7 @@ export class UsersResolver {
     )
 
     const cookie = new Cookies(context.req, context.res)
+
     cookie.set('renthub_token', token, {
       httpOnly: true,
       secure: false,
@@ -199,48 +228,108 @@ export class UsersResolver {
     })
     return user
   }
+  // THIS RESOLVER IS ONLY USED TO VERIFY THAT A USER IS CONNECTED & HIS ROLE //
+  @Query(() => UserContext, { nullable: true })
+  async meContext(@Ctx() context: MyContext): Promise<UserContext | null> {
+    // Get if cookie is present in context
+    const cookies = new Cookies(context.req, context.res)
+    const renthub_token = cookies.get('renthub_token')
 
-  @Query(() => UserContext)
-  async meContext(@Ctx() context: MyContext): Promise<UserContext> {
+    if (!renthub_token) {
+      return null
+    }
+
+    try {
+      // Verify token
+      const payload = jwt.verify(
+        renthub_token,
+        process.env.JWT_SECRET_KEY || ''
+      )
+      // Get user from payload
+      if (typeof payload === 'object' && 'userId' in payload) {
+        const user = await User.findOne({
+          where: { id: payload.userId },
+          relations: {
+            role: true,
+          },
+        })
+        // if user is found, return user context
+        if (user) {
+          const userContext = {
+            lastName: user.lastName,
+            firstName: user.firstName,
+            role: user.role.right,
+          }
+          return userContext
+        } else {
+          return null
+        }
+      }
+    } catch (err) {
+      console.error('Error verifying token:', err)
+      return null
+    }
+
+    return null
+  }
+
+  // THIS RESOLVER IS USED TO RETRIEVE A COMPLETE SET OF INFORMATION ABOUT THE CURRENTLY LOGGED IN USER //
+  @Authorized('ADMIN', 'USER')
+  @Query(() => MeUser)
+  async me(@Ctx() context: MyContext): Promise<MeUser | null> {
     if (!context.user) {
       throw new Error('User not found')
     }
-    const user = context.user as UserContext
-    return user
+
+    const meUser = {
+      id: context.user?.id,
+      email: context.user?.email,
+      firstName: context.user?.firstName,
+      lastName: context.user?.lastName,
+      nickName: context.user?.nickName,
+      phoneNumber: context.user?.phoneNumber,
+      dateOfBirth: context.user?.dateOfBirth,
+      createdBy: context.user?.createdBy,
+      updatedBy: context.user?.updatedBy,
+      createdAt: context.user?.createdAt,
+      updatedAt: context.user?.updatedAt,
+      lastConnectionDate: context.user?.lastConnectionDate,
+    }
+
+    return meUser
   }
 
-  @Query(() => User)
-  async me(@Ctx() context: MyContext): Promise<User | null> {
-    const user = await getUserFromReq(context.req, context.res)
-    return user
-  }
-
+  @Authorized('ADMIN', 'USER')
   @Mutation(() => Boolean)
   async userSignOut(@Ctx() context: MyContext): Promise<boolean> {
     const cookie = new Cookies(context.req, context.res)
-    cookie.set('TGCookie', '', {
+    cookie.set('renthub_token', '', {
       httpOnly: true,
       secure: false,
       maxAge: 0,
     })
     return true
   }
-
+  @Authorized('ADMIN', 'USER')
   @Mutation(() => User, { nullable: true })
   async userUpdate(
     @Ctx() context: MyContext,
     @Arg('data') data: UserUpdateInput
   ): Promise<User | null> {
-    const userId = context.user?.id
+    const userIdInContext = context.user?.id
 
     const user = await User.findOne({
-      where: { id: userId },
+      where: { id: userIdInContext },
       relations: { picture: true },
     })
 
+    if (!user) {
+      throw new Error('User not found')
+    }
+
     if (
-      user &&
-      user.id === context.user?.id //  || context.user?.role
+      context.user?.role.right === 'ADMIN' ||
+      (context.user?.role.right === 'USER' && user.id === userIdInContext)
     ) {
       let oldPictureId: number | null = null
       if (data.pictureId && user.picture?.id) {
@@ -264,7 +353,7 @@ export class UsersResolver {
         }
 
         return await User.findOne({
-          where: { id: userId },
+          where: { id: userIdInContext },
         })
       } else {
         throw new Error(`Error occured: ${JSON.stringify(errors)}`)
@@ -273,6 +362,7 @@ export class UsersResolver {
     return user
   }
 
+  @Authorized('ADMIN')
   @Mutation(() => User, { nullable: true })
   async userDelete(
     @Ctx() context: MyContext,
@@ -280,20 +370,26 @@ export class UsersResolver {
   ): Promise<User | null> {
     const user = await User.findOne({
       where: { id: id },
+      relations: {
+        picture: true,
+        role: true,
+        cart: { productCarts: { productReference: { category: true } } },
+      },
     })
     if (
-      user &&
-      user.id === context.user?.id //  || context.user?.role
+      user
+      // &&
+      // user.id === context.user?.id //  || context.user?.role
     ) {
       const pictureId = user.picture?.id
       await user.remove()
       if (pictureId) {
         await deletePicture(pictureId)
       }
-      user
     } else {
       throw new Error(`Error delete user`)
     }
+    Object.assign(user, { id })
     return user
   }
 }

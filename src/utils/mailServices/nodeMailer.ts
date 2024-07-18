@@ -12,7 +12,12 @@ export const sendEmail = (emailOptions: EmailOptions) => {
   const transporter = nodemailer.createTransport({
     host: process.env.MAIL_HOST,
     port: Number(process.env.MAIL_PORT),
-    secure: false,
+    // if there is no NODE_MAILER_SECURE env => true, if NODE_MAILER_SECURE === false => false
+    secure:
+      !process.env.NODE_MAILER_SECURE ||
+      process.env.NODE_MAILER_SECURE === 'true'
+        ? true
+        : false,
     auth: {
       user: process.env.MAIL_USER,
       pass: process.env.MAIL_PASSWORD,

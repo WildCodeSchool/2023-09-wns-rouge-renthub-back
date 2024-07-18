@@ -11,7 +11,7 @@ import {
 } from 'typeorm'
 import { Field, ID, InputType, ObjectType } from 'type-graphql'
 import { Length, Matches } from 'class-validator'
-import { User } from './User'
+import { User } from './User.entity'
 
 @Entity()
 @ObjectType()
@@ -20,7 +20,7 @@ export class Role extends BaseEntity {
   @Field(() => ID)
   id!: number
 
-  @Column({ length: 50 })
+  @Column({ length: 50, unique: true})
   @Length(2, 50, { message: 'Entre 2 et 50 caractères' })
   @Matches(/^[a-zA-ZÀ-ÿ0-9-]+$/, {
     message:
@@ -31,8 +31,8 @@ export class Role extends BaseEntity {
 
   @Column({
     type: 'enum',
-    enum: ['admin', 'user'],
-    default: 'user',
+    enum: ['ADMIN', 'USER'],
+    default: 'USER',
   })
   @Field()
   right!: string

@@ -6,10 +6,26 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      MAIL_HOST: ${{ secrets.MAIL_HOST }}
+      MAIL_PORT: ${{ secrets.MAIL_PORT }}
+      MAIL_USER: ${{ secrets.MAIL_USER }}
+      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+    services:
+      postgres:
+        image: postgres:latest
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: pgpassword
+          POSTGRES_DB: renthub
     steps:
       - name: Check out code
         uses: actions/checkout@v4

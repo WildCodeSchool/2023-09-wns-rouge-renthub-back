@@ -5,11 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --detectOpenHandles --verbose",
-    "test:docker": "docker stop pgtesting ; docker run --rm --name pgtesting -p 5433:5432 -e POSTGRES_PASSWORD=pgpassword -d postgres && DB_HOST=127.0.0.1 DB_PORT=5433 DB_USERNAME=postgres DB_PASSWORD=pgpassword DB_NAME=renthub jest",
+    "test:docker": "docker stop pgtesting ; docker run --rm --name pgtesting -p 5433:5432 -e POSTGRES_PASSWORD=pgpassword -d postgres && DB_HOST=127.0.0.1 DB_PORT=5433 DB_USERNAME=postgres DB_PASSWORD=pgpassword DB_NAME=renthub jest --verbose --detectOpenHandles",
     "start": "tsnd --poll --respawn --transpile-only ./src/index.ts",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "seed": "ts-node src/seeding/seed.ts"
   },
   "lint-staged": {
     "./{src,tests}/**/*.{ts,tsx,html,css,scss}": "prettier --write ",
@@ -19,6 +20,7 @@
   "license": "ISC",
   "dependencies": {
     "@apollo/server": "^4.9.5",
+    "@faker-js/faker": "^8.4.1",
     "argon2": "^0.31.2",
     "axios": "^1.6.2",
     "class-validator": "^0.14.0",
@@ -31,11 +33,14 @@
     "graphql-tag": "^2.12.6",
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
+    "sharp": "0.33.3",
+    "mime": "4.0.1",
     "nodemailer": "^6.9.9",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
     "type-graphql": "^2.0.0-beta.3",
-    "typeorm": "^0.3.17"
+    "typeorm": "^0.3.17",
+    "typeorm-extension": "^3.5.1"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

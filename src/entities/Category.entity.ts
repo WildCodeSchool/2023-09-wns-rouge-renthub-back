@@ -1,7 +1,6 @@
 import 'reflect-metadata'
 import {
-  BeforeInsert,
-  BeforeUpdate,
+  BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
@@ -12,23 +11,13 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { Field, ID, InputType, ObjectType } from 'type-graphql'
-import { Picture } from './Picture'
+import { Field, ID, InputType, Int, ObjectType } from 'type-graphql'
+import { Picture } from './Picture.entity'
+import { ProductReference } from './ProductReference.entity'
 
 @Entity()
 @ObjectType()
-export class Category {
-  @BeforeInsert()
-  updateDatesOnInsert() {
-    this.createdAt = new Date()
-    this.updatedAt = new Date()
-  }
-
-  @BeforeUpdate()
-  updateDatesOnUpdate() {
-    this.updatedAt = new Date()
-  }
-
+export class Category extends BaseEntity {
   @PrimaryGeneratedColumn()
   @Field(() => ID)
   id: number
@@ -39,7 +28,7 @@ export class Category {
 
   // index permet ordonner les catégories pour l'affichage
   @Column({})
-  @Field(() => ID)
+  @Field(() => Int)
   index: number
 
   @Column({ default: true })
@@ -78,6 +67,14 @@ export class Category {
   @JoinColumn({ name: 'pictureId', referencedColumnName: 'id' })
   @Field(() => Picture, { nullable: true })
   picture?: Picture
+
+  @OneToMany(
+    () => ProductReference,
+    (productReference) => productReference.category,
+    { cascade: true }
+  )
+  @Field(() => [ProductReference], { nullable: true })
+  productReferences: ProductReference[]
 }
 
 @InputType()
@@ -85,7 +82,7 @@ export class CategoryCreateInput {
   @Field()
   name: string
 
-  @Field(() => ID)
+  @Field(() => Int)
   index: number
 
   @Field(() => Boolean, { nullable: true })
@@ -109,7 +106,7 @@ export class CategoryUpdateInput {
   @Field({ nullable: true })
   name?: string
 
-  @Field(() => ID, { nullable: true })
+  @Field(() => Int, { nullable: true })
   index?: number
 
   @Field(() => Boolean, { nullable: true })

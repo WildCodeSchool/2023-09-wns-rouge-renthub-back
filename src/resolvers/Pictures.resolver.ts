@@ -7,9 +7,9 @@ import {
   Authorized,
   Query,
 } from 'type-graphql'
-import { Picture, PictureCreateInput, PictureUpdate } from '../entities/Picture'
-import { MyContext } from '../index'
+import { Picture, PictureCreateInput, PictureUpdate } from '../entities/Picture.entity'
 import { PictureService } from '../services/Picture.service'
+import { MyContext } from '../types/Context.type'
 
 @Resolver(Picture)
 export class PictureResolver {
@@ -19,7 +19,7 @@ export class PictureResolver {
     return pictureById
   }
 
-  @Authorized('ADMIN', 'USER')
+  @Authorized('ADMIN')
   @Mutation(() => Picture)
   async createPictureOnCategory(
     @Ctx() context: MyContext,
@@ -55,7 +55,7 @@ export class PictureResolver {
       context.user.id
     )
   }
-  // suppression du code sur la featured multer ( accessible dans le commit )
+  // @TODO: suppression du code sur la featured multer ( accessible dans le commit )
   @Authorized('ADMIN')
   @Mutation(() => Picture, { nullable: true })
   async deletePicture(

@@ -1,10 +1,10 @@
-import { Picture } from '../../entities/Picture'
+import { Picture } from '../../entities/Picture.entity'
 import path from 'path'
 import { promises as fsPromises } from 'fs'
 
 export async function createImage(filename: string): Promise<Picture> {
   const picture = new Picture()
-  picture.filename = filename
+  picture.name = filename
   await picture.save()
   return picture
 }
@@ -20,7 +20,7 @@ export async function deletePicture(
 
       const filePath = path.join(
         __dirname,
-        `../../public/assets/images/pictures/${picture.filename}`
+        `../../public/assets/images/pictures/${picture.name}`
       )
       await fsPromises.unlink(filePath)
 

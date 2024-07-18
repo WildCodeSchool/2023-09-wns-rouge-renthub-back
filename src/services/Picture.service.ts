@@ -1,5 +1,5 @@
-import { Category } from './../entities/Category'
-import { Picture, PictureCreateInput, PictureUpdate } from '../entities/Picture'
+import { Category } from '../entities/Category.entity'
+import { Picture, PictureCreateInput, PictureUpdate } from '../entities/Picture.entity'
 import { Repository } from 'typeorm'
 import { validate } from 'class-validator'
 import { dataSource } from '../datasource'
@@ -16,15 +16,46 @@ export class PictureService {
     return listPicture
   }
 
-  async find(id: number) {
+  async find(id: number, includeCategory: boolean = true) {
+    const relations: string[] = []
+
+    if (includeCategory) {
+      relations.push('category')
+    }
+
     const picture = await this.db.findOne({
       where: { id },
-      relations: ['category'],
+      relations,
     })
+
     if (!picture) {
       throw new Error(`Picture with ${id} not found`)
     }
     return picture
+  }
+
+  async createImage(
+    domain: string,
+    filename: string,
+    name: string,
+    mimetype: string,
+    path: string
+  ) {
+    try {
+      const picture = this.db.create({
+        name,
+        mimetype,
+        path,
+        urlHD: ` http://${domain}/uploads/${filename}`,
+        urlMiniature: ` http://${domain}/uploads/${filename}`,
+        createdBy: 1,
+      })
+
+      const pictureSave = await picture.save()
+      return pictureSave
+    } catch (error) {
+      throw new Error('Error creating picture')
+    }
   }
 
   async createOnCategory(
@@ -95,13 +126,12 @@ export class PictureService {
       })
       if (category) {
         Object.assign(category, { picture: null })
-        console.log('----0--', category)
         await dataSource.getRepository(Category).save(category)
       }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { raw, affected } = await this.db.delete(picture.id)
+    const { affected } = await this.db.delete(picture.id)
     if (affected === 0) throw new Error('no delete affected on picture')
     return picture
   }

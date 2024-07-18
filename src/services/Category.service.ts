@@ -2,7 +2,7 @@ import {
   Category,
   CategoryCreateInput,
   CategoryUpdateInput,
-} from '../entities/Category'
+} from '../entities/Category.entity'
 
 import { Repository } from 'typeorm'
 import { validate } from 'class-validator'
@@ -16,16 +16,28 @@ export class CategoryService {
 
   async list() {
     const listCategory = this.db.find({
-      relations: ['childCategories', 'parentCategory', 'picture'],
+      relations: {
+        childCategories: true,
+        parentCategory: true,
+        picture: true,
+        productReferences: true,
+      },
     })
+
     return listCategory
   }
 
   async find(id: number) {
     const category = await this.db.findOne({
       where: { id },
-      relations: ['childCategories', 'parentCategory', 'picture'],
+      relations: {
+        childCategories: true,
+        parentCategory: true,
+        picture: true,
+        productReferences: true,
+      },
     })
+
     if (!category) {
       throw new Error('Category not found')
     }
@@ -50,7 +62,10 @@ export class CategoryService {
       }
       Object.assign(newCategory, { parentCategory: parentCategoryIdExist })
     }
-    const newCategorySave = await this.db.save(newCategory)
+    const { id } = await this.db.save(newCategory)
+    if (!id) throw new Error('Category not saved')
+    const newCategorySave = await this.find(id)
+
     return newCategorySave
   }
 
@@ -90,7 +105,7 @@ export class CategoryService {
       relations: ['childCategories', 'parentCategory'],
     })
     if (!category) {
-      throw new Error('Category does exist')
+      throw new Error('Category does not exist')
     }
 
     // delete cascade children
@@ -98,6 +113,8 @@ export class CategoryService {
       await Promise.all(
         category.childCategories.map(async (childCategory) => {
           await this.db.delete(childCategory.id)
+          // ajouter la suppresion des categories petits enfants  via appel recursif
+          // ...
         })
       )
     }
