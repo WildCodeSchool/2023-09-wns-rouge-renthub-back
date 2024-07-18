@@ -5,7 +5,7 @@ import {
   ProductReferenceUpdateInput,
 } from '../entities/ProductReference.entity'
 import { validate } from 'class-validator'
-import { Category } from '../entities/Category'
+import { Category } from '../entities/Category.entity'
 import { formatValidationErrors } from '../utils/utils'
 import { PictureProduct } from '../entities/PictureProduct.entity'
 
@@ -84,13 +84,12 @@ export class ProductReferenceResolver {
         where: { id },
         relations: {
           category: true,
-          productCart: { cartReference: { owner: true } },
+          pictureProduct: true,
+          productCarts: { cartReference: { owner: true } },
           createdBy: true,
           updatedBy: true,
-          pictureProduct: true,
         },
       })
-
       if (productRef) {
         for (const item of productRef.pictureProduct) {
           if (item.id) {

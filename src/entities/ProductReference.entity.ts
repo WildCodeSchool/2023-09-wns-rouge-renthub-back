@@ -55,6 +55,7 @@ export class ProductReference extends EntityWithDefault {
 
   @OneToMany(
     () => PictureProduct,
+
     (pictureProduct) => pictureProduct.productReference,
     { cascade: true }
   )
@@ -68,9 +69,7 @@ export class ProductReference extends EntityWithDefault {
   @Field(() => [Stock], { nullable: true })
   stock!: Stock
 
-  @OneToMany(() => ProductCart, (productCart) => productCart.productReference, {
-    cascade: true,
-  })
+  @OneToMany(() => ProductCart, (productCart) => productCart.productReference)
   @Field(() => [ProductCart])
   productCarts!: ProductCart[]
 }

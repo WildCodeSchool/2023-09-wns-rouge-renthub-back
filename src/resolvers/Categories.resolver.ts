@@ -5,6 +5,7 @@ import {
   CategoryCreateInput,
   CategoryUpdateInput,
 } from '../entities/Category.entity'
+import { ProductReferenceService } from '../services/ProductReference.service'
 
 @Resolver(() => Category)
 export class CategoriesResolver {
@@ -18,6 +19,15 @@ export class CategoriesResolver {
   @Query(() => Category)
   async findCategory(@Arg('id', () => ID) id: number) {
     const categoryById = await new CategoryService().find(+id)
+    await Promise.all(
+      categoryById.productReferences.map(async (productRef) => {
+        const productWithPictures = await new ProductReferenceService().find(
+          productRef.id
+        )
+        // Mettre à jour le productRef avec les détails complets incluant les images
+        Object.assign(productRef, productWithPictures)
+      })
+    )
 
     return categoryById
   }

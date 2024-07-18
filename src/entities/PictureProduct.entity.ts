@@ -6,8 +6,9 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm'
 import { Field, ID, Int, ObjectType } from 'type-graphql'
-import { Picture } from './Picture.entity'
+
 import { ProductReference } from './ProductReference.entity'
+import { Picture } from './Picture.entity'
 
 @Entity()
 @ObjectType()

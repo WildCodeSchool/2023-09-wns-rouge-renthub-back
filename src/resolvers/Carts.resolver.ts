@@ -1,10 +1,4 @@
-import {
-  Arg,
-  Authorized,
-  ID,
-  Query,
-  Resolver,
-} from 'type-graphql'
+import { Arg, Authorized, ID, Query, Resolver } from 'type-graphql'
 import { Cart } from '../entities/Cart.entity'
 import { CartService } from '../services/Cart.service'
 
