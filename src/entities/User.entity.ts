@@ -35,7 +35,7 @@ export class User extends BaseEntity {
   @Column({ length: 50, nullable: true })
   @IsOptional()
   @Length(2, 50, { message: 'Entre 2 et 50 caractères' })
-  @Matches(/^[a-zA-ZÀ-ÿ-]+$/, {
+  @Matches(/^[a-zA-ZÀ-ÿ- ]+$/, {
     message: 'Le prénom ne doit contenir que des lettres',
   })
   @Field({ nullable: true })
@@ -44,7 +44,7 @@ export class User extends BaseEntity {
   @Column({ length: 50, nullable: true })
   @IsOptional()
   @Length(2, 50, { message: 'Entre 2 et 50 caractères' })
-  @Matches(/^[a-zA-ZÀ-ÿ-]+$/, {
+  @Matches(/^[a-zA-ZÀ-ÿ- ]+$/, {
     message: 'Le nom de famille ne doit contenir que des lettres',
   })
   @Field({ nullable: true })
