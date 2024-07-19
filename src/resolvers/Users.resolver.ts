@@ -98,7 +98,7 @@ export class UsersResolver {
 
       await verificationCode.remove()
 
-      await sendConfirmationEmail(user.email, user.nickName)
+      await sendConfirmationEmail(user.email, user.firstName)
 
       return { success: true, message: 'Email verified successfully !' }
     } catch (error) {
