@@ -67,7 +67,7 @@ export class ProductReference extends EntityWithDefault {
     onDelete: 'CASCADE',
   })
   @Field(() => [Stock], { nullable: true })
-  stock!: Stock
+  stock!: Stock[]
 
   @OneToMany(() => ProductCart, (productCart) => productCart.productReference)
   @Field(() => [ProductCart])

@@ -16,7 +16,9 @@ import { StocksFactory } from './factories/stocks.factory'
 import { UsersFactory } from './factories/users.factory'
 
 // Change OPTIONS in dataSource
-;(dataSource.options as any).host = process.env.DB_HOST_LOCAL
+import { OrdersFactory } from './factories/orders.factory'
+import { OrdersStocksFactory } from './factories/orderstocks.factory'
+(dataSource.options as any).host = process.env.DB_HOST_LOCAL
 ;(dataSource.options as any).port = process.env.DB_PORT_LOCAL
 
 // Add seeding OPTIONS to dataSource
@@ -30,6 +32,8 @@ import { UsersFactory } from './factories/users.factory'
   RolesFactory,
   StocksFactory,
   UsersFactory,
+  OrdersFactory,
+  OrdersStocksFactory
 ]
 ;(dataSource.options as any).seeds = [MainSeeder]
 
