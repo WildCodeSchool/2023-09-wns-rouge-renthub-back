@@ -19,6 +19,8 @@ import {
 } from '../entities/User.entity'
 import * as argon2 from 'argon2'
 import jwt from 'jsonwebtoken'
+import { v4 as uuidv4 } from 'uuid'
+import { addDays, isBefore } from 'date-fns'
 import { MyContext } from '../types/Context.type'
 import Cookies from 'cookies'
 import { sendConfirmationEmail } from '../utils/mailServices/verificationEmail'
@@ -26,6 +28,8 @@ import { isRightUser } from '../utils/utils'
 import { VerificationCode } from '../entities/VerificationCode.entity'
 import { typeCodeVerification } from '../utils/constant'
 import { UserService } from '../services/User.service'
+import { UserToken } from '../entities/UserToken.entity'
+import { resetPasswordEmail } from '../utils/mailServices/resetPasswordEmail'
 
 @Resolver(User)
 export class UsersResolver {
@@ -98,7 +102,7 @@ export class UsersResolver {
 
       await verificationCode.remove()
 
-      await sendConfirmationEmail(user.email, user.nickName)
+      await sendConfirmationEmail(user.email, user.firstName)
 
       return { success: true, message: 'Email verified successfully !' }
     } catch (error) {
@@ -107,6 +111,75 @@ export class UsersResolver {
         message: `Error occured : ${error}`,
       }
     }
+  }
+
+  // FORGOT PASSWORD
+  @Mutation(() => Boolean)
+  async resetPassword(
+    @Arg('email') email: string,
+    @Ctx() context: MyContext
+  ): Promise<boolean> {
+    const cookies = new Cookies(context.req, context.res)
+    const renthub_token = cookies.get('renthub_token')
+    // If token is present, throw error
+    if (renthub_token) {
+      throw new Error('already connected')
+    }
+    // Find user by email
+    const user = await User.findOne({ where: { email } })
+    if (!user) {
+      return true
+    }
+
+    // Generate & save token
+    const token = new UserToken()
+    token.user = user
+    token.createdAt = new Date()
+    token.expiresAt = addDays(new Date(), 1)
+    token.token = uuidv4()
+
+    await token.save()
+
+    // Send email
+    await resetPasswordEmail(user.email, user.firstName, token)
+
+    return true
+  }
+
+  // RESET PASSWORD
+  @Mutation(() => Boolean)
+  async setPassword(
+    @Arg('token') token: string,
+    @Arg('password') password: string
+  ): Promise<boolean> {
+    // Find token + user
+    const userToken = await UserToken.findOne({
+      where: { token },
+      relations: { user: true },
+    })
+
+    if (!userToken) {
+      throw new Error('invalid token')
+    }
+
+    // check token validity
+    if (isBefore(new Date(userToken.expiresAt), new Date())) {
+      throw new Error('expired token')
+    }
+
+    // Check new password validity
+    await UserService.validatePassword(password, userToken.user.email)
+
+    // Hash password
+    userToken.user.hashedPassword = await UserService.hashPassword(password)
+
+    // Save user
+    await userToken.user.save()
+
+    // Remove token
+    await userToken.remove()
+
+    return true
   }
 
   // @TODO : Add date of last connection //

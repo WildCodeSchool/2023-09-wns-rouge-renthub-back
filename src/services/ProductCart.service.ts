@@ -15,8 +15,8 @@ export class ProductCartService {
     this.db = dataSource.getRepository(ProductCart)
   }
 
-  async create(data: ProductCartCreateInput) {
-    const newProductCart = this.db.create(data)
+  async create(data: ProductCartCreateInput, cartId: number) {
+    const newProductCart = this.db.create({...data, cartReference: { id: cartId }})
     const errors = await validate(newProductCart)
     if (errors.length > 0) throw new Error(`Validation failed! ${errors}`)
     const { id } = await this.db.save(newProductCart)

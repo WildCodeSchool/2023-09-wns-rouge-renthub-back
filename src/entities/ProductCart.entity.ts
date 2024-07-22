@@ -54,9 +54,6 @@ export class ProductCartCreateInput {
 
   @Field()
   productReference!: ObjectId
-
-  @Field()
-  cartReference!: ObjectId
 }
 
 @InputType()
