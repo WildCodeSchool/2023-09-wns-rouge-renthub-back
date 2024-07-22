@@ -1,18 +1,22 @@
+import { ProductReference } from './../entities/ProductReference.entity'
+// import { PictureProduct } from './../entities/PictureProduct.entity'
 import { Repository } from 'typeorm'
 import { validate } from 'class-validator'
 import { dataSource } from '../datasource'
 import { formatValidationErrors } from '../utils/utils'
 import {
-  ProductReference,
   ProductReferenceCreateInput,
   ProductReferenceUpdateInput,
 } from '../entities/ProductReference.entity'
 import { CategoryService } from './Category.service'
+import { Picture } from '../entities/Picture.entity'
 
 export class ProductReferenceService {
   db: Repository<ProductReference>
+  pictureRepo: Repository<Picture>
   constructor() {
     this.db = dataSource.getRepository(ProductReference)
+    this.pictureRepo = dataSource.getRepository(Picture)
   }
 
   async findAll() {
@@ -22,6 +26,7 @@ export class ProductReferenceService {
         createdBy: true,
         updatedBy: true,
         stock: true,
+        pictureProduct: { picture: true },
         productCarts: { cartReference: { owner: { role: true } } },
       },
     })
@@ -39,12 +44,15 @@ export class ProductReferenceService {
         createdBy: true,
         updatedBy: true,
         stock: { orderStocks: true },
+        pictureProduct: { picture: true },
         productCarts: { cartReference: { owner: { role: true } } },
       },
     })
+
     if (!productReference) {
       throw new Error(`ProductReference with id < ${id} > not found`)
     }
+
     return productReference
   }
 

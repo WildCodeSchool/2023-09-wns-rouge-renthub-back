@@ -37,9 +37,12 @@ export class ProductCartResolver {
   @Authorized('ADMIN', 'USER')
   @Mutation(() => ProductCart)
   async createProductCart(
-    @Arg('data') data: ProductCartCreateInput
+    @Arg('data') data: ProductCartCreateInput,
+    @Ctx() context: MyContext
   ): Promise<ProductCart> {
-    const newProductCart = await new ProductCartService().create(data)
+    const cartId = context.user?.cart?.id
+    if (!cartId) throw new Error('Cart not found')
+    const newProductCart = await new ProductCartService().create(data, cartId)
     return newProductCart
   }
   @Authorized('ADMIN', 'USER')

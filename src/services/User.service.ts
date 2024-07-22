@@ -190,4 +190,23 @@ export class UserService {
     Object.assign(user, { id })
     return user
   }
+
+  static async validatePassword(
+    password: string,
+    email: string
+  ): Promise<void> {
+    const userInput = new UserCreateInput()
+    userInput.password = password
+    userInput.email = email
+    const errors = await validate(userInput)
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${JSON.stringify(errors)}`)
+    }
+  }
+
+  // Hash password
+  static async hashPassword(password: string): Promise<string> {
+    const hashedPassword = await argon2.hash(password)
+    return hashedPassword
+  }
 }

@@ -36,7 +36,7 @@ export class User extends BaseEntity {
   @Column({ length: 50, nullable: true })
   @IsOptional()
   @Length(2, 50, { message: 'Entre 2 et 50 caractères' })
-  @Matches(/^[a-zA-ZÀ-ÿ-]+$/, {
+  @Matches(/^[a-zA-ZÀ-ÿ- ]+$/, {
     message: 'Le prénom ne doit contenir que des lettres',
   })
   @Field({ nullable: true })
@@ -45,7 +45,7 @@ export class User extends BaseEntity {
   @Column({ length: 50, nullable: true })
   @IsOptional()
   @Length(2, 50, { message: 'Entre 2 et 50 caractères' })
-  @Matches(/^[a-zA-ZÀ-ÿ-]+$/, {
+  @Matches(/^[a-zA-ZÀ-ÿ- ]+$/, {
     message: 'Le nom de famille ne doit contenir que des lettres',
   })
   @Field({ nullable: true })
@@ -187,7 +187,10 @@ export class UserUpdateInput {
   dateOfBirth!: Date
 
   @Field({ nullable: true })
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/)
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()_+]{8,}$/, {
+    message:
+      'Password is not valid. At least 8 characters, 1 uppercase, 1 lowercase, 1 special characters and 1 number required!',
+  })
   password!: string
 
   @Field({ nullable: true })

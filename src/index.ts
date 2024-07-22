@@ -57,6 +57,7 @@ async function start() {
   const server = new ApolloServer({
     schema,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+    introspection: true,
   })
 
   await dataSource.initialize()

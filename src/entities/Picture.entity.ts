@@ -64,9 +64,8 @@ export class Picture extends BaseEntity {
   @Field(() => Category, { nullable: true })
   category: Category
 
-  @OneToMany(() => PictureProduct, (pictureProduct) => pictureProduct.picture, {
-    cascade: true,
-  })
+  @OneToMany(() => PictureProduct, (pictureProduct) => pictureProduct.picture)
+  @Field(() => Category, { nullable: true })
   pictureProduct!: PictureProduct[]
 }
 

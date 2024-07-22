@@ -30,8 +30,9 @@ export const customAuthChecker: AuthChecker<MyContext> = async (
       const user = await User.findOne({
         where: { id: payload.userId },
         relations: {
-          role: true,
           cart: true,
+          role: true,
+         
         },
       })
       if (!user) {

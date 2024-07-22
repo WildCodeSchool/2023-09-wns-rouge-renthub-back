@@ -6,12 +6,16 @@ import { Order } from './entities/Order.entity'
 import { OrderStock } from './entities/OrderStock.entity'
 import { Picture } from './entities/Picture.entity'
 import { PictureProduct } from './entities/PictureProduct.entity'
+import { EntityWithDefault } from './entities/EntityWithDefault'
 import { ProductCart } from './entities/ProductCart.entity'
 import { ProductReference } from './entities/ProductReference.entity'
 import { Role } from './entities/Role.entity'
 import { Stock } from './entities/Stock.entity'
 import { User } from './entities/User.entity'
+import { UserToken } from './entities/UserToken.entity'
 import { VerificationCode } from './entities/VerificationCode.entity'
+import { ProductCartSubscriber } from './subscribers/ProductCart.subscriber'
+import { ProductReferenceSubscriber } from './subscribers/ProductReference.subscriber'
 
 export const dataSourceOptions: PostgresConnectionOptions = {
   type: 'postgres',
@@ -20,6 +24,7 @@ export const dataSourceOptions: PostgresConnectionOptions = {
     Category,
     Order,
     OrderStock,
+    EntityWithDefault,
     Picture,
     PictureProduct,
     ProductCart,
@@ -27,9 +32,10 @@ export const dataSourceOptions: PostgresConnectionOptions = {
     Role,
     Stock,
     User,
+    UserToken,
     VerificationCode,
   ],
-  subscribers: [`${__dirname}/subscribers/*.ts`],
+  subscribers: [ProductCartSubscriber, ProductReferenceSubscriber],
   synchronize: true,
   logging: process.env.DOCKER_LOGS === 'true' ? true : false,
 }
