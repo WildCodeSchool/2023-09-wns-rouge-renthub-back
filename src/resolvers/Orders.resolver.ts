@@ -10,10 +10,7 @@ import {
 import { Order, StatusEnum } from '../entities/Order.entity'
 import { MyContext } from '../types/Context.type'
 import { CartService } from '../services/Cart.service'
-import {
-  formatValidationErrors,
-  isRightUser,
-} from '../utils/utils'
+import { formatValidationErrors, isRightUser } from '../utils/utils'
 import { OrderService } from '../services/Order.service'
 import { validate } from 'class-validator'
 import { OrderStock } from '../entities/OrderStock.entity'
@@ -25,7 +22,6 @@ export class OrdersResolver {
   @Authorized('ADMIN', 'USER')
   @Mutation(() => Order)
   async createOrder(
-    // @Arg('data') data: OrderCreateInput,
     @Ctx() context: MyContext
   ): Promise<Order> {
     // User context is missing or user is not authenticated
@@ -40,12 +36,13 @@ export class OrdersResolver {
     const undisposableProductReferences = []
 
     for (const productCart of productCarts) {
-      const availableStocks = await new StockService().findAvailableStocksForDates(
-        productCart.productReference.id,
-        productCart.dateTimeStart,
-        productCart.dateTimeEnd,
-        productCart.quantity
-      )
+      const availableStocks =
+        await new StockService().findAvailableStocksForDates(
+          productCart.productReference.id,
+          productCart.dateTimeStart,
+          productCart.dateTimeEnd,
+          productCart.quantity
+        )
 
       if (availableStocks.length < productCart.quantity) {
         undisposableProductReferences.push(productCart.productReference)
@@ -78,12 +75,13 @@ export class OrdersResolver {
       const orderStocksToInsert: OrderStock[] = []
 
       for (const productCart of productCarts) {
-        const availableStocks = await new StockService().findAvailableStocksForDates(
-          productCart.productReference.id,
-          productCart.dateTimeStart,
-          productCart.dateTimeEnd,
-          productCart.quantity
-        )
+        const availableStocks =
+          await new StockService().findAvailableStocksForDates(
+            productCart.productReference.id,
+            productCart.dateTimeStart,
+            productCart.dateTimeEnd,
+            productCart.quantity
+          )
 
         const orderStockObjects: OrderStock[] = availableStocks.map((stock) => {
           const orderStock = new OrderStock()
@@ -127,12 +125,21 @@ export class OrdersResolver {
     throw new Error('Not authorized')
   }
 
+  @Authorized('ADMIN', 'USER')
+  @Query(() => [Order])
+  async findOrdersByContext(@Ctx() context: MyContext) {
+    const user = context.user
+    if (!user) {
+      throw new Error('User context is missing')
+    }
+    const orders = await new OrderService().findByUserId(user.id)
+    return orders
+  }
+
   @Authorized('ADMIN')
   @Query(() => [Order])
   async findOrders() {
     const orders = await new OrderService().findAll()
-    console.log('TOTO')
-
     return orders
   }
 }

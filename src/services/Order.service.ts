@@ -32,4 +32,17 @@ export class OrderService {
 
     return order
   }
+
+  async findByUserId(id: number) {
+    const order = await this.db.find({
+      where: { user: { id } },
+      relations: {
+        user: true,
+        orderStocks: { stock: { productReference: true } },
+      },
+    })
+    if (!order) throw new Error('Order not found')
+
+    return order
+  }
 }
