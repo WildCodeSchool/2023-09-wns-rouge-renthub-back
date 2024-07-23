@@ -67,7 +67,8 @@ export function formatValidationErrors(errors: ValidationError[]): string {
  */
 export const isRightUser = (userId: number, context: MyContext): boolean => {
   return (
-    (context.user?.role.right === 'USER' && Number(context.user?.id) ===  Number(userId)) ||
+    (context.user?.role.right === 'USER' &&
+      Number(context.user?.id) === Number(userId)) ||
     context.user?.role.right === 'ADMIN'
   )
 }

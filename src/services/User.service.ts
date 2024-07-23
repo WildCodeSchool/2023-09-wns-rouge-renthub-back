@@ -53,6 +53,7 @@ export class UserService {
         picture: true,
         createdBy: true,
         updatedBy: true,
+        orders: { orderStocks: { stock: true } },
       },
     })
     return users
