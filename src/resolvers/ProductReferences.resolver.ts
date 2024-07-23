@@ -1,33 +1,120 @@
-import { Arg, Authorized, ID, Mutation, Query, Resolver } from 'type-graphql'
+import {
+  Arg,
+  Authorized,
+  Ctx,
+  ID,
+  Mutation,
+  Query,
+  Resolver,
+} from 'type-graphql'
 import {
   ProductReference,
   ProductReferenceCreateInput,
   ProductReferenceUpdateInput,
 } from '../entities/ProductReference.entity'
-import { ProductReferenceService } from '../services/ProductReference.service'
+import { validate } from 'class-validator'
+import { Category } from '../entities/Category.entity'
+import { formatValidationErrors } from '../utils/utils'
+import { MyContext } from '../types/Context.type'
+import { Picture } from '../entities/Picture.entity'
 
 @Resolver(() => ProductReference)
 export class ProductReferenceResolver {
   @Authorized('ADMIN')
   @Mutation(() => ProductReference)
   async createProductReference(
+    @Ctx() context: MyContext,
     @Arg('data') data: ProductReferenceCreateInput
   ): Promise<ProductReference> {
-    const newProductReference = new ProductReferenceService().create(data)
-    return newProductReference
+    if (!context.user) {
+      throw new Error('Vous devez être connecté pour effectuer cette action')
+    }
+    try {
+      const newProductReference = new ProductReference()
+      const category = await Category.findOne({
+        where: { id: data.category.id },
+      })
+      if (!category) {
+        throw new Error('Aucune catégorie trouvé')
+      }
+      const pictureProduct = await Picture.findOne({
+        where: { id: data.picture.id },
+      })
+
+      if (!pictureProduct) {
+        throw new Error('Aucune image trouvé')
+      }
+      Object.assign(newProductReference, data)
+      newProductReference.createdBy = context.user
+      const errors = await validate(newProductReference)
+      if (errors.length > 0) {
+        const validationMessages = formatValidationErrors(errors)
+        throw new Error(validationMessages || 'Une erreur est survenue.')
+      }
+      await newProductReference.save()
+
+      return newProductReference
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
   }
 
   @Query(() => [ProductReference])
   async getProductsReferences(): Promise<ProductReference[]> {
-    const productReferences = await new ProductReferenceService().findAll()
-    return productReferences
+    try {
+      const productReferences = await ProductReference.find({
+        relations: {
+          category: true,
+          createdBy: true,
+          updatedBy: true,
+          stock: true,
+          picture: true,
+        },
+      })
+      if (!productReferences) {
+        throw new Error('Aucun produit trouvé')
+      }
+      return productReferences
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
   }
 
   @Query(() => ProductReference)
   async getProductReference(@Arg('id', () => ID) id: number) {
-    const productReference = await new ProductReferenceService().find(id)
-
-    return productReference
+    try {
+      const productRef = await ProductReference.findOne({
+        where: { id },
+        relations: {
+          category: true,
+          picture: true,
+          productCarts: { cartReference: { owner: true } },
+          createdBy: true,
+          updatedBy: true,
+        },
+      })
+      if (productRef) {
+        for (const item of productRef.picture) {
+          if (item.id) {
+            const pictureProduct = await Picture.findOne({
+              where: { id: item.id },
+              relations: {
+                productReference: true,
+              },
+            })
+            if (pictureProduct) {
+              Object.assign(item, pictureProduct)
+            }
+          }
+        }
+      }
+      if (!productRef) {
+        throw new Error('Aucun produit trouvé')
+      }
+      return productRef
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
   }
 
   @Authorized('ADMIN')
@@ -36,19 +123,51 @@ export class ProductReferenceResolver {
     @Arg('id', () => ID) id: number,
     @Arg('data') data: ProductReferenceUpdateInput
   ) {
-    const updatedProductReference = await new ProductReferenceService().update(
-      id,
-      data
-    )
-    return updatedProductReference
+    try {
+      const productRef = await ProductReference.findOne({
+        where: { id: id },
+        relations: {
+          category: true,
+        },
+      })
+      if (!productRef) {
+        throw new Error('Aucun produit trouvé')
+      }
+      if (productRef) {
+        Object.assign(productRef, data)
+        const errors = await validate(productRef)
+        if (errors.length > 0) {
+          const validationMessages = formatValidationErrors(errors)
+          throw new Error(validationMessages || 'Une erreur est survenue.')
+        }
+        await productRef.save()
+      }
+      return productRef
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
   }
 
   @Authorized('ADMIN')
   @Mutation(() => ProductReference)
   async deleteProductReference(@Arg('id', () => ID) id: number) {
-    const deletedProductReference = await new ProductReferenceService().delete(
-      id
-    )
-    return deletedProductReference
+    try {
+      const productRef = await ProductReference.findOne({
+        where: { id },
+        relations: {
+          category: true,
+          stock: true,
+        },
+      })
+      if (!productRef) {
+        throw new Error('Aucun produit trouvé')
+      }
+      await productRef.remove()
+
+      Object.assign(productRef, { id })
+      return productRef
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
   }
 }

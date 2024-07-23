@@ -1,48 +1,59 @@
 import multer from 'multer'
-import { Express } from 'express'
+import { Express, Request, Response } from 'express'
 // import sharp from 'sharp'
 // import mime from 'mime'
 import axios from 'axios'
 import { verifyRecaptchaToken } from './utils/reCaptcha'
 import { sendContactEmail } from './utils/mailServices/contactEmail'
-import { uploadPicture } from './utils/pictureServices/multer'
-import { createImage } from './utils/pictureServices/pictureServices'
+import {
+  processImage,
+  uploadPicture,
+} from './utils/pictureServices/pictureServices'
 import { PictureService } from './services/Picture.service'
 
 export function initializeRoute(app: Express) {
-  const upload = multer({ dest: '/app/uploads/' })
+  // const upload = multer({ dest: '/app/uploads/' })
   //const storage = multer.memoryStorage()
   //const upload = multer({ storage: storage })
 
   // ---API REST in express first --------------------------//
-  app.post('/api/images', upload.single('file'), async (req, res) => {
-    console.info('uploading images', req.file)
-    if (!req.file) {
-      res.status(400).send('No file was uploaded.')
-      return
-    }
+  // app.post('/api/images', upload.single('file'), async (req, res) => {
+  //   console.info('uploading images', req.file)
+  //   if (!req.file) {
+  //     res.status(400).send('No file was uploaded.')
 
-    if (req.file && req.file.mimetype.startsWith('image/')) {
-      //const extension = req.file.fieldname.split('.').pop() //mime.extension(req.file.mimetype)
-      // const filename = `${Date.now()}-${Math.log(Math.random() * 8999) + 1000}.${extension}`
-      //   await sharp(req.file.buffer)
-      //     .resize(2000, 2000, { fit: 'contain' })
-      //     .toFile(`/app/uploads/${filename}`)
+  //     return
+  //   }
 
-      const servicePicture = new PictureService()
-      const newPicture = await servicePicture.createImage(
-        req.get('host') || 'http://localhost:5000',
-        req.file.filename,
-        req.file.originalname,
-        req.file.mimetype,
-        req.file.path
-      )
-      console.info('picture info', newPicture)
-      res.json({ message: true })
-    } else {
-      res.json({ message: false })
+  //   if (req.file && req.file.mimetype.startsWith('image/')) {
+  //     //const extension = req.file.fieldname.split('.').pop() //mime.extension(req.file.mimetype)
+  //     // const filename = `${Date.now()}-${Math.log(Math.random() * 8999) + 1000}.${extension}`
+  //     //   await sharp(req.file.buffer)
+  //     //     .resize(2000, 2000, { fit: 'contain' })
+  //     //     .toFile(`/app/uploads/${filename}`)
+
+  //     const servicePicture = new PictureService()
+  //     const newPicture = await servicePicture.createImage(
+  //       req.get('host') || 'http://localhost:5000',
+  //       req.file.filename,
+  //       req.file.originalname,
+  //       req.file.mimetype,
+  //       req.file.path
+  //     )
+  //     console.info('picture info', newPicture)
+  //     res.json({ message: true })
+  //   } else {
+  //     res.json({ message: false })
+  //   }
+  // })
+
+  app.post(
+    '/api/images',
+    uploadPicture.single('file'),
+    async (req: Request, res: Response) => {
+      await processImage(req, res)
     }
-  })
+  )
 
   app.get('/api/images/:imageId', async (req, res) => {
     if (!req.params.imageId) {

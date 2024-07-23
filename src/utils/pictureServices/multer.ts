@@ -34,7 +34,3 @@ const createMulterStorage = (destinationPath: string) =>
     },
     filename: generateFileName,
   })
-
-export const uploadPicture = multer({
-  storage: createMulterStorage('./public/assets/images/pictures'),
-})

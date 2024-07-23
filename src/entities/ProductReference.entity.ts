@@ -7,12 +7,12 @@ import {
 } from 'typeorm'
 import { Field, ID, InputType, Int, ObjectType } from 'type-graphql'
 import { Category } from './Category.entity'
-import { PictureProduct } from './PictureProduct.entity'
 import { IsBoolean, Length } from 'class-validator'
 import { ObjectId } from './ObjectId'
 import { EntityWithDefault } from './EntityWithDefault'
 import { Stock } from './Stock.entity'
 import { ProductCart } from './ProductCart.entity'
+import { Picture } from './Picture.entity'
 
 @Entity()
 @ObjectType()
@@ -31,8 +31,8 @@ export class ProductReference extends EntityWithDefault {
   @Field()
   description!: string
 
-  @Column()
-  @Field(() => Int)
+  @Column({ nullable: true })
+  @Field(() => Int, { nullable: true })
   index!: number
 
   @Column({ default: true })
@@ -53,15 +53,6 @@ export class ProductReference extends EntityWithDefault {
   @Field(() => Category)
   category?: Category
 
-  @OneToMany(
-    () => PictureProduct,
-
-    (pictureProduct) => pictureProduct.productReference,
-    { cascade: true }
-  )
-  @Field(() => [PictureProduct], { nullable: true })
-  pictureProduct!: PictureProduct[]
-
   @OneToMany(() => Stock, (stock) => stock.productReference, {
     cascade: true,
     onDelete: 'CASCADE',
@@ -72,6 +63,10 @@ export class ProductReference extends EntityWithDefault {
   @OneToMany(() => ProductCart, (productCart) => productCart.productReference)
   @Field(() => [ProductCart])
   productCarts!: ProductCart[]
+
+  @OneToMany(() => Picture, (picture) => picture.productReference)
+  @Field(() => [Picture])
+  picture!: Picture[]
 }
 
 @InputType()
@@ -82,10 +77,10 @@ export class ProductReferenceCreateInput {
   @Field()
   description: string
 
-  @Field(() => Int)
-  index: number
+  @Field(() => Int, { nullable: true })
+  index?: number
 
-  @Field(() => Boolean, { nullable: true })
+  @Field(() => Boolean, { nullable: true, defaultValue: true })
   display: boolean
 
   @Field({ nullable: true })
@@ -95,10 +90,10 @@ export class ProductReferenceCreateInput {
   price: number
 
   @Field()
-  createdBy: ObjectId
+  category: ObjectId
 
   @Field()
-  category: ObjectId
+  picture: ObjectId
 }
 
 @InputType()
