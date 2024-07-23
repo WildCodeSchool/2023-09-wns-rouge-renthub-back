@@ -43,10 +43,7 @@ const corsOptions = {
 }
 app.use(cors(corsOptions))
 app.use(express.json({ limit: '50mb' }))
-app.use(
-  '/api/assets/images',
-  express.static(path.join(__dirname, '../public/assets/images'))
-)
+app.use('/api/images', express.static(path.join(__dirname, '../public/images')))
 
 async function start() {
   const port = process.env.BACKEND_PORT || 5000

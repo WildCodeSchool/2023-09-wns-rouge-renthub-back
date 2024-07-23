@@ -10,6 +10,8 @@ import {
   uploadPicture,
 } from './utils/pictureServices/pictureServices'
 import { PictureService } from './services/Picture.service'
+import { MyContext } from './types/Context.type'
+import Cookies from 'cookies'
 
 export function initializeRoute(app: Express) {
   // const upload = multer({ dest: '/app/uploads/' })
@@ -51,6 +53,13 @@ export function initializeRoute(app: Express) {
     '/api/images',
     uploadPicture.single('file'),
     async (req: Request, res: Response) => {
+      // const cookies = new Cookies(req, res)
+      // const renthub_token = cookies.get('renthub_token')
+
+      // if (!renthub_token) {
+      //   return false
+      // }
+
       await processImage(req, res)
     }
   )

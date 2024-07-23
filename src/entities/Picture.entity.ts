@@ -66,7 +66,7 @@ export class Picture extends BaseEntity {
 
   @ManyToOne(
     () => ProductReference,
-    (productReference) => productReference.picture
+    (productReference) => productReference.pictures
   )
   @Field(() => ProductReference)
   productReference: ProductReference

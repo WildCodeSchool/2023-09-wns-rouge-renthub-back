@@ -37,11 +37,11 @@ export class ProductReferenceResolver {
       if (!category) {
         throw new Error('Aucune catégorie trouvé')
       }
-      const pictureProduct = await Picture.findOne({
-        where: { id: data.picture.id },
+      const newPicture = await Picture.findOne({
+        where: { id: data.pictures[0].id },
       })
 
-      if (!pictureProduct) {
+      if (!newPicture) {
         throw new Error('Aucune image trouvé')
       }
       Object.assign(newProductReference, data)
@@ -52,7 +52,6 @@ export class ProductReferenceResolver {
         throw new Error(validationMessages || 'Une erreur est survenue.')
       }
       await newProductReference.save()
-
       return newProductReference
     } catch (error: any) {
       throw new Error(error.message)
@@ -68,12 +67,10 @@ export class ProductReferenceResolver {
           createdBy: true,
           updatedBy: true,
           stock: true,
-          picture: true,
+          pictures: true,
         },
       })
-      if (!productReferences) {
-        throw new Error('Aucun produit trouvé')
-      }
+
       return productReferences
     } catch (error: any) {
       throw new Error(error.message)
@@ -87,23 +84,23 @@ export class ProductReferenceResolver {
         where: { id },
         relations: {
           category: true,
-          picture: true,
+          pictures: true,
           productCarts: { cartReference: { owner: true } },
           createdBy: true,
           updatedBy: true,
         },
       })
       if (productRef) {
-        for (const item of productRef.picture) {
+        for (const item of productRef.pictures) {
           if (item.id) {
-            const pictureProduct = await Picture.findOne({
+            const picture = await Picture.findOne({
               where: { id: item.id },
               relations: {
                 productReference: true,
               },
             })
-            if (pictureProduct) {
-              Object.assign(item, pictureProduct)
+            if (picture) {
+              Object.assign(item, picture)
             }
           }
         }

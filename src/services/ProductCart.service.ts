@@ -16,7 +16,10 @@ export class ProductCartService {
   }
 
   async create(data: ProductCartCreateInput, cartId: number) {
-    const newProductCart = this.db.create({...data, cartReference: { id: cartId }})
+    const newProductCart = this.db.create({
+      ...data,
+      cartReference: { id: cartId },
+    })
     const errors = await validate(newProductCart)
     if (errors.length > 0) throw new Error(`Validation failed! ${errors}`)
     const { id } = await this.db.save(newProductCart)
@@ -75,7 +78,6 @@ export class ProductCartService {
       where: { id },
       relations: {
         productReference: {
-          pictureProduct: true,
           stock: true,
           productCarts: true,
           category: true,

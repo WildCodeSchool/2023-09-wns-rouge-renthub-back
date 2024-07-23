@@ -5,10 +5,13 @@ import fs from 'fs'
 import sharp from 'sharp'
 import { copyFile } from '../copyFile'
 import { v4 as uuidv4 } from 'uuid'
+import { PictureService } from '../../services/Picture.service'
 
 // folder tmp for temporary storage
-const tempStoragePath = './public/assets/temp'
-const finalStoragePath = './public/assets/images'
+const tempStoragePath = '/app/public/temp'
+// fs.mkdirSync(tempStoragePath, { recursive: true })
+const finalStoragePath = '/app/public/images'
+// fs.mkdirSync(finalStoragePath, { recursive: true })
 
 // Temp storage for uploaded files
 const tempStorage = multer.diskStorage({
@@ -37,17 +40,21 @@ export const processImage = async (
 ) => {
   if (req.file) {
     try {
+      console.log('hello')
       // recupere le chemin du fichier temporaire
       const tempFilePath = path.join(tempStoragePath, req.file.originalname)
       // recupere l'extension du fichier
       const ext = path.extname(req.file.originalname)
       // genere un nouveau nom de fichier
-      const newFilename = `$${Date.now()}-${uuidv4()}.${ext}`
+      const newFilename = `$${Date.now()}-${uuidv4()}${ext}`
       // recupere le chemin du fichier
       const finalFilePath = path.join(finalStoragePath, newFilename)
+      console.log('hello 2')
 
       const image = sharp(tempFilePath)
+
       const metadata = await image.metadata()
+      console.log('hello3')
 
       if (
         (metadata.width && metadata.width > 1280) ||
@@ -63,7 +70,15 @@ export const processImage = async (
         await fs.promises.unlink(tempFilePath)
       }
 
-      res.json({ filename: newFilename })
+      const picture = await new PictureService().createImage(
+        newFilename,
+        newFilename,
+        newFilename,
+        newFilename,
+        newFilename
+      )
+
+      res.json({ pictureId: picture.id })
       // creer picture
       // récupérer l'id et le retourner
       // associer avec product reference

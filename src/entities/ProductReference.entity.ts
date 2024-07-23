@@ -66,7 +66,7 @@ export class ProductReference extends EntityWithDefault {
 
   @OneToMany(() => Picture, (picture) => picture.productReference)
   @Field(() => [Picture])
-  picture!: Picture[]
+  pictures!: Picture[]
 }
 
 @InputType()
@@ -92,8 +92,8 @@ export class ProductReferenceCreateInput {
   @Field()
   category: ObjectId
 
-  @Field()
-  picture: ObjectId
+  @Field(() => [ObjectId])
+  pictures: ObjectId[]
 }
 
 @InputType()
