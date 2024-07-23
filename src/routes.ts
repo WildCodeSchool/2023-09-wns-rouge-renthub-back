@@ -1,8 +1,4 @@
-import multer from 'multer'
 import { Express, Request, Response } from 'express'
-// import sharp from 'sharp'
-// import mime from 'mime'
-import axios from 'axios'
 import { verifyRecaptchaToken } from './utils/reCaptcha'
 import { sendContactEmail } from './utils/mailServices/contactEmail'
 import {
@@ -10,56 +6,14 @@ import {
   uploadPicture,
 } from './utils/pictureServices/pictureServices'
 import { PictureService } from './services/Picture.service'
-import { MyContext } from './types/Context.type'
-import Cookies from 'cookies'
+import { checkUserRights } from './auth'
 
 export function initializeRoute(app: Express) {
-  // const upload = multer({ dest: '/app/uploads/' })
-  //const storage = multer.memoryStorage()
-  //const upload = multer({ storage: storage })
-
-  // ---API REST in express first --------------------------//
-  // app.post('/api/images', upload.single('file'), async (req, res) => {
-  //   console.info('uploading images', req.file)
-  //   if (!req.file) {
-  //     res.status(400).send('No file was uploaded.')
-
-  //     return
-  //   }
-
-  //   if (req.file && req.file.mimetype.startsWith('image/')) {
-  //     //const extension = req.file.fieldname.split('.').pop() //mime.extension(req.file.mimetype)
-  //     // const filename = `${Date.now()}-${Math.log(Math.random() * 8999) + 1000}.${extension}`
-  //     //   await sharp(req.file.buffer)
-  //     //     .resize(2000, 2000, { fit: 'contain' })
-  //     //     .toFile(`/app/uploads/${filename}`)
-
-  //     const servicePicture = new PictureService()
-  //     const newPicture = await servicePicture.createImage(
-  //       req.get('host') || 'http://localhost:5000',
-  //       req.file.filename,
-  //       req.file.originalname,
-  //       req.file.mimetype,
-  //       req.file.path
-  //     )
-  //     console.info('picture info', newPicture)
-  //     res.json({ message: true })
-  //   } else {
-  //     res.json({ message: false })
-  //   }
-  // })
-
   app.post(
     '/api/images',
+    checkUserRights,
     uploadPicture.single('file'),
     async (req: Request, res: Response) => {
-      // const cookies = new Cookies(req, res)
-      // const renthub_token = cookies.get('renthub_token')
-
-      // if (!renthub_token) {
-      //   return false
-      // }
-
       await processImage(req, res)
     }
   )
@@ -89,37 +43,6 @@ export function initializeRoute(app: Express) {
     }
   })
 
-  app.post(
-    '/public/assets/images/default',
-    uploadPicture.single('file'),
-    async (req, res) => {
-      if (req.file) {
-        try {
-          const picture = await createImage(req.file.filename)
-          res.json(picture)
-        } catch (error) {
-          res.status(500).send('Error saving picture')
-        }
-      } else {
-        res.status(400).send('No file was uploaded.')
-      }
-    }
-  )
-  // Api search adress.gouv//
-  app.get('/search-address', async (req, res) => {
-    try {
-      const query = req.query.q
-      const response = await axios.get(
-        `https://api-adresse.data.gouv.fr/search/?q=city=${query}&limit=5`
-      )
-      res.json(response.data)
-    } catch (error) {
-      console.error("Erreur lors de la requête à l'API:", error)
-      res.status(500).send('Erreur interne du serveur')
-    }
-  })
-
   // Send contact email
   app.post('/sendcontactemail', verifyRecaptchaToken, sendContactEmail)
-  //-----------------------------------------//
 }

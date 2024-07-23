@@ -1,8 +1,9 @@
-import { AuthChecker } from 'type-graphql'
+import { AuthChecker, ResolverData } from 'type-graphql'
 import jwt from 'jsonwebtoken'
 import Cookies from 'cookies'
 import { MyContext } from './types/Context.type'
 import { User } from './entities/User.entity'
+import { NextFunction, Request, Response } from 'express'
 
 /**
  * Custom authentication checker function.
@@ -53,4 +54,28 @@ export const customAuthChecker: AuthChecker<MyContext> = async (
   }
 
   return false
+}
+export const checkUserRights = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const context: MyContext = { req, res, user: undefined }
+  const roles: string[] = []
+
+  // Créer un objet de type ResolverData<MyContext>
+  const resolverData: ResolverData<MyContext> = {
+    root: {},
+    args: {},
+    context,
+    info: {} as any, // Vous pouvez remplacer `any` par le type approprié si nécessaire
+  }
+
+  const hasAccess = await customAuthChecker(resolverData, roles)
+
+  if (hasAccess) {
+    next()
+  } else {
+    res.status(403).json({ message: 'Access denied' })
+  }
 }

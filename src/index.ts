@@ -82,16 +82,3 @@ async function start() {
 }
 
 start()
-
-// add upload image step
-
-// 1 - add multer to upload image
-// 2 - add image entity + relation
-// 3- read images with resolver
-// 4- resizer image on uploadPicture
-
-//-----------------------------------------
-//-----------EXPRESS MIDDLEWARES-----------
-//-----------------------------------------
-
-// Upload picture
