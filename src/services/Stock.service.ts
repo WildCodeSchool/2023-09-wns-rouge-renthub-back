@@ -20,7 +20,7 @@ export class StockService {
     return stocks
   }
 
-  async findAllAvailableByProductReferenceId(productReferenceId: number) {
+  private async findAllByProductReferenceId(productReferenceId: number) {
     const stocks = await this.db.find({
       where: { productReference: { id: productReferenceId } },
       relations: { productReference: { category: true }, orderStocks: true },
@@ -35,7 +35,7 @@ export class StockService {
     quantity: number | undefined = undefined
   ): Promise<Stock[]> {
     const stocks =
-      await this.findAllAvailableByProductReferenceId(productReferenceId)
+      await this.findAllByProductReferenceId(productReferenceId)
     if (!stocks) {
       throw new Error('Stocks not found')
     }

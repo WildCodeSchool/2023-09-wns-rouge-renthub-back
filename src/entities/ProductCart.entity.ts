@@ -9,6 +9,7 @@ import { Field, ID, InputType, Int, ObjectType } from 'type-graphql'
 import { ProductReference } from './ProductReference.entity'
 import { Cart } from './Cart.entity'
 import { ObjectId } from './ObjectId'
+import { Min } from 'class-validator'
 
 @Entity()
 @ObjectType()
@@ -19,6 +20,7 @@ export class ProductCart extends BaseEntity {
 
   @Column()
   @Field(() => Int)
+  @Min(1, { message: 'Quantity must be a bigger than zero' })
   quantity!: number
 
   @Column({ type: 'timestamp with time zone' })
@@ -44,6 +46,7 @@ export class ProductCart extends BaseEntity {
 @InputType()
 export class ProductCartCreateInput {
   @Field(() => Int)
+  @Min(1, { message: 'Quantity must be a bigger than zero' })
   quantity!: number
 
   @Field()
@@ -59,6 +62,7 @@ export class ProductCartCreateInput {
 @InputType()
 export class ProductCartUpdateInput {
   @Field(() => Int, { nullable: true })
+  @Min(1, { message: 'Quantity must be a bigger than zero' })
   quantity?: number
 
   @Field({ nullable: true })

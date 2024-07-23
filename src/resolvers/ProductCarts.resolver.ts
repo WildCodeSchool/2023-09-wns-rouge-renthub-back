@@ -17,6 +17,7 @@ import {
 import { ProductCartService } from '../services/ProductCart.service'
 // import { isRightUser, isRightUser, isRightUser } from '../utils/utils'
 import { MyContext } from '../types/Context.type'
+import { StockService } from '../services/Stock.service'
 
 @Resolver(() => ProductCart)
 export class ProductCartResolver {
@@ -42,6 +43,15 @@ export class ProductCartResolver {
   ): Promise<ProductCart> {
     const cartId = context.user?.cart?.id
     if (!cartId) throw new Error('Cart not found')
+    const availableStocks =
+      await new StockService().findAvailableStocksForDates(
+        data.productReference.id,
+        data.dateTimeStart,
+        data.dateTimeEnd,
+        data.quantity
+      )
+    if (availableStocks.length === 0)
+      throw new Error('No available stock for this product')
     const newProductCart = await new ProductCartService().create(data, cartId)
     return newProductCart
   }
@@ -53,6 +63,23 @@ export class ProductCartResolver {
     @Arg('data') data: ProductCartUpdateInput,
     @Ctx() context: MyContext
   ): Promise<ProductCart> {
+    const productCart = await new ProductCartService().find(id)
+    const productCartValid = {
+      ...productCart,
+      ...data,
+    }
+
+    const availableStocks =
+      await new StockService().findAvailableStocksForDates(
+        productCart.productReference.id,
+        productCartValid.dateTimeStart,
+        productCartValid.dateTimeEnd,
+        productCartValid.quantity
+      )
+
+    if (availableStocks.length < Number(productCartValid.quantity))
+      throw new Error('Not enough stock for this product')
+
     const updatedProductCart = await new ProductCartService().update(
       id,
       data,
