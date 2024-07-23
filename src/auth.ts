@@ -32,7 +32,7 @@ export const customAuthChecker: AuthChecker<MyContext> = async (
         relations: {
           cart: true,
           role: true,
-         
+          orders: true,
         },
       })
       if (!user) {

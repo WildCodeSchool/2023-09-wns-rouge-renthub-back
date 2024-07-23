@@ -14,10 +14,59 @@ export class StockService {
   }
 
   async findAll() {
-    const stocks = this.db.find({
+    const stocks = await this.db.find({
       relations: { productReference: { category: true } },
     })
     return stocks
+  }
+
+  async findAllAvailableByProductReferenceId(productReferenceId: number) {
+    const stocks = await this.db.find({
+      where: { productReference: { id: productReferenceId } },
+      relations: { productReference: { category: true }, orderStocks: true },
+    })
+    return stocks
+  }
+
+  async findAvailableStocksForDates(
+    productReferenceId: number,
+    dateStart: Date,
+    dateEnd: Date,
+    quantity: number | undefined = undefined
+  ): Promise<Stock[]> {
+    const stocks =
+      await this.findAllAvailableByProductReferenceId(productReferenceId)
+    if (!stocks) {
+      throw new Error('Stocks not found')
+    }
+    const availableStocks = []
+    for (const stock of stocks) {
+      if (stock.isAvailable === false) {
+        continue
+      }
+
+      const orderStocks = stock.orderStocks
+      let isAvailable = true
+
+      for (const orderStock of orderStocks) {
+        if (
+          !(
+            dateEnd <= orderStock.dateTimeStart ||
+            dateStart >= orderStock.dateTimeEnd
+          )
+        ) {
+          isAvailable = false
+          break
+        }
+      }
+      if (isAvailable) {
+        availableStocks.push(stock)
+      }
+      if (quantity && availableStocks.length >= quantity) {
+        break
+      }
+    }
+    return availableStocks
   }
 
   async find(id: number) {

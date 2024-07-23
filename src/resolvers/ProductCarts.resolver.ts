@@ -45,6 +45,7 @@ export class ProductCartResolver {
     const newProductCart = await new ProductCartService().create(data, cartId)
     return newProductCart
   }
+
   @Authorized('ADMIN', 'USER')
   @Mutation(() => ProductCart)
   async updateProductCart(
