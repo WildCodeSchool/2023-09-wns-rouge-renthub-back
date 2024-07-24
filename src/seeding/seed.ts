@@ -8,7 +8,6 @@ import MainSeeder from './main.seeder'
 import { CartsFactory } from './factories/carts.factory'
 import { CategoriesFactory } from './factories/categories.factory'
 import { PicturesFactory } from './factories/pictures.factory'
-import { PictureProductsFactory } from './factories/pictureProducts.factory'
 import { ProductCartsFactory } from './factories/productCarts.factory'
 import { ProductReferencesFactory } from './factories/productReferences.factory'
 import { RolesFactory } from './factories/roles.factory'
@@ -26,7 +25,6 @@ import { OrdersStocksFactory } from './factories/orderstocks.factory'
   CartsFactory,
   CategoriesFactory,
   PicturesFactory,
-  PictureProductsFactory,
   ProductCartsFactory,
   ProductReferencesFactory,
   RolesFactory,
