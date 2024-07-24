@@ -1,15 +1,14 @@
 import express from 'express'
 import multer from 'multer'
 import path from 'path'
-import fs from 'fs'
+import fs, { promises as fsPromises } from 'fs'
 import sharp from 'sharp'
 import { copyFile } from '../copyFile'
 import { v4 as uuidv4 } from 'uuid'
 import { PictureService } from '../../services/Picture.service'
+import { Picture } from '../../entities/Picture.entity'
 
-// folder tmp for temporary storage
 const tempStoragePath = '/app/public/temp'
-// fs.mkdirSync(tempStoragePath, { recursive: true })
 const finalStoragePath = '/app/public/images'
 // fs.mkdirSync(finalStoragePath, { recursive: true })
 
@@ -40,7 +39,6 @@ export const processImage = async (
 ) => {
   if (req.file) {
     try {
-      console.log('hello')
       // recupere le chemin du fichier temporaire
       const tempFilePath = path.join(tempStoragePath, req.file.originalname)
       // recupere l'extension du fichier
@@ -49,12 +47,8 @@ export const processImage = async (
       const newFilename = `$${Date.now()}-${uuidv4()}${ext}`
       // recupere le chemin du fichier
       const finalFilePath = path.join(finalStoragePath, newFilename)
-      console.log('hello 2')
-
       const image = sharp(tempFilePath)
-
       const metadata = await image.metadata()
-      console.log('hello3')
 
       if (
         (metadata.width && metadata.width > 1280) ||
@@ -79,14 +73,36 @@ export const processImage = async (
       )
 
       res.json({ pictureId: picture.id })
-      // creer picture
-      // récupérer l'id et le retourner
-      // associer avec product reference
     } catch (error) {
       console.error('Error processing image:', error)
       res.status(500).send('Error processing image')
     }
   } else {
     res.status(400).send('No file was uploaded.')
+  }
+}
+
+export async function deletePicture(
+  pictureId: number
+): Promise<Picture | null> {
+  const picture = await Picture.findOneBy({ id: pictureId })
+
+  if (picture) {
+    try {
+      await Picture.remove(picture)
+
+      const filePath = path.join(
+        __dirname,
+        `../../public/images/${picture.name}`
+      )
+      await fsPromises.unlink(filePath)
+
+      return picture
+    } catch (error) {
+      console.error('Error removing picture', error)
+      throw new Error('Error removing picture')
+    }
+  } else {
+    throw new Error('Picture not found')
   }
 }

@@ -45,7 +45,7 @@ export const customAuthChecker: AuthChecker<MyContext> = async (
       context.user = user
 
       // CHECK USER ROLE //
-      return user.role.right.length === 0 || roles.includes(user.role.right)
+      return roles.length === 0 || roles.includes(user.role.right)
     }
   } catch {
     console.error('Invalid renthub_token')
@@ -63,14 +63,12 @@ export const checkUserRights = async (
   const context: MyContext = { req, res, user: undefined }
   const roles: string[] = []
 
-  // Créer un objet de type ResolverData<MyContext>
   const resolverData: ResolverData<MyContext> = {
     root: {},
     args: {},
     context,
-    info: {} as any, // Vous pouvez remplacer `any` par le type approprié si nécessaire
+    info: {} as any,
   }
-
   const hasAccess = await customAuthChecker(resolverData, roles)
 
   if (hasAccess) {
