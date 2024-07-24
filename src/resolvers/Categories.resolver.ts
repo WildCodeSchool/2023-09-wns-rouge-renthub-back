@@ -6,6 +6,7 @@ import {
   CategoryUpdateInput,
 } from '../entities/Category.entity'
 import { ProductReferenceService } from '../services/ProductReference.service'
+import { IsNull } from 'typeorm'
 
 @Resolver(() => Category)
 export class CategoriesResolver {
@@ -54,5 +55,20 @@ export class CategoriesResolver {
     const isDelete = await new CategoryService().delete(+id)
 
     return isDelete
+  }
+
+  // GET ALL WITH FULL HIERARCHY
+  @Query(() => [Category])
+  async categoriesGetAllWithHierarchy(): Promise<Category[]> {
+    // Fetch all root categories with their full hierarchy
+    const rootCategories = await Category.find({
+      where: { parentCategory: IsNull(), display: true },
+      relations: {
+        childCategories: true,
+      },
+      order: { id: 'ASC' },
+    })
+
+    return rootCategories
   }
 }

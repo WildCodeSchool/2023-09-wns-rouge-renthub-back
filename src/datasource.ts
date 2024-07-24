@@ -2,8 +2,9 @@ import { DataSource } from 'typeorm'
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions'
 import { Cart } from './entities/Cart.entity'
 import { Category } from './entities/Category.entity'
+import { Order } from './entities/Order.entity'
+import { OrderStock } from './entities/OrderStock.entity'
 import { Picture } from './entities/Picture.entity'
-import { PictureProduct } from './entities/PictureProduct.entity'
 import { EntityWithDefault } from './entities/EntityWithDefault'
 import { ProductCart } from './entities/ProductCart.entity'
 import { ProductReference } from './entities/ProductReference.entity'
@@ -20,9 +21,10 @@ export const dataSourceOptions: PostgresConnectionOptions = {
   entities: [
     Cart,
     Category,
+    Order,
+    OrderStock,
     EntityWithDefault,
     Picture,
-    PictureProduct,
     ProductCart,
     ProductReference,
     Role,

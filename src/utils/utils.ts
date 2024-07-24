@@ -9,6 +9,7 @@ import { MyContext } from '../types/Context.type'
  * @param data The data payload you want to apply on your base entity (to update)
  * @returns The merged entity (the entity is updated as well)
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function merge(entity: any, data: any): any {
   // should keep existing relations
   for (const [key, value] of Object.entries(data)) {
@@ -66,7 +67,8 @@ export function formatValidationErrors(errors: ValidationError[]): string {
  */
 export const isRightUser = (userId: number, context: MyContext): boolean => {
   return (
-    (context.user?.role.right === 'USER' && Number(context.user?.id) ===  Number(userId)) ||
+    (context.user?.role.right === 'USER' &&
+      Number(context.user?.id) === Number(userId)) ||
     context.user?.role.right === 'ADMIN'
   )
 }

@@ -2,11 +2,11 @@ import { SeederFactoryManager } from 'typeorm-extension'
 import { Stock } from '../../entities/Stock.entity'
 import { ProductReference } from '../../entities/ProductReference.entity'
 
-export type StockesSeederTypes = {
+export type StocksSeederTypes = {
   stocksSaved: Stock[]
 }
 
-export default async function stockesSeeder(
+export default async function stocksSeeder(
   productsRefereces: ProductReference[],
   factoryManager: SeederFactoryManager
 ) {
@@ -15,10 +15,10 @@ export default async function stockesSeeder(
   const stockFactory = factoryManager.get(Stock)
   
   for (const productReferece of productsRefereces) {
-    const stockes = await stockFactory.saveMany(5)
-    stockes.sort((a, b) => a.id - b.id)
+    const stocks = await stockFactory.saveMany(5)
+    stocks.sort((a, b) => a.id - b.id)
 
-    for (const stock of stockes) {
+    for (const stock of stocks) {
 
       stock.name = `${productReferece.name} ${stock.name}`
       stock.isAvailable = Math.random() > 0.5

@@ -4,12 +4,14 @@ import {
   PrimaryGeneratedColumn,
   JoinColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm'
 import { IsOptional, Length, IsDate } from 'class-validator'
 import { Field, ID, InputType, ObjectType } from 'type-graphql'
 import { ProductReference } from './ProductReference.entity'
 import { EntityWithDefault } from './EntityWithDefault'
 import { ObjectId } from './ObjectId'
+import { OrderStock } from './OrderStock.entity'
 
 @Entity()
 @ObjectType()
@@ -58,6 +60,10 @@ export class Stock extends EntityWithDefault {
   @JoinColumn({ name: 'productReference' })
   @Field(() => ProductReference)
   productReference!: ProductReference
+
+  @OneToMany(() => OrderStock, (orderStock) => orderStock.stock)
+  @Field(() => [OrderStock], { nullable: true })
+  orderStocks!: OrderStock[]
 }
 
 @InputType()

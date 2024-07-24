@@ -8,7 +8,6 @@ import MainSeeder from './main.seeder'
 import { CartsFactory } from './factories/carts.factory'
 import { CategoriesFactory } from './factories/categories.factory'
 import { PicturesFactory } from './factories/pictures.factory'
-import { PictureProductsFactory } from './factories/pictureProducts.factory'
 import { ProductCartsFactory } from './factories/productCarts.factory'
 import { ProductReferencesFactory } from './factories/productReferences.factory'
 import { RolesFactory } from './factories/roles.factory'
@@ -16,7 +15,9 @@ import { StocksFactory } from './factories/stocks.factory'
 import { UsersFactory } from './factories/users.factory'
 
 // Change OPTIONS in dataSource
-;(dataSource.options as any).host = process.env.DB_HOST_LOCAL
+import { OrdersFactory } from './factories/orders.factory'
+import { OrdersStocksFactory } from './factories/orderstocks.factory'
+(dataSource.options as any).host = process.env.DB_HOST_LOCAL
 ;(dataSource.options as any).port = process.env.DB_PORT_LOCAL
 
 // Add seeding OPTIONS to dataSource
@@ -24,12 +25,13 @@ import { UsersFactory } from './factories/users.factory'
   CartsFactory,
   CategoriesFactory,
   PicturesFactory,
-  PictureProductsFactory,
   ProductCartsFactory,
   ProductReferencesFactory,
   RolesFactory,
   StocksFactory,
   UsersFactory,
+  OrdersFactory,
+  OrdersStocksFactory
 ]
 ;(dataSource.options as any).seeds = [MainSeeder]
 

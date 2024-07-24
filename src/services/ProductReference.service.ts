@@ -1,5 +1,4 @@
 import { ProductReference } from './../entities/ProductReference.entity'
-// import { PictureProduct } from './../entities/PictureProduct.entity'
 import { Repository } from 'typeorm'
 import { validate } from 'class-validator'
 import { dataSource } from '../datasource'
@@ -26,7 +25,7 @@ export class ProductReferenceService {
         createdBy: true,
         updatedBy: true,
         stock: true,
-        pictureProduct: { picture: true },
+        pictures: true,
         productCarts: { cartReference: { owner: { role: true } } },
       },
     })
@@ -44,7 +43,7 @@ export class ProductReferenceService {
         createdBy: true,
         updatedBy: true,
         stock: true,
-        pictureProduct: { picture: true },
+        pictures: true,
         productCarts: { cartReference: { owner: { role: true } } },
       },
     })

@@ -1,4 +1,12 @@
-import { Arg, Authorized, ID, Mutation, Query, Resolver } from 'type-graphql'
+import {
+  Arg,
+  Authorized,
+  ID,
+  Int,
+  Mutation,
+  Query,
+  Resolver,
+} from 'type-graphql'
 
 import {
   Stock,
@@ -15,7 +23,22 @@ export class StockResolver {
     const stocks = await new StockService().findAll()
     return stocks
   }
-  @Authorized('ADMIN', 'USER')
+
+  @Query(() => Int)
+  async findAvailableStocksByDatesAndProductId(
+    @Arg('productReferenceId') productReferenceId: number,
+    @Arg('dateStart') dateStart: Date,
+    @Arg('dateEnd') dateEnd: Date
+  ) {
+    const countAvailableStocks =
+      await new StockService().findAvailableStocksForDates(
+        productReferenceId,
+        dateStart,
+        dateEnd
+      )
+    return countAvailableStocks.length
+  }
+
   @Query(() => Stock)
   async findStock(@Arg('id', () => ID) id: number) {
     const stockById = await new StockService().find(+id)
