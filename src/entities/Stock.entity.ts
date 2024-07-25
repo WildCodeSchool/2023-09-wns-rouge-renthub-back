@@ -35,7 +35,7 @@ export class Stock extends EntityWithDefault {
   @Field()
   serialNumber!: string
 
-  @Column({ type: 'timestamp with time zone' })
+  @Column({ type: 'timestamp with time zone', nullable: true })
   @IsOptional()
   @IsDate({ message: 'Doit être une date valide' })
   @Field(() => Date, { nullable: true })
