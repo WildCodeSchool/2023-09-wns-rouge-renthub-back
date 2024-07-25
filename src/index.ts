@@ -24,7 +24,7 @@ import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHt
 //-----------------EXPRESS-----------------
 //-----------------------------------------
 
-import express from 'express'
+import express, { Request, Response } from 'express'
 import http from 'http'
 import cors from 'cors'
 import path from 'path'
@@ -60,20 +60,22 @@ async function start() {
   await dataSource.initialize()
   await server.start()
 
-  initializeRoute(app)
-
-  app.use(
-    '/',
+  app.use('/', (req: Request, res: Response, next) => {
+    if (req.path === '/api/images') {
+      return next()
+    }
     express.json({ limit: '50mb' }),
-    expressMiddleware(server, {
-      context: async (args) => {
-        return {
-          req: args.req,
-          res: args.res,
-        }
-      },
-    })
-  )
+      expressMiddleware(server, {
+        context: async (args) => {
+          return {
+            req: args.req,
+            res: args.res,
+          }
+        },
+      })(req, res, next)
+  })
+
+  initializeRoute(app)
 
   await new Promise<void>((resolve) =>
     httpServer.listen({ port: port }, resolve)
