@@ -1,5 +1,13 @@
 import { CategoryService } from '../services/Category.service'
-import { Arg, Authorized, ID, Mutation, Query, Resolver } from 'type-graphql'
+import {
+  Arg,
+  Authorized,
+  Ctx,
+  ID,
+  Mutation,
+  Query,
+  Resolver,
+} from 'type-graphql'
 import {
   Category,
   CategoryCreateInput,
@@ -7,6 +15,7 @@ import {
 } from '../entities/Category.entity'
 import { ProductReferenceService } from '../services/ProductReference.service'
 import { IsNull } from 'typeorm'
+import { MyContext } from '../types/Context.type'
 
 @Resolver(() => Category)
 export class CategoriesResolver {
@@ -35,8 +44,14 @@ export class CategoriesResolver {
 
   @Authorized('ADMIN')
   @Mutation(() => Category)
-  async createCategory(@Arg('data') data: CategoryCreateInput) {
-    const newCategory = await new CategoryService().create(data)
+  async createCategory(
+    @Arg('data') data: CategoryCreateInput,
+    @Ctx() context: MyContext
+  ) {
+    if (!context.user) {
+      throw new Error('User not found')
+    }
+    const newCategory = await new CategoryService().create(data, context.user)
 
     return newCategory
   }

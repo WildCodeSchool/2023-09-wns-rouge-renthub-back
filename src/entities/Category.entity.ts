@@ -88,9 +88,6 @@ export class CategoryCreateInput {
   @Field(() => Boolean, { nullable: true })
   display: boolean
 
-  @Field(() => ID)
-  createdBy: number
-
   @Field(() => ID, { nullable: true })
   parentCategoryId: number
 }
