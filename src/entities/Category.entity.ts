@@ -27,7 +27,7 @@ export class Category extends BaseEntity {
   name: string
 
   // index permet ordonner les catégories pour l'affichage
-  @Column({})
+  @Column({ nullable: true })
   @Field(() => Int)
   index: number
 
@@ -82,7 +82,7 @@ export class CategoryCreateInput {
   @Field()
   name: string
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   index: number
 
   @Field(() => Boolean, { nullable: true })
@@ -93,9 +93,6 @@ export class CategoryCreateInput {
 
   @Field(() => ID, { nullable: true })
   parentCategoryId: number
-
-  // @Field(() => PictureCreateInput, { nullable: true })
-  // picture?: PictureCreateInput
 }
 
 @InputType()
