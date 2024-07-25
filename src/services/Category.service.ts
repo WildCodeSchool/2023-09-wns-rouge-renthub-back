@@ -7,6 +7,7 @@ import {
 import { Repository } from 'typeorm'
 import { validate } from 'class-validator'
 import { dataSource } from '../datasource'
+import { User } from '../entities/User.entity'
 
 export class CategoryService {
   db: Repository<Category>
@@ -44,7 +45,7 @@ export class CategoryService {
     return category
   }
 
-  async create(categoryInput: CategoryCreateInput) {
+  async create(categoryInput: CategoryCreateInput, user: User) {
     const errors = await validate(categoryInput)
 
     if (errors.length > 0) {
@@ -62,6 +63,8 @@ export class CategoryService {
       }
       Object.assign(newCategory, { parentCategory: parentCategoryIdExist })
     }
+    newCategory.createdBy = user.id
+    newCategory.updatedBy = user.id
     const { id } = await this.db.save(newCategory)
     if (!id) throw new Error('Category not saved')
     const newCategorySave = await this.find(id)
