@@ -88,6 +88,7 @@ export class ProductReferenceResolver {
           productCarts: { cartReference: { owner: true } },
           createdBy: true,
           updatedBy: true,
+          stock: true,
         },
       })
       if (productRef) {
