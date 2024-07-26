@@ -19,6 +19,7 @@ import { StockResolver } from './resolvers/Stocks.resolver'
 import { CartResolver } from './resolvers/Carts.resolver'
 import { ProductCartResolver } from './resolvers/ProductCarts.resolver'
 import { OrdersResolver } from './resolvers/Orders.resolver'
+import { OrderStocksResolver } from './resolvers/OrderStocks.resolver'
 
 export async function getSchema() {
   const schema = await buildSchema({
@@ -33,6 +34,7 @@ export async function getSchema() {
       CartResolver,
       ProductCartResolver,
       OrdersResolver,
+      OrderStocksResolver,
     ],
     authChecker: customAuthChecker,
   })
