@@ -45,4 +45,14 @@ export class OrderService {
 
     return order
   }
+
+  async deleteById(id: number) {
+    const order = await this.db.findOne({
+      where: { id },
+    })
+    if (!order) throw new Error("order doesn't exist")
+
+    this.db.remove(order)
+    return order
+  }
 }
