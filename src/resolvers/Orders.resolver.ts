@@ -142,4 +142,11 @@ export class OrdersResolver {
     const orders = await new OrderService().findAll()
     return orders
   }
+
+  @Authorized('ADMIN')
+  @Mutation(() => [Order])
+  async deleteOrderById(@Arg('id', () => ID) id: number) {
+    const order = await new OrderService().deleteById(id)
+    return order
+  }
 }
